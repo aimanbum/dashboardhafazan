@@ -96,15 +96,22 @@
                 tbody.innerHTML = "";
                 
                 if(data.length > 0) {
-                    data.forEach(item => {
-                        let row = `<tr>
-                            <td class="fw-bold text-dark">${item['Nama'] || '-'}</td>
-                            <td class="text-muted">${item['No IC'] || '-'}</td>
-                            <td>${item['Kelas'] || '-'}</td>
-                            <td>${item['Guru Halaqah'] || '-'}</td>
-                            <td><span class="indicator-badge">${item['Indikator'] || '-'}</span></td>
-                        </tr>`;
-                        tbody.innerHTML += row;
+data.forEach(item => {
+    // Fungsi untuk cari data tanpa kira huruf besar/kecil
+    const dapatkanData = (key) => {
+        const tajukReal = Object.keys(item).find(k => k.toLowerCase().trim() === key.toLowerCase());
+        return tajukReal ? item[tajukReal] : '-';
+    };
+
+    let row = `<tr>
+        <td class="fw-bold text-dark">${dapatkanData('Nama')}</td>
+        <td class="text-muted">${dapatkanData('No IC')}</td>
+        <td>${dapatkanData('Kelas')}</td>
+        <td>${dapatkanData('Guru Halaqah')}</td>
+        <td><span class="indicator-badge">${dapatkanData('Indikator')}</span></td>
+    </tr>`;
+    tbody.innerHTML += row;
+});
                     });
                 } else {
                     tbody.innerHTML = '<tr><td colspan="5" class="text-center">Tiada data ditemui.</td></tr>';
