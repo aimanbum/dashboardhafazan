@@ -9,19 +9,21 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <style>
-        body { background-color: #f8f9fa; font-family: sans-serif; }
-        .hero { background: #1e5128; color: white; padding: 20px; border-bottom: 4px solid #d4af37; text-align: center; }
-        .card { border-radius: 15px; margin-bottom: 20px; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        body { background-color: #f8f9fa; font-family: 'Poppins', sans-serif; }
+        .hero { background: #1e5128; color: white; padding: 25px; border-bottom: 5px solid #d4af37; text-align: center; }
+        .card { border-radius: 15px; margin-bottom: 20px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
         .chart-box { height: 350px !important; }
         .table-warning-custom { background-color: #fff3cd; border-left: 5px solid #ffc107; }
-        .badge-bawah { background-color: #dc3545; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold; }
+        .badge-bawah { background-color: #dc3545; color: white; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 0.85rem; }
+        .nav-pills .nav-link { color: #1e5128; font-weight: 600; border: 1px solid #1e5128; margin: 0 5px; }
+        .nav-pills .nav-link.active { background-color: #1e5128; color: white; }
     </style>
 </head>
 <body>
 
 <div class="hero">
-    <h2>ANALISIS PRESTASI HAFAZAN</h2>
-    <p>SMK AGAMA TOK BACHOK - INTERVENSI PELAJAR</p>
+    <h2 class="fw-bold">ANALISIS PRESTASI HAFAZAN</h2>
+    <p class="mb-0">SMK AGAMA TOK BACHOK</p>
 </div>
 
 <div class="container my-4">
@@ -33,18 +35,19 @@
         <li class="nav-item"><button class="nav-link" onclick="ambilData(5, this)">T5</button></li>
     </ul>
 
-    <div class="card p-3">
-        <h5 class="text-center fw-bold text-success mb-3">Statistik Keseluruhan Tingkatan</h5>
+    <div class="card p-4 text-center">
+        <h5 class="fw-bold text-success mb-3">Statistik Keseluruhan Hafazan</h5>
         <canvas id="barChart" class="chart-box"></canvas>
     </div>
 
-    <div class="card p-3 table-warning-custom">
+    <div class="card p-4 table-warning-custom">
         <h5 class="fw-bold text-danger mb-3">⚠️ SENARAI PELAJAR BAWAH SUKATAN</h5>
         <div class="table-responsive">
-            <table class="table table-hover">
+            <table class="table table-hover align-middle">
                 <thead class="table-dark">
                     <tr>
-                        <th>Nama</th>
+                        <th style="width: 50px;">Bil.</th>
+                        <th>Nama Pelajar</th>
                         <th>No IC</th>
                         <th>Kelas</th>
                         <th>Guru Halaqah</th>
@@ -52,7 +55,7 @@
                     </tr>
                 </thead>
                 <tbody id="isiJadual">
-                    <tr><td colspan="5" class="text-center">Sila pilih tingkatan...</td></tr>
+                    <tr><td colspan="6" class="text-center py-4">Sila pilih tingkatan...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -89,34 +92,34 @@
         const tbody = document.getElementById('isiJadual');
         tbody.innerHTML = "";
         let s = { "Khatam": 0, "Lebih": 0, "Dalam": 0, "Bawah": 0 };
+        let count = 0; // Pembolehubah untuk nombor bilangan
 
         data.forEach(d => {
-            // FUNGSI SMART MATCH: Mencari data walaupun tajuk di Sheet ada sedikit perbezaan
-            const val = (target) => {
-                let foundKey = Object.keys(d).find(key => 
-                    key.toLowerCase().replace(/[\s.]/g, '') === target.toLowerCase().replace(/[\s.]/g, '')
+            const cariData = (kataKunci) => {
+                let keyHasil = Object.keys(d).find(k => 
+                    k.toLowerCase().replace(/[\s.]/g, '').includes(kataKunci.toLowerCase())
                 );
-                return foundKey ? d[foundKey] : '-';
+                return keyHasil ? d[keyHasil] : '-';
             };
 
-            let nama = val('Nama');
-            let ic = val('No IC');
-            let kelas = val('Kelas');
-            let guru = val('Guru Halaqah');
-            let indikator = val('Indikator');
+            let nama = cariData('namapelajar');
+            let ic = cariData('noic');
+            let kelas = cariData('kelas');
+            let guru = cariData('guruhalaqah');
+            let indikator = cariData('indikator');
 
             let indUpper = indikator.toString().toUpperCase();
 
-            // Kira Statistik untuk Carta
             if(indUpper.includes('KHATAM')) s.Khatam++;
             else if(indUpper.includes('LEBIH')) s.Lebih++;
             else if(indUpper.includes('DALAM')) s.Dalam++;
             else if(indUpper.includes('BAWAH')) s.Bawah++;
 
-            // PAPARKAN HANYA PELAJAR BAWAH SUKATAN
             if(indUpper.includes('BAWAH')) {
+                count++; // Tambah 1 bagi setiap pelajar bawah sukatan
                 tbody.innerHTML += `<tr>
-                    <td class="fw-bold">${nama}</td>
+                    <td>${count}</td>
+                    <td class="fw-bold text-dark">${nama}</td>
                     <td>${ic}</td>
                     <td>${kelas}</td>
                     <td>${guru}</td>
@@ -126,7 +129,7 @@
         });
 
         if(tbody.innerHTML === "") {
-            tbody.innerHTML = "<tr><td colspan='5' class='text-center text-muted'>Tiada data 'Bawah Sukatan' dijumpai untuk tingkatan ini.</td></tr>";
+            tbody.innerHTML = "<tr><td colspan='6' class='text-center text-muted py-4'>Tiada data 'Bawah Sukatan' dikesan untuk tingkatan ini.</td></tr>";
         }
 
         updateCharts(s);
@@ -152,9 +155,10 @@
                     datalabels: {
                         color: 'white',
                         font: { weight: 'bold', size: 14 },
-                        formatter: (value) => value > 0 ? value : ''
+                        formatter: (val) => val > 0 ? val : ''
                     }
-                }
+                },
+                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
             }
         });
     }
