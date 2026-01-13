@@ -3,33 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Hafazan SMKATB</title>
+    <title>Portal Hafazan SMKATB</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <style>
-        body { font-family: 'Poppins', sans-serif; background-color: #f8f9fa; }
-        .header-section { background: linear-gradient(135deg, #1e5128, #4e944f); color: white; padding: 40px 0; border-bottom: 5px solid #d4af37; }
-        .nav-pills .nav-link { color: #1e5128; border: 1px solid #1e5128; margin: 0 5px; border-radius: 20px; font-weight: 600; }
-        .nav-pills .nav-link.active { background-color: #1e5128; color: white; border-color: #1e5128; }
+        body { font-family: 'Poppins', sans-serif; background-color: #f0f4f8; }
+        .hero { background: linear-gradient(135deg, #1e5128, #4e944f); color: white; padding: 40px 0; border-bottom: 5px solid #d4af37; }
+        .nav-pills .nav-link { color: #1e5128; border: 1px solid #1e5128; margin: 5px; border-radius: 50px; font-weight: 600; padding: 10px 20px; transition: 0.3s; }
+        .nav-pills .nav-link.active { background-color: #1e5128; color: white; border-color: #1e5128; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         .content-card { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .search-box { border-radius: 50px; padding-left: 20px; border: 2px solid #eee; margin-bottom: 20px; }
+        .search-box:focus { border-color: #1e5128; box-shadow: none; }
         .table thead { background-color: #1e5128; color: white; }
-        .status-tag { padding: 5px 12px; border-radius: 50px; font-size: 0.85rem; font-weight: 600; }
-        .bg-lancar { background-color: #d1e7dd; color: #0f5132; }
-        .bg-proses { background-color: #fff3cd; color: #856404; }
+        .indicator-badge { padding: 5px 15px; border-radius: 50px; font-size: 0.8rem; font-weight: bold; background-color: #e8f5e9; color: #2e7d32; }
     </style>
 </head>
 <body>
 
-<div class="header-section text-center">
+<div class="hero text-center">
     <div class="container">
-        <h1 class="fw-bold">PORTAL DATA HAFAZAN</h1>
-        <p class="mb-0">SMK AGAMA TUN SAID (SMKATB)</p>
+        <h1 class="fw-bold">REKOD HAFAZAN SMKATB</h1>
+        <p class="mb-0">Portal Semakan Prestasi Hafazan Setiap Tingkatan</p>
     </div>
 </div>
 
-<div class="container my-5">
-    <ul class="nav nav-pills justify-content-center mb-5" id="pills-tab" role="tablist">
+<div class="container my-4">
+    <ul class="nav nav-pills justify-content-center mb-4">
         <li class="nav-item"><button class="nav-link active" onclick="loadData(1, this)">Tingkatan 1</button></li>
         <li class="nav-item"><button class="nav-link" onclick="loadData(2, this)">Tingkatan 2</button></li>
         <li class="nav-item"><button class="nav-link" onclick="loadData(3, this)">Tingkatan 3</button></li>
@@ -38,108 +38,106 @@
     </ul>
 
     <div class="content-card">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3 id="displayTingkatan" class="fw-bold text-success mb-0">Tingkatan 1</h3>
-            <div id="loadingStatus" class="spinner-border text-success spinner-border-sm" role="status" style="display:none;"></div>
+        <div class="row mb-3 align-items-center">
+            <div class="col-md-6">
+                <h3 id="displayTing" class="fw-bold text-success mb-2 mb-md-0">Tingkatan 1</h3>
+            </div>
+            <div class="col-md-6">
+                <input type="text" id="searchInput" class="form-control search-box" placeholder="Cari nama anak atau IC..." onkeyup="searchTable()">
+            </div>
         </div>
 
         <div class="table-responsive">
-            <table class="table table-hover align-middle">
+            <table class="table table-hover align-middle" id="mainTable">
                 <thead>
                     <tr>
-                        <th style="width: 30%;">Nama Pelajar</th>
+                        <th>Nama</th>
+                        <th>No IC</th>
                         <th>Kelas</th>
-                        <th>Surah Hafazan</th>
-                        <th>Status</th>
-                        <th>Gred</th>
+                        <th>Guru Halaqah</th>
+                        <th>Indikator</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
-                    </tbody>
+                    <tr><td colspan="5" class="text-center">Memuatkan data...</td></tr>
+                </tbody>
             </table>
-        </div>
-        
-        <div id="emptyMessage" class="text-center py-5" style="display:none;">
-            <p class="text-muted">Tiada data dijumpai untuk tingkatan ini atau pautan CSV belum diset.</p>
         </div>
     </div>
 </div>
 
 <script>
-    // 1. MASUKKAN PAUTAN CSV ANDA DI SINI
-    const pautanCSV = {
-        1: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQd8KR9lDaJaaU5Ba_m-AtrsSxFXJXdPHzjGCbN8rH0dcwbRp1lQ5GaoNHI_cQpKejriavr2Ycj9-h9/pub?gid=864006815&single=true&output=csv
-',
-        2: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQd8KR9lDaJaaU5Ba_m-AtrsSxFXJXdPHzjGCbN8rH0dcwbRp1lQ5GaoNHI_cQpKejriavr2Ycj9-h9/pub?gid=0&single=true&output=csv
-',
-        3: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQd8KR9lDaJaaU5Ba_m-AtrsSxFXJXdPHzjGCbN8rH0dcwbRp1lQ5GaoNHI_cQpKejriavr2Ycj9-h9/pub?gid=1239159275&single=true&output=csv
-',
-        4: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQd8KR9lDaJaaU5Ba_m-AtrsSxFXJXdPHzjGCbN8rH0dcwbRp1lQ5GaoNHI_cQpKejriavr2Ycj9-h9/pub?gid=619009113&single=true&output=csv
-',
+    // Pautan CSV yang telah anda berikan
+    const csvLinks = {
+        1: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQd8KR9lDaJaaU5Ba_m-AtrsSxFXJXdPHzjGCbN8rH0dcwbRp1lQ5GaoNHI_cQpKejriavr2Ycj9-h9/pub?gid=864006815&single=true&output=csv',
+        2: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQd8KR9lDaJaaU5Ba_m-AtrsSxFXJXdPHzjGCbN8rH0dcwbRp1lQ5GaoNHI_cQpKejriavr2Ycj9-h9/pub?gid=0&single=true&output=csv',
+        3: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQd8KR9lDaJaaU5Ba_m-AtrsSxFXJXdPHzjGCbN8rH0dcwbRp1lQ5GaoNHI_cQpKejriavr2Ycj9-h9/pub?gid=1239159275&single=true&output=csv',
+        4: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQd8KR9lDaJaaU5Ba_m-AtrsSxFXJXdPHzjGCbN8rH0dcwbRp1lQ5GaoNHI_cQpKejriavr2Ycj9-h9/pub?gid=619009113&single=true&output=csv',
         5: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQd8KR9lDaJaaU5Ba_m-AtrsSxFXJXdPHzjGCbN8rH0dcwbRp1lQ5GaoNHI_cQpKejriavr2Ycj9-h9/pub?gid=1591484628&single=true&output=csv'
     };
 
-    // Muat data automatik Tingkatan 1 masa mula-mula buka page
-    window.onload = function() {
-        const firstTab = document.querySelector('.nav-link.active');
-        loadData(1, firstTab);
-    };
+    function loadData(ting, btn) {
+        // Update styling butang
+        document.querySelectorAll('.nav-link').forEach(nav => nav.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('displayTing').innerText = "Tingkatan " + ting;
+        document.getElementById('searchInput').value = ""; // Reset carian
 
-    function loadData(ting, element) {
-        // Update UI Tab Aktif
-        const tabs = document.querySelectorAll('.nav-link');
-        tabs.forEach(t => t.classList.remove('active'));
-        element.classList.add('active');
-
-        // Update Judul & Loading
-        document.getElementById('displayTingkatan').innerText = "Tingkatan " + ting;
-        document.getElementById('loadingStatus').style.display = 'block';
-        
-        const url = pautanCSV[ting];
+        const url = csvLinks[ting];
         const tbody = document.getElementById('tableBody');
-        const emptyMsg = document.getElementById('emptyMessage');
-
-        // Jika link belum dimasukkan
-        if(url.includes('LETAK_LINK')) {
-            tbody.innerHTML = "";
-            emptyMsg.style.display = 'block';
-            document.getElementById('loadingStatus').style.display = 'none';
-            return;
-        }
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center"><div class="spinner-border text-success" role="status"></div></td></tr>';
 
         Papa.parse(url, {
             download: true,
             header: true,
+            skipEmptyLines: true,
             complete: function(results) {
                 const data = results.data;
                 tbody.innerHTML = "";
-                document.getElementById('loadingStatus').style.display = 'none';
-
-                if (data.length > 0) {
-                    emptyMsg.style.display = 'none';
-                    data.forEach(p => {
-                        // Logik warna status
-                        let statusClass = (p.Status && p.Status.toUpperCase() === 'LANCAR') ? 'bg-lancar' : 'bg-proses';
-                        
+                
+                if(data.length > 0) {
+                    data.forEach(item => {
                         let row = `<tr>
-                            <td class="fw-bold">${p.Nama || '-'}</td>
-                            <td>${p.Kelas || '-'}</td>
-                            <td>${p.Surah || '-'}</td>
-                            <td><span class="status-tag ${statusClass}">${p.Status || '-'}</span></td>
-                            <td class="fw-bold text-primary text-center">${p.Gred || '-'}</td>
+                            <td class="fw-bold text-dark">${item['Nama'] || '-'}</td>
+                            <td class="text-muted">${item['No IC'] || '-'}</td>
+                            <td>${item['Kelas'] || '-'}</td>
+                            <td>${item['Guru Halaqah'] || '-'}</td>
+                            <td><span class="indicator-badge">${item['Indikator'] || '-'}</span></td>
                         </tr>`;
                         tbody.innerHTML += row;
                     });
                 } else {
-                    emptyMsg.style.display = 'block';
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center">Tiada data ditemui.</td></tr>';
                 }
             },
             error: function() {
-                alert("Ralat memuatkan data. Pastikan Google Sheets sudah 'Publish to Web' sebagai CSV.");
-                document.getElementById('loadingStatus').style.display = 'none';
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Ralat memuatkan data. Sila cuba lagi.</td></tr>';
             }
         });
     }
+
+    function searchTable() {
+        let input = document.getElementById("searchInput").value.toUpperCase();
+        let table = document.getElementById("mainTable");
+        let tr = table.getElementsByTagName("tr");
+
+        for (let i = 1; i < tr.length; i++) {
+            let tdNama = tr[i].getElementsByTagName("td")[0];
+            let tdIC = tr[i].getElementsByTagName("td")[1];
+            if (tdNama || tdIC) {
+                let txtValueNama = tdNama.textContent || tdNama.innerText;
+                let txtValueIC = tdIC.textContent || tdIC.innerText;
+                if (txtValueNama.toUpperCase().indexOf(input) > -1 || txtValueIC.toUpperCase().indexOf(input) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+
+    // Auto load Tingkatan 1 pada mulanya
+    window.onload = () => loadData(1, document.querySelector('.nav-link.active'));
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
