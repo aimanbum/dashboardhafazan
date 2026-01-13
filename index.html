@@ -7,18 +7,21 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <style>
         body { background-color: #f8f9fa; font-family: sans-serif; }
         .hero { background: #1e5128; color: white; padding: 20px; border-bottom: 4px solid #d4af37; text-align: center; }
         .card { border-radius: 15px; margin-bottom: 20px; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .chart-box { height: 300px !important; }
+        .chart-box { height: 350px !important; }
+        .table-warning-custom { background-color: #fff3cd; border-left: 5px solid #ffc107; }
+        .badge-bawah { background-color: #dc3545; color: white; padding: 5px 10px; border-radius: 5px; }
     </style>
 </head>
 <body>
 
 <div class="hero">
-    <h2>DASHBOARD PRESTASI HAFAZAN</h2>
-    <p>SMK AGAMA TOK BACHOK</p>
+    <h2>ANALISIS PRESTASI HAFAZAN</h2>
+    <p>SMK AGAMA TUN SAID - SENARAI INTERVENSI</p>
 </div>
 
 <div class="container my-4">
@@ -31,18 +34,27 @@
     </ul>
 
     <div class="row">
-        <div class="col-md-6"><div class="card p-3"><canvas id="barChart" class="chart-box"></canvas></div></div>
-        <div class="col-md-6"><div class="card p-3"><canvas id="pieChart" class="chart-box"></canvas></div></div>
+        <div class="col-md-12">
+            <div class="card p-3">
+                <h5 class="text-center fw-bold text-success mb-3">Statistik Keseluruhan Tingkatan</h5>
+                <canvas id="barChart" class="chart-box"></canvas>
+            </div>
+        </div>
     </div>
 
-    <div class="card p-3">
-        <input type="text" id="search" class="form-control mb-3" placeholder="Cari nama..." onkeyup="filterNama()">
+    <div class="card p-3 table-warning-custom">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold text-danger mb-0">⚠️ SENARAI PELAJAR BAWAH SUKATAN</h5>
+            <input type="text" id="search" class="form-control w-25" placeholder="Cari nama..." onkeyup="filterNama()">
+        </div>
         <div class="table-responsive">
-            <table class="table table-sm">
-                <thead>
-                    <tr><th>Nama</th><th>No IC</th><th>Kelas</th><th>Guru</th><th>Indikator</th></tr>
+            <table class="table table-hover">
+                <thead class="table-dark">
+                    <tr><th>Nama</th><th>No IC</th><th>Kelas</th><th>Guru Halaqah</th><th>Status</th></tr>
                 </thead>
-                <tbody id="isiJadual"></tbody>
+                <tbody id="isiJadual">
+                    <tr><td colspan="5" class="text-center">Memuatkan data...</td></tr>
+                </tbody>
             </table>
         </div>
     </div>
@@ -57,7 +69,8 @@
         5: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQd8KR9lDaJaaU5Ba_m-AtrsSxFXJXdPHzjGCbN8rH0dcwbRp1lQ5GaoNHI_cQpKejriavr2Ycj9-h9/pub?gid=1591484628&single=true&output=csv'
     };
 
-    let bChart, pChart;
+    let bChart;
+    Chart.register(ChartDataLabels);
 
     function ambilData(ting, btn) {
         document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
@@ -76,37 +89,68 @@
     function prosesData(data) {
         const tbody = document.getElementById('isiJadual');
         tbody.innerHTML = "";
-        let s = { "Khatam": 0, "Lebih": 0, "Bawah": 0 };
+        let s = { "Khatam": 0, "Lebih": 0, "Dalam": 0, "Bawah": 0 };
 
         data.forEach(d => {
-            // Logik mencari header secara fleksibel
             const getV = (k) => {
                 let key = Object.keys(d).find(x => x.toLowerCase().replace(/[\s.]/g, '') === k.toLowerCase());
                 return key ? d[key] : '-';
             };
 
-            let n = getV('nama'), ic = getV('noic'), k = getV('kelas'), g = getV('guruhalaqah'), ind = getV('indikator');
+            let n = getV('nama'), ic = getV('noic'), kl = getV('kelas'), g = getV('guruhalaqah'), ind = getV('indikator');
+            let indUpper = ind.toUpperCase();
 
-            if(ind.toUpperCase().includes('KHATAM')) s.Khatam++;
-            else if(ind.toUpperCase().includes('LEBIH')) s.Lebih++;
-            else if(ind.toUpperCase().includes('BAWAH')) s.Bawah++;
+            // Kira Statistik
+            if(indUpper.includes('KHATAM')) s.Khatam++;
+            else if(indUpper.includes('LEBIH')) s.Lebih++;
+            else if(indUpper.includes('DALAM')) s.Dalam++;
+            else if(indUpper.includes('BAWAH')) s.Bawah++;
 
-            tbody.innerHTML += `<tr><td>${n}</td><td>${ic}</td><td>${k}</td><td>${g}</td><td>${ind}</td></tr>`;
+            // Hanya paparkan yang BAWAH SUKATAN dalam jadual
+            if(indUpper.includes('BAWAH')) {
+                tbody.innerHTML += `<tr>
+                    <td class="fw-bold">${n}</td>
+                    <td>${ic}</td>
+                    <td>${kl}</td>
+                    <td>${g}</td>
+                    <td><span class="badge-bawah">${ind}</span></td>
+                </tr>`;
+            }
         });
+
+        if(tbody.innerHTML === "") {
+            tbody.innerHTML = "<tr><td colspan='5' class='text-center'>Alhamdulillah, tiada pelajar bawah sukatan.</td></tr>";
+        }
+
         updateCharts(s);
     }
 
     function updateCharts(s) {
-        const ctxB = document.getElementById('barChart'), ctxP = document.getElementById('pieChart');
-        if(bChart) bChart.destroy(); if(pChart) pChart.destroy();
+        const ctxB = document.getElementById('barChart');
+        if(bChart) bChart.destroy();
         
-        const config = {
-            labels: ['Khatam', 'Lebih Sukatan', 'Bawah Sukatan'],
-            datasets: [{ data: [s.Khatam, s.Lebih, s.Bawah], backgroundColor: ['#28a745', '#007bff', '#dc3545'] }]
-        };
-
-        bChart = new Chart(ctxB, { type: 'bar', data: config, options: { maintainAspectRatio: false } });
-        pChart = new Chart(ctxP, { type: 'pie', data: config, options: { maintainAspectRatio: false } });
+        bChart = new Chart(ctxB, {
+            type: 'bar',
+            data: {
+                labels: ['Khatam', 'Lebih Sukatan', 'Dalam Sukatan', 'Bawah Sukatan'],
+                datasets: [{
+                    label: 'Bilangan Pelajar',
+                    data: [s.Khatam, s.Lebih, s.Dalam, s.Bawah],
+                    backgroundColor: ['#198754', '#0d6efd', '#6c757d', '#dc3545']
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                plugins: {
+                    datalabels: {
+                        color: 'white',
+                        font: { weight: 'bold', size: 14 },
+                        formatter: (value) => value > 0 ? value : ''
+                    }
+                },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
     }
 
     function filterNama() {
