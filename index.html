@@ -15,6 +15,7 @@
         .chart-box { height: 350px !important; }
         .table-warning-custom { background-color: #fff3cd; border-left: 5px solid #ffc107; }
         .badge-bawah { background-color: #dc3545; color: white; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 0.85rem; }
+        .text-hutang { color: #dc3545; font-weight: bold; }
         .nav-pills .nav-link { color: #1e5128; font-weight: 600; border: 1px solid #1e5128; margin: 0 5px; }
         .nav-pills .nav-link.active { background-color: #1e5128; color: white; }
     </style>
@@ -41,21 +42,22 @@
     </div>
 
     <div class="card p-4 table-warning-custom">
-        <h5 class="fw-bold text-danger mb-3">⚠️ SENARAI PELAJAR BAWAH SUKATAN</h5>
+        <h5 class="fw-bold text-danger mb-3">⚠️ SENARAI PELAJAR BAWAH SUKATAN (INTERVENSI)</h5>
         <div class="table-responsive">
-            <table class="table table-hover align-middle">
+            <table class="table table-hover align-middle bg-white rounded shadow-sm">
                 <thead class="table-dark">
                     <tr>
                         <th style="width: 50px;">Bil.</th>
                         <th>Nama Pelajar</th>
-                        <th>No IC</th>
                         <th>Kelas</th>
+                        <th>Muka Surat</th>
+                        <th>Hutang (Ms)</th>
                         <th>Guru Halaqah</th>
                         <th>Indikator</th>
                     </tr>
                 </thead>
                 <tbody id="isiJadual">
-                    <tr><td colspan="6" class="text-center py-4">Sila pilih tingkatan...</td></tr>
+                    <tr><td colspan="7" class="text-center py-4">Memproses data...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -92,21 +94,26 @@
         const tbody = document.getElementById('isiJadual');
         tbody.innerHTML = "";
         let s = { "Khatam": 0, "Lebih": 0, "Dalam": 0, "Bawah": 0 };
-        let count = 0; // Pembolehubah untuk nombor bilangan
+        let count = 0;
 
         data.forEach(d => {
-            const cariData = (kataKunci) => {
-                let keyHasil = Object.keys(d).find(k => 
-                    k.toLowerCase().replace(/[\s.]/g, '').includes(kataKunci.toLowerCase())
-                );
+            const cari = (k) => {
+                let keyHasil = Object.keys(d).find(x => x.toLowerCase().replace(/[\s.]/g, '').includes(k.toLowerCase().replace(/[\s.]/g, '')));
                 return keyHasil ? d[keyHasil] : '-';
             };
 
-            let nama = cariData('namapelajar');
-            let ic = cariData('noic');
-            let kelas = cariData('kelas');
-            let guru = cariData('guruhalaqah');
-            let indikator = cariData('indikator');
+            let nama = cari('namapelajar');
+            let ms = cari('mukasurat');
+            let sukatan = cari('sukatansemasa');
+            let kelas = cari('kelas');
+            let guru = cari('guruhalaqah');
+            let indikator = cari('indikator');
+
+            // Pengiraan Hutang
+            let msVal = parseFloat(ms) || 0;
+            let sukatanVal = parseFloat(sukatan) || 0;
+            let hutang = sukatanVal - msVal;
+            if (hutang < 0) hutang = 0; // Tak dikira hutang jika lebih sukatan
 
             let indUpper = indikator.toString().toUpperCase();
 
@@ -116,12 +123,13 @@
             else if(indUpper.includes('BAWAH')) s.Bawah++;
 
             if(indUpper.includes('BAWAH')) {
-                count++; // Tambah 1 bagi setiap pelajar bawah sukatan
+                count++;
                 tbody.innerHTML += `<tr>
                     <td>${count}</td>
                     <td class="fw-bold text-dark">${nama}</td>
-                    <td>${ic}</td>
                     <td>${kelas}</td>
+                    <td>${ms}</td>
+                    <td class="text-hutang">${hutang}</td>
                     <td>${guru}</td>
                     <td><span class="badge-bawah">${indikator}</span></td>
                 </tr>`;
@@ -129,7 +137,7 @@
         });
 
         if(tbody.innerHTML === "") {
-            tbody.innerHTML = "<tr><td colspan='6' class='text-center text-muted py-4'>Tiada data 'Bawah Sukatan' dikesan untuk tingkatan ini.</td></tr>";
+            tbody.innerHTML = "<tr><td colspan='7' class='text-center py-4 text-muted'>Alhamdulillah, tiada rekod bawah sukatan dijumpai.</td></tr>";
         }
 
         updateCharts(s);
@@ -138,7 +146,6 @@
     function updateCharts(s) {
         const ctxB = document.getElementById('barChart');
         if(bChart) bChart.destroy();
-        
         bChart = new Chart(ctxB, {
             type: 'bar',
             data: {
@@ -152,13 +159,8 @@
             options: {
                 maintainAspectRatio: false,
                 plugins: {
-                    datalabels: {
-                        color: 'white',
-                        font: { weight: 'bold', size: 14 },
-                        formatter: (val) => val > 0 ? val : ''
-                    }
-                },
-                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+                    datalabels: { color: 'white', font: { weight: 'bold', size: 14 }, formatter: (v) => v > 0 ? v : '' }
+                }
             }
         });
     }
