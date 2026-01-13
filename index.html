@@ -14,14 +14,14 @@
         .card { border-radius: 15px; margin-bottom: 20px; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .chart-box { height: 350px !important; }
         .table-warning-custom { background-color: #fff3cd; border-left: 5px solid #ffc107; }
-        .badge-bawah { background-color: #dc3545; color: white; padding: 5px 10px; border-radius: 5px; }
+        .badge-bawah { background-color: #dc3545; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="hero">
     <h2>ANALISIS PRESTASI HAFAZAN</h2>
-    <p>SMK AGAMA TUN SAID - SENARAI INTERVENSI</p>
+    <p>SMK AGAMA TOK BACHOK - INTERVENSI PELAJAR</p>
 </div>
 
 <div class="container my-4">
@@ -33,27 +33,26 @@
         <li class="nav-item"><button class="nav-link" onclick="ambilData(5, this)">T5</button></li>
     </ul>
 
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card p-3">
-                <h5 class="text-center fw-bold text-success mb-3">Statistik Keseluruhan Tingkatan</h5>
-                <canvas id="barChart" class="chart-box"></canvas>
-            </div>
-        </div>
+    <div class="card p-3">
+        <h5 class="text-center fw-bold text-success mb-3">Statistik Keseluruhan Tingkatan</h5>
+        <canvas id="barChart" class="chart-box"></canvas>
     </div>
 
     <div class="card p-3 table-warning-custom">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-bold text-danger mb-0">⚠️ SENARAI PELAJAR BAWAH SUKATAN</h5>
-            <input type="text" id="search" class="form-control w-25" placeholder="Cari nama..." onkeyup="filterNama()">
-        </div>
+        <h5 class="fw-bold text-danger mb-3">⚠️ SENARAI PELAJAR BAWAH SUKATAN</h5>
         <div class="table-responsive">
             <table class="table table-hover">
                 <thead class="table-dark">
-                    <tr><th>Nama</th><th>No IC</th><th>Kelas</th><th>Guru Halaqah</th><th>Status</th></tr>
+                    <tr>
+                        <th>Nama</th>
+                        <th>No IC</th>
+                        <th>Kelas</th>
+                        <th>Guru Halaqah</th>
+                        <th>Indikator</th>
+                    </tr>
                 </thead>
                 <tbody id="isiJadual">
-                    <tr><td colspan="5" class="text-center">Memuatkan data...</td></tr>
+                    <tr><td colspan="5" class="text-center">Sila pilih tingkatan...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -92,34 +91,42 @@
         let s = { "Khatam": 0, "Lebih": 0, "Dalam": 0, "Bawah": 0 };
 
         data.forEach(d => {
-            const getV = (k) => {
-                let key = Object.keys(d).find(x => x.toLowerCase().replace(/[\s.]/g, '') === k.toLowerCase());
-                return key ? d[key] : '-';
+            // FUNGSI SMART MATCH: Mencari data walaupun tajuk di Sheet ada sedikit perbezaan
+            const val = (target) => {
+                let foundKey = Object.keys(d).find(key => 
+                    key.toLowerCase().replace(/[\s.]/g, '') === target.toLowerCase().replace(/[\s.]/g, '')
+                );
+                return foundKey ? d[foundKey] : '-';
             };
 
-            let n = getV('nama'), ic = getV('noic'), kl = getV('kelas'), g = getV('guruhalaqah'), ind = getV('indikator');
-            let indUpper = ind.toUpperCase();
+            let nama = val('Nama');
+            let ic = val('No IC');
+            let kelas = val('Kelas');
+            let guru = val('Guru Halaqah');
+            let indikator = val('Indikator');
 
-            // Kira Statistik
+            let indUpper = indikator.toString().toUpperCase();
+
+            // Kira Statistik untuk Carta
             if(indUpper.includes('KHATAM')) s.Khatam++;
             else if(indUpper.includes('LEBIH')) s.Lebih++;
             else if(indUpper.includes('DALAM')) s.Dalam++;
             else if(indUpper.includes('BAWAH')) s.Bawah++;
 
-            // Hanya paparkan yang BAWAH SUKATAN dalam jadual
+            // PAPARKAN HANYA PELAJAR BAWAH SUKATAN
             if(indUpper.includes('BAWAH')) {
                 tbody.innerHTML += `<tr>
-                    <td class="fw-bold">${n}</td>
+                    <td class="fw-bold">${nama}</td>
                     <td>${ic}</td>
-                    <td>${kl}</td>
-                    <td>${g}</td>
-                    <td><span class="badge-bawah">${ind}</span></td>
+                    <td>${kelas}</td>
+                    <td>${guru}</td>
+                    <td><span class="badge-bawah">${indikator}</span></td>
                 </tr>`;
             }
         });
 
         if(tbody.innerHTML === "") {
-            tbody.innerHTML = "<tr><td colspan='5' class='text-center'>Alhamdulillah, tiada pelajar bawah sukatan.</td></tr>";
+            tbody.innerHTML = "<tr><td colspan='5' class='text-center text-muted'>Tiada data 'Bawah Sukatan' dijumpai untuk tingkatan ini.</td></tr>";
         }
 
         updateCharts(s);
@@ -147,18 +154,9 @@
                         font: { weight: 'bold', size: 14 },
                         formatter: (value) => value > 0 ? value : ''
                     }
-                },
-                scales: { y: { beginAtZero: true } }
+                }
             }
         });
-    }
-
-    function filterNama() {
-        let val = document.getElementById('search').value.toUpperCase();
-        let rows = document.getElementById('isiJadual').getElementsByTagName('tr');
-        for (let r of rows) {
-            r.style.display = r.innerText.toUpperCase().includes(val) ? "" : "none";
-        }
     }
 
     window.onload = () => ambilData(1, document.querySelector('.nav-link.active'));
