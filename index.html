@@ -3,83 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Statistik Hafazan SMKATB</title>
+    <title>Analisis Hafazan SMKATB</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
     <style>
-        body { font-family: 'Poppins', sans-serif; background-color: #f0f4f8; }
-        .hero { background: linear-gradient(135deg, #1e5128, #4e944f); color: white; padding: 30px 0; border-bottom: 5px solid #d4af37; }
-        .nav-pills .nav-link { color: #1e5128; border: 1px solid #1e5128; margin: 5px; border-radius: 50px; font-weight: 600; }
-        .nav-pills .nav-link.active { background-color: #1e5128; color: white; border-color: #1e5128; }
-        .card { border: none; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .chart-container { position: relative; height: 300px; width: 100%; }
-        .table thead { background-color: #1e5128; color: white; }
+        body { background-color: #f8f9fa; font-family: sans-serif; }
+        .hero { background: #1e5128; color: white; padding: 20px; border-bottom: 4px solid #d4af37; text-align: center; }
+        .card { border-radius: 15px; margin-bottom: 20px; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .chart-box { height: 300px !important; }
     </style>
 </head>
 <body>
 
-<div class="hero text-center">
-    <div class="container">
-        <h2 class="fw-bold">STATISTIK HAFAZAN SMKATB</h2>
-        <p>Analisis Prestasi Khatam & Sukatan Pelajar</p>
-    </div>
+<div class="hero">
+    <h2>DASHBOARD PRESTASI HAFAZAN</h2>
+    <p>SMK AGAMA TOK BACHOK</p>
 </div>
 
 <div class="container my-4">
     <ul class="nav nav-pills justify-content-center mb-4">
-        <li class="nav-item"><button class="nav-link active" onclick="loadData(1, this)">Tingkatan 1</button></li>
-        <li class="nav-item"><button class="nav-link" onclick="loadData(2, this)">Tingkatan 2</button></li>
-        <li class="nav-item"><button class="nav-link" onclick="loadData(3, this)">Tingkatan 3</button></li>
-        <li class="nav-item"><button class="nav-link" onclick="loadData(4, this)">Tingkatan 4</button></li>
-        <li class="nav-item"><button class="nav-link" onclick="loadData(5, this)">Tingkatan 5</button></li>
+        <li class="nav-item"><button class="nav-link active" onclick="ambilData(1, this)">T1</button></li>
+        <li class="nav-item"><button class="nav-link" onclick="ambilData(2, this)">T2</button></li>
+        <li class="nav-item"><button class="nav-link" onclick="ambilData(3, this)">T3</button></li>
+        <li class="nav-item"><button class="nav-link" onclick="ambilData(4, this)">T4</button></li>
+        <li class="nav-item"><button class="nav-link" onclick="ambilData(5, this)">T5</button></li>
     </ul>
 
     <div class="row">
-        <div class="col-md-7">
-            <div class="card p-4">
-                <h5 class="fw-bold text-success mb-3">Bilangan Pelajar Mengikut Kategori</h5>
-                <div class="chart-container">
-                    <canvas id="barChart"></canvas>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-5">
-            <div class="card p-4">
-                <h5 class="fw-bold text-success mb-3">Peratusan (%) Keseluruhan</h5>
-                <div class="chart-container">
-                    <canvas id="pieChart"></canvas>
-                </div>
-            </div>
-        </div>
+        <div class="col-md-6"><div class="card p-3"><canvas id="barChart" class="chart-box"></canvas></div></div>
+        <div class="col-md-6"><div class="card p-3"><canvas id="pieChart" class="chart-box"></canvas></div></div>
     </div>
 
-    <div class="card p-4 mt-2">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 id="displayTing" class="fw-bold text-success">Senarai Pelajar Tingkatan 1</h5>
-            <input type="text" id="searchInput" class="form-control w-25" placeholder="Cari nama..." onkeyup="searchTable()">
-        </div>
+    <div class="card p-3">
+        <input type="text" id="search" class="form-control mb-3" placeholder="Cari nama..." onkeyup="filterNama()">
         <div class="table-responsive">
-            <table class="table table-hover" id="mainTable">
+            <table class="table table-sm">
                 <thead>
-                    <tr>
-                        <th>Nama</th>
-                        <th>No IC</th>
-                        <th>Kelas</th>
-                        <th>Indikator</th>
-                    </tr>
+                    <tr><th>Nama</th><th>No IC</th><th>Kelas</th><th>Guru</th><th>Indikator</th></tr>
                 </thead>
-                <tbody id="tableBody">
-                    </tbody>
+                <tbody id="isiJadual"></tbody>
             </table>
         </div>
     </div>
 </div>
 
 <script>
-    const csvLinks = {
+    const links = {
         1: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQd8KR9lDaJaaU5Ba_m-AtrsSxFXJXdPHzjGCbN8rH0dcwbRp1lQ5GaoNHI_cQpKejriavr2Ycj9-h9/pub?gid=864006815&single=true&output=csv',
         2: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQd8KR9lDaJaaU5Ba_m-AtrsSxFXJXdPHzjGCbN8rH0dcwbRp1lQ5GaoNHI_cQpKejriavr2Ycj9-h9/pub?gid=0&single=true&output=csv',
         3: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQd8KR9lDaJaaU5Ba_m-AtrsSxFXJXdPHzjGCbN8rH0dcwbRp1lQ5GaoNHI_cQpKejriavr2Ycj9-h9/pub?gid=1239159275&single=true&output=csv',
@@ -87,92 +57,67 @@
         5: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQd8KR9lDaJaaU5Ba_m-AtrsSxFXJXdPHzjGCbN8rH0dcwbRp1lQ5GaoNHI_cQpKejriavr2Ycj9-h9/pub?gid=1591484628&single=true&output=csv'
     };
 
-    let myBarChart, myPieChart;
+    let bChart, pChart;
 
-    function loadData(ting, btn) {
-        document.querySelectorAll('.nav-link').forEach(nav => nav.classList.remove('active'));
+    function ambilData(ting, btn) {
+        document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
         btn.classList.add('active');
-        document.getElementById('displayTing').innerText = "Senarai Pelajar Tingkatan " + ting;
 
-        Papa.parse(csvLinks[ting], {
+        Papa.parse(links[ting], {
             download: true,
             header: true,
-            complete: function(results) {
-                renderTableAndCharts(results.data);
+            skipEmptyLines: true,
+            complete: function(res) {
+                prosesData(res.data);
             }
         });
     }
 
-    function renderTableAndCharts(data) {
-        const tbody = document.getElementById('tableBody');
+    function prosesData(data) {
+        const tbody = document.getElementById('isiJadual');
         tbody.innerHTML = "";
+        let s = { "Khatam": 0, "Lebih": 0, "Bawah": 0 };
 
-        // Kategori untuk carta
-        let stats = { "Khatam": 0, "Lebih Sukatan": 0, "Bawah Sukatan": 0, "Lain-lain": 0 };
+        data.forEach(d => {
+            // Logik mencari header secara fleksibel
+            const getV = (k) => {
+                let key = Object.keys(d).find(x => x.toLowerCase().replace(/[\s.]/g, '') === k.toLowerCase());
+                return key ? d[key] : '-';
+            };
 
-        data.forEach(item => {
-            // Mapping data (Penting: Nama header mesti tepat atau guna fungsi pembersihan)
-            let nama = item['Nama'] || '-';
-            let ic = item['No IC'] || '-';
-            let kelas = item['Kelas'] || '-';
-            let indikator = (item['Indikator'] || '').trim();
+            let n = getV('nama'), ic = getV('noic'), k = getV('kelas'), g = getV('guruhalaqah'), ind = getV('indikator');
 
-            // Kira statistik
-            if (indikator.toUpperCase().includes('KHATAM')) stats["Khatam"]++;
-            else if (indikator.toUpperCase().includes('LEBIH')) stats["Lebih Sukatan"]++;
-            else if (indikator.toUpperCase().includes('BAWAH')) stats["Bawah Sukatan"]++;
-            else stats["Lain-lain"]++;
+            if(ind.toUpperCase().includes('KHATAM')) s.Khatam++;
+            else if(ind.toUpperCase().includes('LEBIH')) s.Lebih++;
+            else if(ind.toUpperCase().includes('BAWAH')) s.Bawah++;
 
-            tbody.innerHTML += `<tr>
-                <td>${nama}</td>
-                <td>${ic}</td>
-                <td>${kelas}</td>
-                <td><span class="badge bg-light text-dark border">${indikator || '-'}</span></td>
-            </tr>`;
+            tbody.innerHTML += `<tr><td>${n}</td><td>${ic}</td><td>${k}</td><td>${g}</td><td>${ind}</td></tr>`;
         });
-
-        updateCharts(stats);
+        updateCharts(s);
     }
 
-    function updateCharts(stats) {
-        const labels = Object.keys(stats);
-        const values = Object.values(stats);
-        const colors = ['#2e7d32', '#1976d2', '#d32f2f', '#9e9e9e'];
+    function updateCharts(s) {
+        const ctxB = document.getElementById('barChart'), ctxP = document.getElementById('pieChart');
+        if(bChart) bChart.destroy(); if(pChart) pChart.destroy();
+        
+        const config = {
+            labels: ['Khatam', 'Lebih Sukatan', 'Bawah Sukatan'],
+            datasets: [{ data: [s.Khatam, s.Lebih, s.Bawah], backgroundColor: ['#28a745', '#007bff', '#dc3545'] }]
+        };
 
-        if (myBarChart) myBarChart.destroy();
-        if (myPieChart) myPieChart.destroy();
-
-        // Bar Chart
-        myBarChart = new Chart(document.getElementById('barChart'), {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{ label: 'Bilangan Pelajar', data: values, backgroundColor: colors }]
-            },
-            options: { responsive: true, maintainAspectRatio: false }
-        });
-
-        // Pie Chart
-        myPieChart = new Chart(document.getElementById('pieChart'), {
-            type: 'pie',
-            data: {
-                labels: labels,
-                datasets: [{ data: values, backgroundColor: colors }]
-            },
-            options: { responsive: true, maintainAspectRatio: false }
-        });
+        bChart = new Chart(ctxB, { type: 'bar', data: config, options: { maintainAspectRatio: false } });
+        pChart = new Chart(ctxP, { type: 'pie', data: config, options: { maintainAspectRatio: false } });
     }
 
-    function searchTable() {
-        let input = document.getElementById("searchInput").value.toUpperCase();
-        let tr = document.getElementById("mainTable").getElementsByTagName("tr");
-        for (let i = 1; i < tr.length; i++) {
-            let txt = tr[i].innerText || tr[i].textContent;
-            tr[i].style.display = txt.toUpperCase().indexOf(input) > -1 ? "" : "none";
+    function filterNama() {
+        let val = document.getElementById('search').value.toUpperCase();
+        let rows = document.getElementById('isiJadual').getElementsByTagName('tr');
+        for (let r of rows) {
+            r.style.display = r.innerText.toUpperCase().includes(val) ? "" : "none";
         }
     }
 
-    window.onload = () => loadData(1, document.querySelector('.nav-link.active'));
+    window.onload = () => ambilData(1, document.querySelector('.nav-link.active'));
 </script>
 </body>
 </html>
