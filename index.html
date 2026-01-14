@@ -3,59 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analisis Hafazan Bulanan SMKATB</title>
+    <title>Dashboard Analisis 2026</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <style>
-        body { background-color: #f0f4f8; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f0f4f8; font-family: 'Segoe UI', sans-serif; }
         .hero { background: linear-gradient(135deg, #1a4d2e, #2e7d32); color: white; padding: 30px 0; border-bottom: 5px solid #d4af37; text-align: center; }
         .filter-panel { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-top: -30px; position: relative; z-index: 10; }
         .card { border-radius: 15px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .chart-container { position: relative; height: 350px; width: 100%; }
         .text-hutang { color: #dc3545; font-weight: bold; }
+        .total-box { background: #1a4d2e; color: white; padding: 10px 20px; border-radius: 10px; display: inline-block; margin-bottom: 15px; font-weight: 600; }
         .table-intervensi { background-color: #fff9e6; border-left: 6px solid #ffc107; }
-        .badge-status { font-size: 0.75rem; padding: 5px 10px; border-radius: 5px; }
     </style>
 </head>
 <body>
 
 <div class="hero">
-    <h2 class="fw-bold">DASHBOARD ANALISIS BULANAN</h2>
-    <p class="mb-0">PEMANTAUAN PRESTASI HAFAZAN SMKATB</p>
+    <h2 class="fw-bold">DASHBOARD ANALISIS BULANAN TAHUN 2026</h2>
+    <p class="mb-0">SMK AGAMA TUN SAID (SMKATB)</p>
 </div>
 
 <div class="container my-4">
-    <div class="filter-panel mb-4">
+    <div class="filter-panel mb-4 text-center">
         <div class="row g-3 justify-content-center">
             <div class="col-md-5">
-                <label class="form-label fw-bold text-success">1. Pilih Bulan Analisis:</label>
+                <label class="form-label fw-bold text-success">Pilih Bulan:</label>
                 <select id="selBulan" class="form-select form-select-lg" onchange="muatData()">
-                    <option value="JAN">JANUARI</option>
-                    <option value="FEB">FEBRUARI</option>
-                    <option value="MAC">MAC</option>
-                    <option value="APR">APRIL</option>
-                    <option value="MEI">MEI</option>
-                    <option value="JUN">JUN</option>
-                    <option value="JUL">JULAI</option>
-                    <option value="OGOS">OGOS</option>
-                    <option value="SEP">SEPTEMBER</option>
-                    <option value="OKT">OKTOBER</option>
-                    <option value="NOV">NOVEMBER</option>
-                    <option value="DIS">DISEMBER</option>
+                    <option value="JAN">JANUARI</option><option value="FEB">FEBRUARI</option>
+                    <option value="MAC">MAC</option><option value="APR">APRIL</option>
+                    <option value="MEI">MEI</option><option value="JUN">JUN</option>
+                    <option value="JUL">JULAI</option><option value="OGOS">OGOS</option>
+                    <option value="SEP">SEPTEMBER</option><option value="OKT">OKTOBER</option>
+                    <option value="NOV">NOVEMBER</option><option value="DIS">DISEMBER</option>
                 </select>
             </div>
             <div class="col-md-5">
-                <label class="form-label fw-bold text-success">2. Pilih Tingkatan:</label>
+                <label class="form-label fw-bold text-success">Pilih Tingkatan:</label>
                 <select id="selTing" class="form-select form-select-lg" onchange="muatData()">
-                    <option value="1">TINGKATAN 1</option>
-                    <option value="2">TINGKATAN 2</option>
-                    <option value="3">TINGKATAN 3</option>
-                    <option value="4">TINGKATAN 4</option>
+                    <option value="1">TINGKATAN 1</option><option value="2">TINGKATAN 2</option>
+                    <option value="3">TINGKATAN 3</option><option value="4">TINGKATAN 4</option>
                     <option value="5">TINGKATAN 5</option>
                 </select>
             </div>
+        </div>
+    </div>
+
+    <div class="text-center">
+        <div class="total-box shadow-sm">
+            Jumlah Pelajar Tingkatan <span id="txtTing">-</span>: <span id="totalPelajar">0</span> Orang
         </div>
     </div>
 
@@ -72,17 +70,12 @@
             <table class="table table-hover align-middle bg-white rounded shadow-sm">
                 <thead class="table-dark">
                     <tr>
-                        <th style="width: 50px;">Bil.</th>
-                        <th>Nama Pelajar</th>
-                        <th>Kelas</th>
-                        <th>Muka Surat</th>
-                        <th>Hutang (Ms)</th>
-                        <th>Guru Halaqah</th>
-                        <th>Indikator</th>
+                        <th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th>
+                        <th>Muka Surat</th><th>Hutang (Ms)</th><th>Guru Halaqah</th><th>Indikator</th>
                     </tr>
                 </thead>
                 <tbody id="isiJadual">
-                    <tr><td colspan="7" class="text-center py-4">Sila tunggu, sedang memproses data...</td></tr>
+                    <tr><td colspan="7" class="text-center py-4">Sila tunggu...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -110,80 +103,62 @@
 
     function muatData() {
         const bulan = document.getElementById('selBulan').value;
+        const ting = document.getElementById('selTing').value;
         const url = pautanBulan[bulan];
         const namaBulan = document.getElementById('selBulan').options[document.getElementById('selBulan').selectedIndex].text;
         
+        document.getElementById('tajukCarta').innerText = `Analisis Tingkatan ${ting} : ${namaBulan}`;
+        document.getElementById('txtTing').innerText = ting;
+
         Papa.parse(url, {
-            download: true,
-            header: true,
-            skipEmptyLines: true,
-            complete: function(res) {
-                prosesAnalisis(res.data);
-            }
+            download: true, header: true, skipEmptyLines: true,
+            complete: function(res) { prosesAnalisis(res.data, ting); }
         });
     }
 
-    function prosesAnalisis(data) {
-        const filterTing = document.getElementById('selTing').value;
+    function prosesAnalisis(data, filterTing) {
         const tbody = document.getElementById('isiJadual');
         tbody.innerHTML = "";
-        
-        let s = { "Khatam": 0, "Lebih": 0, "Dalam": 0, "Bawah": 0 };
-        let count = 0;
+        let s = { "Khatam": 0, "Lebih": 0, "Bawah": 0 };
+        let totalCount = 0;
+        let bawahCount = 0;
 
         data.forEach(d => {
-            // Fungsi cari data walaupun header ada jarak/huruf besar kecil
             const cari = (k) => {
-                let keyHasil = Object.keys(d).find(x => 
-                    x.toLowerCase().replace(/[\s.]/g, '').includes(k.toLowerCase().replace(/[\s.]/g, ''))
-                );
+                let keyHasil = Object.keys(d).find(x => x.toLowerCase().replace(/[\s.]/g, '').includes(k.toLowerCase().replace(/[\s.]/g, '')));
                 return keyHasil ? d[keyHasil] : '';
             };
 
-            let nama = cari('namapelajar');
-            let kelas = cari('kelas');
-            let ind = cari('indikator').toUpperCase();
-            
-            // Logik Kenalpasti Tingkatan
-            let tingData = cari('tingkatan');
-            if (!tingData) {
-                // Jika kolum tingkatan tiada, ambil angka pertama dari kolum Kelas (Cth: "1 IBNU SINA" -> "1")
-                let match = kelas.match(/\d+/);
-                tingData = match ? match[0] : '';
-            }
+            let kls = cari('kelas');
+            let match = kls.match(/\d+/);
+            let tingData = match ? match[0] : '';
 
-            // Tapis mengikut Tingkatan yang dipilih di dropdown
             if (tingData.toString() === filterTing.toString()) {
+                totalCount++;
+                let nama = cari('namapelajar');
+                let ind = cari('indikator').toUpperCase();
                 let ms = parseFloat(cari('mukasurat')) || 0;
                 let sukatan = parseFloat(cari('sukatansemasa')) || 0;
                 let hutang = Math.max(0, sukatan - ms);
 
-                // Update Statistik untuk Carta
                 if(ind.includes('KHATAM')) s.Khatam++;
                 else if(ind.includes('LEBIH')) s.Lebih++;
-                else if(ind.includes('DALAM')) s.Dalam++;
                 else if(ind.includes('BAWAH')) s.Bawah++;
 
-                // Hanya masukkan ke jadual jika BAWAH SUKATAN
                 if(ind.includes('BAWAH')) {
-                    count++;
+                    bawahCount++;
                     tbody.innerHTML += `<tr>
-                        <td>${count}</td>
+                        <td>${bawahCount}</td>
                         <td class="fw-bold text-uppercase small">${nama}</td>
-                        <td>${kelas}</td>
-                        <td>${ms}</td>
-                        <td class="text-hutang">${hutang}</td>
-                        <td>${cari('guruhalaqah')}</td>
-                        <td><span class="badge bg-danger badge-status">${cari('indikator')}</span></td>
+                        <td>${kls}</td><td>${ms}</td><td class="text-hutang">${hutang}</td>
+                        <td>${cari('guruhalaqah')}</td><td><span class="badge bg-danger">${ind}</span></td>
                     </tr>`;
                 }
             }
         });
 
-        if(tbody.innerHTML === "") {
-            tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">Tiada data intervensi (Bawah Sukatan) untuk Tingkatan ${filterTing}.</td></tr>`;
-        }
-
+        document.getElementById('totalPelajar').innerText = totalCount;
+        if(tbody.innerHTML === "") tbody.innerHTML = "<tr><td colspan='7' class='text-center py-4 text-muted'>Tiada rekod intervensi.</td></tr>";
         updateChart(s);
     }
 
@@ -193,23 +168,18 @@
         bChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['Khatam', 'Lebih Sukatan', 'Dalam Sukatan', 'Bawah Sukatan'],
+                labels: ['Khatam', 'Lebih Sukatan', 'Bawah Sukatan'],
                 datasets: [{
                     label: 'Bilangan Pelajar',
-                    data: [s.Khatam, s.Lebih, s.Dalam, s.Bawah],
-                    backgroundColor: ['#198754', '#0d6efd', '#6c757d', '#dc3545']
+                    data: [s.Khatam, s.Lebih, s.Bawah],
+                    backgroundColor: ['#198754', '#0d6efd', '#dc3545']
                 }]
             },
             options: {
                 maintainAspectRatio: false,
                 plugins: {
-                    datalabels: {
-                        color: 'white',
-                        font: { weight: 'bold', size: 12 },
-                        formatter: (val) => val > 0 ? val : ''
-                    }
-                },
-                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+                    datalabels: { color: 'white', font: { weight: 'bold', size: 14 }, formatter: (v) => v > 0 ? v : '' }
+                }
             }
         });
     }
