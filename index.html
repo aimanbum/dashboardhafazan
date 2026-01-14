@@ -17,19 +17,29 @@
         .text-hutang { color: #dc3545; font-weight: bold; }
         .total-box { background: #1a4d2e; color: white; padding: 10px 20px; border-radius: 10px; display: inline-block; margin-bottom: 15px; font-weight: 600; }
         .table-intervensi { background-color: #fff9e6; border-left: 6px solid #ffc107; }
+
+        /* Style Khas Untuk Cetakan */
+        @media print {
+            .hero, .filter-panel, .btn-print, .nav { display: none !important; }
+            body { background-color: white !important; padding: 0; }
+            .container { max-width: 100% !important; width: 100% !important; margin: 0 !important; }
+            .card { box-shadow: none !important; border: 1px solid #ddd !important; }
+            .chart-container { height: 400px !important; }
+            #isiJadual tr { page-break-inside: avoid; }
+        }
     </style>
 </head>
 <body>
 
 <div class="hero">
     <h2 class="fw-bold">DASHBOARD ANALISIS BULANAN TAHUN 2026</h2>
-    <p class="mb-0">SMK AGAMA TUN SAID (SMKATB)</p>
+    <p class="mb-0">SMK AGAMA TOK BACHOK</p>
 </div>
 
 <div class="container my-4">
     <div class="filter-panel mb-4 text-center">
         <div class="row g-3 justify-content-center">
-            <div class="col-md-5">
+            <div class="col-md-4">
                 <label class="form-label fw-bold text-success">Pilih Bulan:</label>
                 <select id="selBulan" class="form-select form-select-lg" onchange="muatData()">
                     <option value="JAN">JANUARI</option><option value="FEB">FEBRUARI</option>
@@ -40,13 +50,16 @@
                     <option value="NOV">NOVEMBER</option><option value="DIS">DISEMBER</option>
                 </select>
             </div>
-            <div class="col-md-5">
+            <div class="col-md-4">
                 <label class="form-label fw-bold text-success">Pilih Tingkatan:</label>
                 <select id="selTing" class="form-select form-select-lg" onchange="muatData()">
                     <option value="1">TINGKATAN 1</option><option value="2">TINGKATAN 2</option>
                     <option value="3">TINGKATAN 3</option><option value="4">TINGKATAN 4</option>
                     <option value="5">TINGKATAN 5</option>
                 </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end justify-content-center">
+                <button onclick="window.print()" class="btn btn-dark btn-lg w-100 btn-print shadow">🖨️ Cetak</button>
             </div>
         </div>
     </div>
@@ -136,7 +149,7 @@
             if (tingData.toString() === filterTing.toString()) {
                 totalCount++;
                 let nama = cari('namapelajar');
-                let ind = cari('indikator').toUpperCase();
+                let ind = (cari('indikator') || "").toUpperCase();
                 let ms = parseFloat(cari('mukasurat')) || 0;
                 let sukatan = parseFloat(cari('sukatansemasa')) || 0;
                 let hutang = Math.max(0, sukatan - ms);
@@ -176,6 +189,7 @@
                 }]
             },
             options: {
+                responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
                     datalabels: { color: 'white', font: { weight: 'bold', size: 14 }, formatter: (v) => v > 0 ? v : '' }
