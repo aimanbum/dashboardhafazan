@@ -9,30 +9,29 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <style>
-        body { background-color: #f0f4f8; font-family: 'Poppins', sans-serif; }
-        .hero { background: linear-gradient(135deg, #1a4d2e, #347a44); color: white; padding: 30px 0; border-bottom: 5px solid #d4af37; text-align: center; }
+        body { background-color: #f0f4f8; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .hero { background: linear-gradient(135deg, #1a4d2e, #2e7d32); color: white; padding: 30px 0; border-bottom: 5px solid #d4af37; text-align: center; }
         .filter-panel { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-top: -30px; position: relative; z-index: 10; }
         .card { border-radius: 15px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .chart-container { position: relative; height: 350px; width: 100%; }
         .text-hutang { color: #dc3545; font-weight: bold; }
         .table-intervensi { background-color: #fff9e6; border-left: 6px solid #ffc107; }
-        .form-select { border: 2px solid #e0e0e0; font-weight: 600; }
-        .form-select:focus { border-color: #1a4d2e; box-shadow: none; }
+        .badge-status { font-size: 0.75rem; padding: 5px 10px; border-radius: 5px; }
     </style>
 </head>
 <body>
 
 <div class="hero">
-    <h2 class="fw-bold">DASHBOARD ANALISIS HAFAZAN</h2>
-    <p class="mb-0">SMK AGAMA TUN SAID (SMKATB)</p>
+    <h2 class="fw-bold">DASHBOARD ANALISIS BULANAN</h2>
+    <p class="mb-0">PEMANTAUAN PRESTASI HAFAZAN SMKATB</p>
 </div>
 
 <div class="container my-4">
     <div class="filter-panel mb-4">
         <div class="row g-3 justify-content-center">
-            <div class="col-md-4">
-                <label class="form-label fw-bold text-success">1. Pilih Bulan:</label>
-                <select id="selBulan" class="form-select" onchange="muatData()">
+            <div class="col-md-5">
+                <label class="form-label fw-bold text-success">1. Pilih Bulan Analisis:</label>
+                <select id="selBulan" class="form-select form-select-lg" onchange="muatData()">
                     <option value="JAN">JANUARI</option>
                     <option value="FEB">FEBRUARI</option>
                     <option value="MAC">MAC</option>
@@ -47,9 +46,9 @@
                     <option value="DIS">DISEMBER</option>
                 </select>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-5">
                 <label class="form-label fw-bold text-success">2. Pilih Tingkatan:</label>
-                <select id="selTing" class="form-select" onchange="muatData()">
+                <select id="selTing" class="form-select form-select-lg" onchange="muatData()">
                     <option value="1">TINGKATAN 1</option>
                     <option value="2">TINGKATAN 2</option>
                     <option value="3">TINGKATAN 3</option>
@@ -83,7 +82,7 @@
                     </tr>
                 </thead>
                 <tbody id="isiJadual">
-                    <tr><td colspan="7" class="text-center py-4 text-muted">Sila pilih bulan dan tingkatan...</td></tr>
+                    <tr><td colspan="7" class="text-center py-4">Sila tunggu, sedang memproses data...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -111,69 +110,78 @@
 
     function muatData() {
         const bulan = document.getElementById('selBulan').value;
-        const ting = document.getElementById('selTing').value;
         const url = pautanBulan[bulan];
         const namaBulan = document.getElementById('selBulan').options[document.getElementById('selBulan').selectedIndex].text;
         
-        document.getElementById('tajukCarta').innerText = `Analisis Tingkatan ${ting} : ${namaBulan}`;
-
         Papa.parse(url, {
             download: true,
             header: true,
             skipEmptyLines: true,
             complete: function(res) {
-                prosesAnalisis(res.data, ting);
+                prosesAnalisis(res.data);
             }
         });
     }
 
-    function prosesAnalisis(data, filterTing) {
+    function prosesAnalisis(data) {
+        const filterTing = document.getElementById('selTing').value;
         const tbody = document.getElementById('isiJadual');
         tbody.innerHTML = "";
+        
         let s = { "Khatam": 0, "Lebih": 0, "Dalam": 0, "Bawah": 0 };
         let count = 0;
 
         data.forEach(d => {
+            // Fungsi cari data walaupun header ada jarak/huruf besar kecil
             const cari = (k) => {
-                let keyHasil = Object.keys(d).find(x => x.toLowerCase().replace(/[\s.]/g, '').includes(k.toLowerCase().replace(/[\s.]/g, '')));
-                return keyHasil ? d[keyHasil] : '-';
+                let keyHasil = Object.keys(d).find(x => 
+                    x.toLowerCase().replace(/[\s.]/g, '').includes(k.toLowerCase().replace(/[\s.]/g, ''))
+                );
+                return keyHasil ? d[keyHasil] : '';
             };
 
-            // Ambil data Tingkatan dari Sheets (Pastikan ada kolum 'TINGKATAN' dalam Sheets anda)
-            let tingkatanSheet = cari('tingkatan').toString();
+            let nama = cari('namapelajar');
+            let kelas = cari('kelas');
+            let ind = cari('indikator').toUpperCase();
+            
+            // Logik Kenalpasti Tingkatan
+            let tingData = cari('tingkatan');
+            if (!tingData) {
+                // Jika kolum tingkatan tiada, ambil angka pertama dari kolum Kelas (Cth: "1 IBNU SINA" -> "1")
+                let match = kelas.match(/\d+/);
+                tingData = match ? match[0] : '';
+            }
 
-            // Hanya proses jika Tingkatan padan dengan pilihan dropdown
-            if (tingkatanSheet === filterTing) {
-                let nama = cari('namapelajar');
+            // Tapis mengikut Tingkatan yang dipilih di dropdown
+            if (tingData.toString() === filterTing.toString()) {
                 let ms = parseFloat(cari('mukasurat')) || 0;
                 let sukatan = parseFloat(cari('sukatansemasa')) || 0;
-                let indikator = cari('indikator').toUpperCase();
                 let hutang = Math.max(0, sukatan - ms);
 
-                // Statistik Carta
-                if(indikator.includes('KHATAM')) s.Khatam++;
-                else if(indikator.includes('LEBIH')) s.Lebih++;
-                else if(indikator.includes('DALAM')) s.Dalam++;
-                else if(indikator.includes('BAWAH')) s.Bawah++;
+                // Update Statistik untuk Carta
+                if(ind.includes('KHATAM')) s.Khatam++;
+                else if(ind.includes('LEBIH')) s.Lebih++;
+                else if(ind.includes('DALAM')) s.Dalam++;
+                else if(ind.includes('BAWAH')) s.Bawah++;
 
-                // Masukkan ke Jadual jika Bawah Sukatan
-                if(indikator.includes('BAWAH')) {
+                // Hanya masukkan ke jadual jika BAWAH SUKATAN
+                if(ind.includes('BAWAH')) {
                     count++;
                     tbody.innerHTML += `<tr>
                         <td>${count}</td>
                         <td class="fw-bold text-uppercase small">${nama}</td>
-                        <td>${cari('kelas')}</td>
+                        <td>${kelas}</td>
                         <td>${ms}</td>
                         <td class="text-hutang">${hutang}</td>
                         <td>${cari('guruhalaqah')}</td>
-                        <td><span class="badge bg-danger">${cari('indikator')}</span></td>
+                        <td><span class="badge bg-danger badge-status">${cari('indikator')}</span></td>
                     </tr>`;
                 }
             }
         });
 
         if(tbody.innerHTML === "") {
-            tbody.innerHTML = "<tr><td colspan='7' class='text-center py-4 text-muted'>Tiada rekod pelajar Bawah Sukatan untuk tingkatan ini.</td></tr>";
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">Tiada data intervensi (Bawah Sukatan) untuk Tingkatan ${filterTing}.</td></tr>`;
         }
 
         updateChart(s);
@@ -195,8 +203,13 @@
             options: {
                 maintainAspectRatio: false,
                 plugins: {
-                    datalabels: { color: 'white', font: { weight: 'bold' }, formatter: (v) => v > 0 ? v : '' }
-                }
+                    datalabels: {
+                        color: 'white',
+                        font: { weight: 'bold', size: 12 },
+                        formatter: (val) => val > 0 ? val : ''
+                    }
+                },
+                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
             }
         });
     }
