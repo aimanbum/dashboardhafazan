@@ -11,7 +11,6 @@
     <style>
         body { background-color: #f0f4f8; font-family: 'Segoe UI', sans-serif; }
         
-        /* Hero Section */
         .hero { 
             background: linear-gradient(135deg, #1a4d2e, #2e7d32) !important; 
             color: white !important; 
@@ -48,20 +47,14 @@
         .table-intervensi { border-left: 6px solid #ffc107 !important; }
         .text-hutang { color: #dc3545 !important; font-weight: bold; }
 
-        /* --- STYLING KHAS UNTUK PRINT --- */
         @media print {
             body { background-color: white !important; }
             .filter-panel, .btn-print, .nav, footer { display: none !important; }
             .hero { padding: 20px 0 !important; margin-bottom: 20px; }
             .card { box-shadow: none !important; border: 1px solid #ccc !important; page-break-inside: avoid; }
-            .total-box { border: 1px solid #1a4d2e !important; color: #1a4d2e !important; background: none !important; }
-            
-            /* Paksa warna keluar dalam PDF/Print */
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            
             table { width: 100% !important; font-size: 10pt; }
             .table-dark { background-color: #212529 !important; color: white !important; }
-            .badge { border: 1px solid #dc3545 !important; color: #dc3545 !important; background: none !important; }
         }
     </style>
 </head>
@@ -78,7 +71,7 @@
 </div>
 
 <div class="container my-4">
-    <div class="filter-panel mb-4 btn-print">
+    <div class="filter-panel mb-4">
         <div class="row g-3 justify-content-center align-items-end">
             <div class="col-md-3">
                 <label class="form-label fw-bold">Bulan:</label>
@@ -134,7 +127,7 @@
                     </tr>
                 </thead>
                 <tbody id="isiJadual">
-                    <tr><td colspan="7" class="text-center py-4">Memproses data...</td></tr>
+                    <tr><td colspan="7" class="text-center py-4">Sila pilih Bulan dan Tingkatan...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -142,7 +135,6 @@
 </div>
 
 <script>
-    // Pautan CSV anda kekal sama
     const pautanBulan = {
         "JAN": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTYiDjR12MHpZvInZnwExZxUdha7h3Ud7okqz8YjCp62F4GAFjeobZqj6PPB3NfBcYlP_rbmW6if3DM/pub?gid=0&single=true&output=csv",
         "FEB": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTYiDjR12MHpZvInZnwExZxUdha7h3Ud7okqz8YjCp62F4GAFjeobZqj6PPB3NfBcYlP_rbmW6if3DM/pub?gid=1376498148&single=true&output=csv",
@@ -167,12 +159,16 @@
         const url = pautanBulan[bulan];
         const namaBulan = document.getElementById('selBulan').options[document.getElementById('selBulan').selectedIndex].text;
         
-        document.getElementById('tajukCarta').innerText = `Analisis Tingkatan ${ting} : ${namaBulan}`;
+        document.getElementById('tajukCarta').innerText = "Analisis Tingkatan " + ting + " : " + namaBulan;
         document.getElementById('txtTing').innerText = ting;
 
         Papa.parse(url, {
-            download: true, header: true, skipEmptyLines: true,
-            complete: function(res) { prosesAnalisis(res.data, ting); }
+            download: true, 
+            header: true, 
+            skipEmptyLines: true,
+            complete: function(res) { 
+                prosesAnalisis(res.data, ting); 
+            }
         });
     }
 
@@ -207,21 +203,23 @@
 
                 if(ind.includes('BAWAH')) {
                     bawahCount++;
-                    tbody.innerHTML += `<tr>
-                        <td class="text-center">${bawahCount}</td>
-                        <td class="fw-bold text-uppercase small">${nama}</td>
-                        <td class="text-center small">${kls}</td>
-                        <td class="text-center">${ms}</td>
-                        <td class="text-center text-hutang">${hutang}</td>
-                        <td class="small">${cari('guruhalaqah')}</td>
-                        <td class="text-center"><span class="badge bg-danger">${ind}</span></td>
-                    </tr>`;
+                    tbody.innerHTML += "<tr>" +
+                        "<td class='text-center'>" + bawahCount + "</td>" +
+                        "<td class='fw-bold text-uppercase small'>" + nama + "</td>" +
+                        "<td class='text-center small'>" + kls + "</td>" +
+                        "<td class='text-center'>" + ms + "</td>" +
+                        "<td class='text-center text-hutang'>" + hutang + "</td>" +
+                        "<td class='small'>" + cari('guruhalaqah') + "</td>" +
+                        "<td class='text-center'><span class='badge bg-danger'>" + ind + "</span></td>" +
+                    "</tr>";
                 }
             }
         });
 
         document.getElementById('totalPelajar').innerText = totalCount;
-        if(tbody.innerHTML === "") tbody.innerHTML = "<tr><td colspan="7" class="text-center py-4 text-muted">Tiada rekod intervensi dijumpai.</td></tr>";
+        if(tbody.innerHTML === "") {
+            tbody.innerHTML = "<tr><td colspan='7' class='text-center py-4 text-muted'>Tiada rekod intervensi dijumpai.</td></tr>";
+        }
         updateChart(s);
     }
 
