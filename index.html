@@ -11,7 +11,6 @@
     <style>
         body { background-color: #f0f4f8; font-family: 'Segoe UI', sans-serif; }
         
-        /* Hero Section */
         .hero { 
             background: linear-gradient(135deg, #1a4d2e, #2e7d32) !important; 
             color: white !important; 
@@ -47,12 +46,10 @@
             -webkit-print-color-adjust: exact;
         }
 
-        /* Styling Jadual Intervensi mengikut Screenshot */
         .table-intervensi { background-color: #fff9e6 !important; border: 1px solid #ffeeba !important; border-radius: 10px; overflow: hidden; }
-        .table thead th { background-color: #212529 !important; color: white !important; border: none; text-transform: uppercase; font-size: 0.85rem; vertical-align: middle; }
+        .table thead th { background-color: #212529 !important; color: white !important; border: none; text-transform: uppercase; font-size: 0.8rem; vertical-align: middle; text-align: center; }
         .text-hutang { color: #dc3545 !important; font-weight: bold; }
         
-        /* Styling Badge Merah mengikut Screenshot */
         .badge-bawah {
             border: 2px solid #dc3545 !important;
             color: #dc3545 !important;
@@ -60,12 +57,11 @@
             font-weight: bold;
             border-radius: 20px;
             padding: 2px 10px;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             display: inline-block;
             white-space: nowrap;
         }
 
-        /* --- STYLING KHAS UNTUK PRINT --- */
         @media print {
             body { background-color: white !important; }
             .filter-panel, .btn-print, .nav, footer { display: none !important; }
@@ -73,7 +69,7 @@
             .card { box-shadow: none !important; border: 1px solid #ccc !important; page-break-inside: avoid; }
             .total-box { border: 1px solid #1a4d2e !important; color: #1a4d2e !important; background: none !important; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            table { width: 100% !important; font-size: 10pt; }
+            table { width: 100% !important; font-size: 9pt; }
             .badge-bawah { border: 2px solid #dc3545 !important; }
         }
     </style>
@@ -131,23 +127,24 @@
         </div>
     </div>
 
-    <div class="card p-4 table-intervensi shadow-sm">
+    <div class="card p-3 table-intervensi shadow-sm">
         <h5 class="fw-bold text-danger mb-3">⚠️ SENARAI PELAJAR BAWAH SUKATAN</h5>
         <div class="table-responsive">
             <table class="table table-hover align-middle">
                 <thead>
                     <tr>
-                        <th class="text-center">Bil.</th>
+                        <th>Bil.</th>
                         <th>Nama Pelajar</th>
-                        <th class="text-center">Kelas</th>
-                        <th class="text-center">Muka Surat</th>
-                        <th class="text-center">Hutang (Ms)</th>
+                        <th>Kelas</th>
+                        <th>Sukatan Semasa</th>
+                        <th>Muka Surat</th>
+                        <th>Hutang (Ms)</th>
                         <th>Guru Halaqah</th>
-                        <th class="text-center">Indikator</th>
+                        <th>Indikator</th>
                     </tr>
                 </thead>
                 <tbody id="isiJadual">
-                    <tr><td colspan="7" class="text-center py-4">Sila pilih Bulan dan Tingkatan...</td></tr>
+                    <tr><td colspan="8" class="text-center py-4">Sila pilih Bulan dan Tingkatan...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -155,7 +152,6 @@
 </div>
 
 <script>
-    // Pautan CSV anda kekal sama mengikut tetapan Google Sheets
     const pautanBulan = {
         "JAN": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTYiDjR12MHpZvInZnwExZxUdha7h3Ud7okqz8YjCp62F4GAFjeobZqj6PPB3NfBcYlP_rbmW6if3DM/pub?gid=0&single=true&output=csv",
         "FEB": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTYiDjR12MHpZvInZnwExZxUdha7h3Ud7okqz8YjCp62F4GAFjeobZqj6PPB3NfBcYlP_rbmW6if3DM/pub?gid=1376498148&single=true&output=csv",
@@ -180,7 +176,6 @@
         const url = pautanBulan[bulan];
         const namaBulan = document.getElementById('selBulan').options[document.getElementById('selBulan').selectedIndex].text;
         
-        document.getElementById('tajukCarta').innerText = "Analisis Tingkatan " + ting + " : " + namaBulan;
         document.getElementById('txtTing').innerText = ting;
 
         Papa.parse(url, {
@@ -222,8 +217,9 @@
                     bawahCount++;
                     tbody.innerHTML += "<tr>" +
                         "<td class='text-center'>" + bawahCount + "</td>" +
-                        "<td class='fw-bold text-uppercase' style='font-size:0.8rem;'>" + nama + "</td>" +
+                        "<td class='fw-bold text-uppercase' style='font-size:0.75rem;'>" + nama + "</td>" +
                         "<td class='text-center small'>" + kls + "</td>" +
+                        "<td class='text-center'>" + sukatan + "</td>" +
                         "<td class='text-center'>" + ms + "</td>" +
                         "<td class='text-center text-hutang'>" + hutang + "</td>" +
                         "<td class='small'>" + cari('guruhalaqah') + "</td>" +
@@ -234,7 +230,7 @@
         });
 
         document.getElementById('totalPelajar').innerText = totalCount;
-        if(tbody.innerHTML === "") tbody.innerHTML = "<tr><td colspan='7' class='text-center py-4 text-muted'>Tiada rekod intervensi dijumpai.</td></tr>";
+        if(tbody.innerHTML === "") tbody.innerHTML = "<tr><td colspan='8' class='text-center py-4 text-muted'>Tiada rekod intervensi dijumpai.</td></tr>";
         updateChart(s);
     }
 
