@@ -3,34 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analisis Bulanan Hafazan SMKATB</title>
+    <title>Analisis Hafazan Bulanan SMKATB</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <style>
-        body { background-color: #f4f7f6; font-family: 'Poppins', sans-serif; }
-        .hero { background: #1e5128; color: white; padding: 25px; border-bottom: 5px solid #d4af37; text-align: center; }
-        .filter-panel { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-top: -25px; position: relative; z-index: 10; }
-        .card { border-radius: 15px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        body { background-color: #f0f4f8; font-family: 'Poppins', sans-serif; }
+        .hero { background: linear-gradient(135deg, #1a4d2e, #347a44); color: white; padding: 30px 0; border-bottom: 5px solid #d4af37; text-align: center; }
+        .filter-panel { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-top: -30px; position: relative; z-index: 10; }
+        .card { border-radius: 15px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .chart-container { position: relative; height: 350px; width: 100%; }
         .text-hutang { color: #dc3545; font-weight: bold; }
-        .table-intervensi { background-color: #fff9e6; border-left: 5px solid #ffc107; }
+        .table-intervensi { background-color: #fff9e6; border-left: 6px solid #ffc107; }
+        .form-select { border: 2px solid #e0e0e0; font-weight: 600; }
+        .form-select:focus { border-color: #1a4d2e; box-shadow: none; }
     </style>
 </head>
 <body>
 
 <div class="hero">
-    <h2 class="fw-bold">DASHBOARD ANALISIS BULANAN</h2>
-    <p class="mb-0">PEMANTAUAN PRESTASI HAFAZAN SMKATB</p>
+    <h2 class="fw-bold">DASHBOARD ANALISIS HAFAZAN</h2>
+    <p class="mb-0">SMK AGAMA TUN SAID (SMKATB)</p>
 </div>
 
 <div class="container my-4">
     <div class="filter-panel mb-4">
-        <div class="row justify-content-center">
-            <div class="col-md-6 text-center">
-                <label class="form-label fw-bold text-success fs-5">Sila Pilih Bulan Analisis:</label>
-                <select id="selBulan" class="form-select form-select-lg shadow-sm" onchange="muatDataBulanan()">
+        <div class="row g-3 justify-content-center">
+            <div class="col-md-4">
+                <label class="form-label fw-bold text-success">1. Pilih Bulan:</label>
+                <select id="selBulan" class="form-select" onchange="muatData()">
                     <option value="JAN">JANUARI</option>
                     <option value="FEB">FEBRUARI</option>
                     <option value="MAC">MAC</option>
@@ -45,22 +47,28 @@
                     <option value="DIS">DISEMBER</option>
                 </select>
             </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-12">
-            <div class="card p-4">
-                <h5 id="tajukCarta" class="fw-bold text-success text-center mb-3">Statistik Pencapaian</h5>
-                <div class="chart-container">
-                    <canvas id="barChart"></canvas>
-                </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold text-success">2. Pilih Tingkatan:</label>
+                <select id="selTing" class="form-select" onchange="muatData()">
+                    <option value="1">TINGKATAN 1</option>
+                    <option value="2">TINGKATAN 2</option>
+                    <option value="3">TINGKATAN 3</option>
+                    <option value="4">TINGKATAN 4</option>
+                    <option value="5">TINGKATAN 5</option>
+                </select>
             </div>
         </div>
     </div>
 
+    <div class="card p-4">
+        <h5 id="tajukCarta" class="fw-bold text-success text-center mb-3">Analisis Pencapaian</h5>
+        <div class="chart-container">
+            <canvas id="barChart"></canvas>
+        </div>
+    </div>
+
     <div class="card p-4 table-intervensi">
-        <h5 class="fw-bold text-danger mb-3">⚠️ SENARAI PELAJAR BAWAH SUKATAN (INTERVENSI)</h5>
+        <h5 class="fw-bold text-danger mb-3">⚠️ SENARAI PELAJAR BAWAH SUKATAN</h5>
         <div class="table-responsive">
             <table class="table table-hover align-middle bg-white rounded shadow-sm">
                 <thead class="table-dark">
@@ -70,11 +78,12 @@
                         <th>Kelas</th>
                         <th>Muka Surat</th>
                         <th>Hutang (Ms)</th>
+                        <th>Guru Halaqah</th>
                         <th>Indikator</th>
                     </tr>
                 </thead>
                 <tbody id="isiJadual">
-                    <tr><td colspan="6" class="text-center py-4">Sila pilih bulan untuk melihat data...</td></tr>
+                    <tr><td colspan="7" class="text-center py-4 text-muted">Sila pilih bulan dan tingkatan...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -82,7 +91,6 @@
 </div>
 
 <script>
-    // SEMUA PAUTAN CSV ANDA
     const pautanBulan = {
         "JAN": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTYiDjR12MHpZvInZnwExZxUdha7h3Ud7okqz8YjCp62F4GAFjeobZqj6PPB3NfBcYlP_rbmW6if3DM/pub?gid=0&single=true&output=csv",
         "FEB": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTYiDjR12MHpZvInZnwExZxUdha7h3Ud7okqz8YjCp62F4GAFjeobZqj6PPB3NfBcYlP_rbmW6if3DM/pub?gid=1376498148&single=true&output=csv",
@@ -101,24 +109,25 @@
     let bChart;
     Chart.register(ChartDataLabels);
 
-    function muatDataBulanan() {
+    function muatData() {
         const bulan = document.getElementById('selBulan').value;
+        const ting = document.getElementById('selTing').value;
         const url = pautanBulan[bulan];
-        const tajuk = document.getElementById('selBulan').options[document.getElementById('selBulan').selectedIndex].text;
+        const namaBulan = document.getElementById('selBulan').options[document.getElementById('selBulan').selectedIndex].text;
         
-        document.getElementById('tajukCarta').innerText = "Statistik Pencapaian : " + tajuk;
+        document.getElementById('tajukCarta').innerText = `Analisis Tingkatan ${ting} : ${namaBulan}`;
 
         Papa.parse(url, {
             download: true,
             header: true,
             skipEmptyLines: true,
             complete: function(res) {
-                prosesAnalisis(res.data);
+                prosesAnalisis(res.data, ting);
             }
         });
     }
 
-    function prosesAnalisis(data) {
+    function prosesAnalisis(data, filterTing) {
         const tbody = document.getElementById('isiJadual');
         tbody.innerHTML = "";
         let s = { "Khatam": 0, "Lebih": 0, "Dalam": 0, "Bawah": 0 };
@@ -130,34 +139,41 @@
                 return keyHasil ? d[keyHasil] : '-';
             };
 
-            let nama = cari('namapelajar');
-            let ms = parseFloat(cari('mukasurat')) || 0;
-            let sukatan = parseFloat(cari('sukatansemasa')) || 0;
-            let indikator = cari('indikator').toUpperCase();
-            let hutang = Math.max(0, sukatan - ms);
+            // Ambil data Tingkatan dari Sheets (Pastikan ada kolum 'TINGKATAN' dalam Sheets anda)
+            let tingkatanSheet = cari('tingkatan').toString();
 
-            // Statistik Carta
-            if(indikator.includes('KHATAM')) s.Khatam++;
-            else if(indikator.includes('LEBIH')) s.Lebih++;
-            else if(indikator.includes('DALAM')) s.Dalam++;
-            else if(indikator.includes('BAWAH')) s.Bawah++;
+            // Hanya proses jika Tingkatan padan dengan pilihan dropdown
+            if (tingkatanSheet === filterTing) {
+                let nama = cari('namapelajar');
+                let ms = parseFloat(cari('mukasurat')) || 0;
+                let sukatan = parseFloat(cari('sukatansemasa')) || 0;
+                let indikator = cari('indikator').toUpperCase();
+                let hutang = Math.max(0, sukatan - ms);
 
-            // Masukkan ke Jadual jika Bawah Sukatan
-            if(indikator.includes('BAWAH')) {
-                count++;
-                tbody.innerHTML += `<tr>
-                    <td>${count}</td>
-                    <td class="fw-bold text-uppercase small">${nama}</td>
-                    <td>${cari('kelas')}</td>
-                    <td>${ms}</td>
-                    <td class="text-hutang">${hutang}</td>
-                    <td><span class="badge bg-danger">${cari('indikator')}</span></td>
-                </tr>`;
+                // Statistik Carta
+                if(indikator.includes('KHATAM')) s.Khatam++;
+                else if(indikator.includes('LEBIH')) s.Lebih++;
+                else if(indikator.includes('DALAM')) s.Dalam++;
+                else if(indikator.includes('BAWAH')) s.Bawah++;
+
+                // Masukkan ke Jadual jika Bawah Sukatan
+                if(indikator.includes('BAWAH')) {
+                    count++;
+                    tbody.innerHTML += `<tr>
+                        <td>${count}</td>
+                        <td class="fw-bold text-uppercase small">${nama}</td>
+                        <td>${cari('kelas')}</td>
+                        <td>${ms}</td>
+                        <td class="text-hutang">${hutang}</td>
+                        <td>${cari('guruhalaqah')}</td>
+                        <td><span class="badge bg-danger">${cari('indikator')}</span></td>
+                    </tr>`;
+                }
             }
         });
 
         if(tbody.innerHTML === "") {
-            tbody.innerHTML = "<tr><td colspan='6' class='text-center py-4 text-muted'>Alhamdulillah, tiada rekod intervensi untuk bulan ini.</td></tr>";
+            tbody.innerHTML = "<tr><td colspan='7' class='text-center py-4 text-muted'>Tiada rekod pelajar Bawah Sukatan untuk tingkatan ini.</td></tr>";
         }
 
         updateChart(s);
@@ -180,14 +196,12 @@
                 maintainAspectRatio: false,
                 plugins: {
                     datalabels: { color: 'white', font: { weight: 'bold' }, formatter: (v) => v > 0 ? v : '' }
-                },
-                scales: { y: { beginAtZero: true } }
+                }
             }
         });
     }
 
-    // Load Januari secara automatik
-    window.onload = muatDataBulanan;
+    window.onload = muatData;
 </script>
 </body>
 </html>
