@@ -10,61 +10,34 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <style>
         body { background-color: #f0f4f8; font-family: 'Segoe UI', sans-serif; }
-        
-        /* Hero Section */
-        .hero { 
-            background: linear-gradient(135deg, #1a4d2e, #2e7d32); 
-            color: white; 
-            padding: 40px 0 60px 0; 
-            border-bottom: 5px solid #d4af37; 
-            text-align: center; 
-        }
-        
-        /* Frame Logo supaya bulat dan putih */
-        .logo-container {
-            width: 130px;
-            height: 130px;
-            background: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px auto;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            border: 3px solid #d4af37;
-            overflow: hidden; /* Pastikan gambar tidak terkeluar dari bulatan */
-        }
-
-        .school-logo {
-            width: 110px;
-            height: auto;
-            object-fit: contain;
-        }
-
-        .filter-panel { 
-            background: white; 
-            border-radius: 15px; 
-            padding: 25px; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
-            margin-top: -40px; 
-            position: relative; 
-            z-index: 10; 
-        }
-        
+        .hero { background: linear-gradient(135deg, #1a4d2e, #2e7d32); color: white; padding: 40px 0 60px 0; border-bottom: 5px solid #d4af37; text-align: center; }
+        .logo-container { width: 130px; height: 130px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: 3px solid #d4af37; overflow: hidden; }
+        .school-logo { width: 110px; height: auto; object-fit: contain; }
+        .filter-panel { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-top: -40px; position: relative; z-index: 10; }
         .card { border-radius: 15px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .chart-container { position: relative; height: 350px; width: 100%; }
         .text-hutang { color: #dc3545; font-weight: bold; }
         .total-box { background: #1a4d2e; color: white; padding: 12px 25px; border-radius: 30px; display: inline-block; margin-bottom: 20px; font-weight: 600; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .table-intervensi { background-color: #fff9e6; border-left: 6px solid #ffc107; }
 
+        /* --- TETAPAN CETAKAN (PRINT SETTINGS) --- */
         @media print {
+            @page { size: A4 portrait; margin: 1cm; }
+            body { background-color: white !important; -webkit-print-color-adjust: exact; }
             .hero { background: white !important; color: black !important; padding: 10px 0 !important; border-bottom: 2px solid #000 !important; }
             .logo-container { box-shadow: none !important; border: 1px solid #000 !important; width: 100px !important; height: 100px !important; }
             .school-logo { width: 80px !important; }
             .filter-panel, .btn-print, .nav { display: none !important; }
-            body { background-color: white !important; }
-            .card { box-shadow: none !important; border: 1px solid #ddd !important; }
-            .total-box { color: black !important; border: 1px solid #000 !important; background: none !important; }
+            .card { box-shadow: none !important; border: 1px solid #ddd !important; margin-bottom: 20px; page-break-inside: avoid; }
+            .total-box { color: black !important; border: 1px solid #000 !important; background: none !important; padding: 5px 15px !important; }
+            
+            /* Pastikan jadual muat dalam lebar kertas */
+            .table-responsive { overflow: visible !important; }
+            table { width: 100% !important; table-layout: auto !important; font-size: 10pt !important; }
+            th, td { padding: 4px !important; }
+            
+            /* Elakkan carta pecah dua halaman */
+            .chart-container { height: 300px !important; page-break-after: always; }
         }
     </style>
 </head>
@@ -103,7 +76,7 @@
                 </select>
             </div>
             <div class="col-md-2 text-center">
-                <button onclick="window.print()" class="btn btn-dark btn-lg w-100 btn-print shadow-sm">🖨️ CETAK</button>
+                <button id="btnPrint" onclick="cetakLaporan()" class="btn btn-dark btn-lg w-100 btn-print shadow-sm">🖨️ CETAK</button>
             </div>
         </div>
     </div>
@@ -127,13 +100,13 @@
             <table class="table table-hover align-middle bg-white rounded shadow-sm">
                 <thead class="table-dark">
                     <tr>
-                        <th style="width: 50px;">Bil.</th>
-                        <th>Nama Pelajar</th>
-                        <th>Kelas</th>
-                        <th>Muka Surat</th>
-                        <th>Hutang (Ms)</th>
-                        <th>Guru Halaqah</th>
-                        <th>Indikator</th>
+                        <th style="width: 5%;">Bil.</th>
+                        <th style="width: 30%;">Nama Pelajar</th>
+                        <th style="width: 15%;">Kelas</th>
+                        <th style="width: 10%;">Muka Surat</th>
+                        <th style="width: 10%;">Hutang (Ms)</th>
+                        <th style="width: 15%;">Guru Halaqah</th>
+                        <th style="width: 15%;">Indikator</th>
                     </tr>
                 </thead>
                 <tbody id="isiJadual">
@@ -240,11 +213,22 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: {
+                    onComplete: function() {
+                        // Membolehkan butang cetak hanya selepas animasi carta selesai
+                        document.getElementById('btnPrint').disabled = false;
+                    }
+                },
                 plugins: {
                     datalabels: { color: 'white', font: { weight: 'bold', size: 14 }, formatter: (v) => v > 0 ? v : '' }
                 }
             }
         });
+    }
+
+    // Fungsi khas untuk memastikan carta "render" sebelum cetak
+    function cetakLaporan() {
+        window.print();
     }
 
     window.onload = muatData;
