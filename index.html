@@ -32,11 +32,13 @@
             margin: 0 auto 20px auto;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             border: 3px solid #d4af37;
+            overflow: hidden; /* Pastikan gambar tidak terkeluar dari bulatan */
         }
 
         .school-logo {
             width: 110px;
             height: auto;
+            object-fit: contain;
         }
 
         .filter-panel { 
@@ -71,7 +73,7 @@
 <div class="hero">
     <div class="container">
         <div class="logo-container">
-            <img src="https://i.ibb.co/XrnZzH6/Logo-SMKA-Tok-Bachok.jpg" alt="Logo SMKATB" class="school-logo">
+            <img src="logo.png" alt="Logo SMKATB" class="school-logo">
         </div>
         <h2 class="fw-bold text-uppercase">Dashboard Prestasi Hafazan Tahun 2026</h2>
         <h4 class="mb-0">SMK AGAMA TOK BACHOK</h4>
