@@ -3,45 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analisis Hafazan SMKATB</title>
+    <title>Analisis Bulanan Hafazan SMKATB</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <style>
-        body { background-color: #f8f9fa; font-family: 'Poppins', sans-serif; }
+        body { background-color: #f4f7f6; font-family: 'Poppins', sans-serif; }
         .hero { background: #1e5128; color: white; padding: 25px; border-bottom: 5px solid #d4af37; text-align: center; }
-        .card { border-radius: 15px; margin-bottom: 20px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        .chart-box { height: 350px !important; }
-        .table-warning-custom { background-color: #fff3cd; border-left: 5px solid #ffc107; }
-        .badge-bawah { background-color: #dc3545; color: white; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 0.85rem; }
+        .filter-panel { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-top: -25px; position: relative; z-index: 10; }
+        .card { border-radius: 15px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        .chart-container { position: relative; height: 350px; width: 100%; }
         .text-hutang { color: #dc3545; font-weight: bold; }
-        .nav-pills .nav-link { color: #1e5128; font-weight: 600; border: 1px solid #1e5128; margin: 0 5px; }
-        .nav-pills .nav-link.active { background-color: #1e5128; color: white; }
+        .table-intervensi { background-color: #fff9e6; border-left: 5px solid #ffc107; }
     </style>
 </head>
 <body>
 
 <div class="hero">
-    <h2 class="fw-bold">ANALISIS PRESTASI HAFAZAN</h2>
-    <p class="mb-0">SMK AGAMA TOK BACHOK</p>
+    <h2 class="fw-bold">DASHBOARD ANALISIS BULANAN</h2>
+    <p class="mb-0">PEMANTAUAN PRESTASI HAFAZAN SMKATB</p>
 </div>
 
 <div class="container my-4">
-    <ul class="nav nav-pills justify-content-center mb-4">
-        <li class="nav-item"><button class="nav-link active" onclick="ambilData(1, this)">T1</button></li>
-        <li class="nav-item"><button class="nav-link" onclick="ambilData(2, this)">T2</button></li>
-        <li class="nav-item"><button class="nav-link" onclick="ambilData(3, this)">T3</button></li>
-        <li class="nav-item"><button class="nav-link" onclick="ambilData(4, this)">T4</button></li>
-        <li class="nav-item"><button class="nav-link" onclick="ambilData(5, this)">T5</button></li>
-    </ul>
-
-    <div class="card p-4 text-center">
-        <h5 class="fw-bold text-success mb-3">Statistik Keseluruhan Hafazan</h5>
-        <canvas id="barChart" class="chart-box"></canvas>
+    <div class="filter-panel mb-4">
+        <div class="row justify-content-center">
+            <div class="col-md-6 text-center">
+                <label class="form-label fw-bold text-success fs-5">Sila Pilih Bulan Analisis:</label>
+                <select id="selBulan" class="form-select form-select-lg shadow-sm" onchange="muatDataBulanan()">
+                    <option value="JAN">JANUARI</option>
+                    <option value="FEB">FEBRUARI</option>
+                    <option value="MAC">MAC</option>
+                    <option value="APR">APRIL</option>
+                    <option value="MEI">MEI</option>
+                    <option value="JUN">JUN</option>
+                    <option value="JUL">JULAI</option>
+                    <option value="OGOS">OGOS</option>
+                    <option value="SEP">SEPTEMBER</option>
+                    <option value="OKT">OKTOBER</option>
+                    <option value="NOV">NOVEMBER</option>
+                    <option value="DIS">DISEMBER</option>
+                </select>
+            </div>
+        </div>
     </div>
 
-    <div class="card p-4 table-warning-custom">
+    <div class="row">
+        <div class="col-12">
+            <div class="card p-4">
+                <h5 id="tajukCarta" class="fw-bold text-success text-center mb-3">Statistik Pencapaian</h5>
+                <div class="chart-container">
+                    <canvas id="barChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card p-4 table-intervensi">
         <h5 class="fw-bold text-danger mb-3">⚠️ SENARAI PELAJAR BAWAH SUKATAN (INTERVENSI)</h5>
         <div class="table-responsive">
             <table class="table table-hover align-middle bg-white rounded shadow-sm">
@@ -52,12 +70,11 @@
                         <th>Kelas</th>
                         <th>Muka Surat</th>
                         <th>Hutang (Ms)</th>
-                        <th>Guru Halaqah</th>
                         <th>Indikator</th>
                     </tr>
                 </thead>
                 <tbody id="isiJadual">
-                    <tr><td colspan="7" class="text-center py-4">Memproses data...</td></tr>
+                    <tr><td colspan="6" class="text-center py-4">Sila pilih bulan untuk melihat data...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -65,32 +82,43 @@
 </div>
 
 <script>
-    const links = {
-        1: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQd8KR9lDaJaaU5Ba_m-AtrsSxFXJXdPHzjGCbN8rH0dcwbRp1lQ5GaoNHI_cQpKejriavr2Ycj9-h9/pub?gid=864006815&single=true&output=csv',
-        2: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQd8KR9lDaJaaU5Ba_m-AtrsSxFXJXdPHzjGCbN8rH0dcwbRp1lQ5GaoNHI_cQpKejriavr2Ycj9-h9/pub?gid=0&single=true&output=csv',
-        3: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQd8KR9lDaJaaU5Ba_m-AtrsSxFXJXdPHzjGCbN8rH0dcwbRp1lQ5GaoNHI_cQpKejriavr2Ycj9-h9/pub?gid=1239159275&single=true&output=csv',
-        4: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQd8KR9lDaJaaU5Ba_m-AtrsSxFXJXdPHzjGCbN8rH0dcwbRp1lQ5GaoNHI_cQpKejriavr2Ycj9-h9/pub?gid=619009113&single=true&output=csv',
-        5: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQd8KR9lDaJaaU5Ba_m-AtrsSxFXJXdPHzjGCbN8rH0dcwbRp1lQ5GaoNHI_cQpKejriavr2Ycj9-h9/pub?gid=1591484628&single=true&output=csv'
+    // SEMUA PAUTAN CSV ANDA
+    const pautanBulan = {
+        "JAN": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTYiDjR12MHpZvInZnwExZxUdha7h3Ud7okqz8YjCp62F4GAFjeobZqj6PPB3NfBcYlP_rbmW6if3DM/pub?gid=0&single=true&output=csv",
+        "FEB": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTYiDjR12MHpZvInZnwExZxUdha7h3Ud7okqz8YjCp62F4GAFjeobZqj6PPB3NfBcYlP_rbmW6if3DM/pub?gid=1376498148&single=true&output=csv",
+        "MAC": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTYiDjR12MHpZvInZnwExZxUdha7h3Ud7okqz8YjCp62F4GAFjeobZqj6PPB3NfBcYlP_rbmW6if3DM/pub?gid=216137022&single=true&output=csv",
+        "APR": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTYiDjR12MHpZvInZnwExZxUdha7h3Ud7okqz8YjCp62F4GAFjeobZqj6PPB3NfBcYlP_rbmW6if3DM/pub?gid=1844714932&single=true&output=csv",
+        "MEI": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTYiDjR12MHpZvInZnwExZxUdha7h3Ud7okqz8YjCp62F4GAFjeobZqj6PPB3NfBcYlP_rbmW6if3DM/pub?gid=544457727&single=true&output=csv",
+        "JUN": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTYiDjR12MHpZvInZnwExZxUdha7h3Ud7okqz8YjCp62F4GAFjeobZqj6PPB3NfBcYlP_rbmW6if3DM/pub?gid=175525940&single=true&output=csv",
+        "JUL": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTYiDjR12MHpZvInZnwExZxUdha7h3Ud7okqz8YjCp62F4GAFjeobZqj6PPB3NfBcYlP_rbmW6if3DM/pub?gid=1723006112&single=true&output=csv",
+        "OGOS": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTYiDjR12MHpZvInZnwExZxUdha7h3Ud7okqz8YjCp62F4GAFjeobZqj6PPB3NfBcYlP_rbmW6if3DM/pub?gid=2006426475&single=true&output=csv",
+        "SEP": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTYiDjR12MHpZvInZnwExZxUdha7h3Ud7okqz8YjCp62F4GAFjeobZqj6PPB3NfBcYlP_rbmW6if3DM/pub?gid=845385119&single=true&output=csv",
+        "OKT": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTYiDjR12MHpZvInZnwExZxUdha7h3Ud7okqz8YjCp62F4GAFjeobZqj6PPB3NfBcYlP_rbmW6if3DM/pub?gid=504640802&single=true&output=csv",
+        "NOV": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTYiDjR12MHpZvInZnwExZxUdha7h3Ud7okqz8YjCp62F4GAFjeobZqj6PPB3NfBcYlP_rbmW6if3DM/pub?gid=452114125&single=true&output=csv",
+        "DIS": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTYiDjR12MHpZvInZnwExZxUdha7h3Ud7okqz8YjCp62F4GAFjeobZqj6PPB3NfBcYlP_rbmW6if3DM/pub?gid=457144559&single=true&output=csv"
     };
 
     let bChart;
     Chart.register(ChartDataLabels);
 
-    function ambilData(ting, btn) {
-        document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
-        btn.classList.add('active');
+    function muatDataBulanan() {
+        const bulan = document.getElementById('selBulan').value;
+        const url = pautanBulan[bulan];
+        const tajuk = document.getElementById('selBulan').options[document.getElementById('selBulan').selectedIndex].text;
+        
+        document.getElementById('tajukCarta').innerText = "Statistik Pencapaian : " + tajuk;
 
-        Papa.parse(links[ting], {
+        Papa.parse(url, {
             download: true,
             header: true,
             skipEmptyLines: true,
             complete: function(res) {
-                prosesData(res.data);
+                prosesAnalisis(res.data);
             }
         });
     }
 
-    function prosesData(data) {
+    function prosesAnalisis(data) {
         const tbody = document.getElementById('isiJadual');
         tbody.innerHTML = "";
         let s = { "Khatam": 0, "Lebih": 0, "Dalam": 0, "Bawah": 0 };
@@ -103,50 +131,42 @@
             };
 
             let nama = cari('namapelajar');
-            let ms = cari('mukasurat');
-            let sukatan = cari('sukatansemasa');
-            let kelas = cari('kelas');
-            let guru = cari('guruhalaqah');
-            let indikator = cari('indikator');
+            let ms = parseFloat(cari('mukasurat')) || 0;
+            let sukatan = parseFloat(cari('sukatansemasa')) || 0;
+            let indikator = cari('indikator').toUpperCase();
+            let hutang = Math.max(0, sukatan - ms);
 
-            // Pengiraan Hutang
-            let msVal = parseFloat(ms) || 0;
-            let sukatanVal = parseFloat(sukatan) || 0;
-            let hutang = sukatanVal - msVal;
-            if (hutang < 0) hutang = 0; // Tak dikira hutang jika lebih sukatan
+            // Statistik Carta
+            if(indikator.includes('KHATAM')) s.Khatam++;
+            else if(indikator.includes('LEBIH')) s.Lebih++;
+            else if(indikator.includes('DALAM')) s.Dalam++;
+            else if(indikator.includes('BAWAH')) s.Bawah++;
 
-            let indUpper = indikator.toString().toUpperCase();
-
-            if(indUpper.includes('KHATAM')) s.Khatam++;
-            else if(indUpper.includes('LEBIH')) s.Lebih++;
-            else if(indUpper.includes('DALAM')) s.Dalam++;
-            else if(indUpper.includes('BAWAH')) s.Bawah++;
-
-            if(indUpper.includes('BAWAH')) {
+            // Masukkan ke Jadual jika Bawah Sukatan
+            if(indikator.includes('BAWAH')) {
                 count++;
                 tbody.innerHTML += `<tr>
                     <td>${count}</td>
-                    <td class="fw-bold text-dark">${nama}</td>
-                    <td>${kelas}</td>
+                    <td class="fw-bold text-uppercase small">${nama}</td>
+                    <td>${cari('kelas')}</td>
                     <td>${ms}</td>
                     <td class="text-hutang">${hutang}</td>
-                    <td>${guru}</td>
-                    <td><span class="badge-bawah">${indikator}</span></td>
+                    <td><span class="badge bg-danger">${cari('indikator')}</span></td>
                 </tr>`;
             }
         });
 
         if(tbody.innerHTML === "") {
-            tbody.innerHTML = "<tr><td colspan='7' class='text-center py-4 text-muted'>Alhamdulillah, tiada rekod bawah sukatan dijumpai.</td></tr>";
+            tbody.innerHTML = "<tr><td colspan='6' class='text-center py-4 text-muted'>Alhamdulillah, tiada rekod intervensi untuk bulan ini.</td></tr>";
         }
 
-        updateCharts(s);
+        updateChart(s);
     }
 
-    function updateCharts(s) {
-        const ctxB = document.getElementById('barChart');
+    function updateChart(s) {
+        const ctx = document.getElementById('barChart');
         if(bChart) bChart.destroy();
-        bChart = new Chart(ctxB, {
+        bChart = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: ['Khatam', 'Lebih Sukatan', 'Dalam Sukatan', 'Bawah Sukatan'],
@@ -159,13 +179,15 @@
             options: {
                 maintainAspectRatio: false,
                 plugins: {
-                    datalabels: { color: 'white', font: { weight: 'bold', size: 14 }, formatter: (v) => v > 0 ? v : '' }
-                }
+                    datalabels: { color: 'white', font: { weight: 'bold' }, formatter: (v) => v > 0 ? v : '' }
+                },
+                scales: { y: { beginAtZero: true } }
             }
         });
     }
 
-    window.onload = () => ambilData(1, document.querySelector('.nav-link.active'));
+    // Load Januari secara automatik
+    window.onload = muatDataBulanan;
 </script>
 </body>
 </html>
