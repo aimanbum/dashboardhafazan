@@ -46,20 +46,21 @@
             -webkit-print-color-adjust: exact;
         }
 
-        .table-intervensi { background-color: #fff9e6 !important; border: 1px solid #ffeeba !important; border-radius: 10px; overflow: hidden; }
-        .table thead th { background-color: #212529 !important; color: white !important; border: none; text-transform: uppercase; font-size: 0.8rem; vertical-align: middle; text-align: center; }
+        /* Juzuk Grid Styling */
+        .juzuk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 10px; margin-top: 15px; }
+        .juzuk-item { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 8px 5px; text-align: center; }
+        .juzuk-num { font-size: 0.75rem; color: #6c757d; display: block; }
+        .juzuk-val { font-weight: bold; font-size: 1.1rem; color: #1a4d2e; }
+        .juzuk-item.active { background: #e8f5e9; border-color: #2e7d32; }
+
+        .table-intervensi { background-color: #fff9e6 !important; border: 1px solid #ffeeba !important; }
+        .table thead th { background-color: #212529 !important; color: white !important; text-align: center; font-size: 0.8rem; }
         .text-hutang { color: #dc3545 !important; font-weight: bold; }
         
         .badge-bawah {
             border: 2px solid #dc3545 !important;
             color: #dc3545 !important;
-            background-color: transparent !important;
-            font-weight: bold;
-            border-radius: 20px;
-            padding: 2px 10px;
-            font-size: 0.7rem;
-            display: inline-block;
-            white-space: nowrap;
+            font-weight: bold; border-radius: 20px; padding: 2px 10px; font-size: 0.7rem;
         }
 
         @media print {
@@ -69,8 +70,8 @@
             .card { box-shadow: none !important; border: 1px solid #ccc !important; page-break-inside: avoid; }
             .total-box { border: 1px solid #1a4d2e !important; color: #1a4d2e !important; background: none !important; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            table { width: 100% !important; font-size: 9pt; }
-            .badge-bawah { border: 2px solid #dc3545 !important; }
+            table { width: 100% !important; font-size: 8pt; }
+            .juzuk-grid { grid-template-columns: repeat(10, 1fr) !important; }
         }
     </style>
 </head>
@@ -87,7 +88,7 @@
 </div>
 
 <div class="container my-4">
-    <div class="filter-panel mb-4">
+    <div class="filter-panel mb-4 btn-print">
         <div class="row g-3 justify-content-center align-items-end">
             <div class="col-md-3">
                 <label class="form-label fw-bold">Bulan:</label>
@@ -121,6 +122,12 @@
     </div>
 
     <div class="card p-3 mb-4">
+        <h6 class="fw-bold text-success border-bottom pb-2">BILANGAN PELAJAR MENGIKUT JUZUK</h6>
+        <div id="juzukGrid" class="juzuk-grid">
+            </div>
+    </div>
+
+    <div class="card p-3 mb-4">
         <h5 id="tajukCarta" class="fw-bold text-success text-center mb-3">Analisis Pencapaian</h5>
         <div class="chart-container">
             <canvas id="barChart"></canvas>
@@ -144,7 +151,7 @@
                     </tr>
                 </thead>
                 <tbody id="isiJadual">
-                    <tr><td colspan="8" class="text-center py-4">Sila pilih Bulan dan Tingkatan...</td></tr>
+                    <tr><td colspan="8" class="text-center py-4">Memproses data...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -174,8 +181,6 @@
         const bulan = document.getElementById('selBulan').value;
         const ting = document.getElementById('selTing').value;
         const url = pautanBulan[bulan];
-        const namaBulan = document.getElementById('selBulan').options[document.getElementById('selBulan').selectedIndex].text;
-        
         document.getElementById('txtTing').innerText = ting;
 
         Papa.parse(url, {
@@ -186,8 +191,12 @@
 
     function prosesAnalisis(data, filterTing) {
         const tbody = document.getElementById('isiJadual');
+        const jGrid = document.getElementById('juzukGrid');
         tbody.innerHTML = "";
+        jGrid.innerHTML = "";
+
         let s = { "Khatam": 0, "Lebih": 0, "Bawah": 0 };
+        let juzukCounts = Array(31).fill(0); // Index 1-30
         let totalCount = 0;
         let bawahCount = 0;
 
@@ -209,6 +218,12 @@
                 let sukatan = parseFloat(cari('sukatansemasa')) || 0;
                 let hutang = Math.max(0, sukatan - ms);
 
+                // Kira Juzuk (Formula Mushaf Madinah)
+                let currentJuz = ms <= 1 ? 0 : Math.ceil((ms - 1) / 20);
+                if (currentJuz >= 1 && currentJuz <= 30) {
+                    juzukCounts[currentJuz]++;
+                }
+
                 if(ind.includes('KHATAM')) s.Khatam++;
                 else if(ind.includes('LEBIH')) s.Lebih++;
                 else if(ind.includes('BAWAH')) s.Bawah++;
@@ -229,6 +244,12 @@
             }
         });
 
+        // Paparkan Grid Juzuk
+        for (let i = 1; i <= 30; i++) {
+            let activeClass = juzukCounts[i] > 0 ? 'active' : '';
+            jGrid.innerHTML += `<div class="juzuk-item ${activeClass}"><span class="juzuk-num">Juz ${i}</span><span class="juzuk-val">${juzukCounts[i]}</span></div>`;
+        }
+
         document.getElementById('totalPelajar').innerText = totalCount;
         if(tbody.innerHTML === "") tbody.innerHTML = "<tr><td colspan='8' class='text-center py-4 text-muted'>Tiada rekod intervensi dijumpai.</td></tr>";
         updateChart(s);
@@ -248,8 +269,7 @@
                 }]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
+                responsive: true, maintainAspectRatio: false,
                 plugins: {
                     datalabels: { color: 'white', font: { weight: 'bold', size: 14 }, formatter: (v) => v > 0 ? v : '' }
                 }
