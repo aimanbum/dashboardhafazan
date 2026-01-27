@@ -19,7 +19,7 @@
         
         /* Stats Boxes */
         .total-box { background: #1a4d2e !important; color: white !important; padding: 10px 20px; border-radius: 30px; display: inline-block; margin: 10px 5px; -webkit-print-color-adjust: exact; font-weight: bold; }
-        .skip-box { background: #fd7e14 !important; } /* Warna Jingga untuk Skip */
+        .skip-box { background: #fd7e14 !important; }
 
         .juzuk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 10px; margin-top: 15px; }
         .juzuk-item { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 8px 5px; text-align: center; }
@@ -33,10 +33,13 @@
         .table-skip { background-color: #fff5eb !important; border: 1px solid #fd7e14 !important; }
         .table thead th { background-color: #212529 !important; color: white !important; text-align: center; font-size: 0.8rem; }
         
+        .badge-bawah { border: 2px solid #dc3545 !important; color: #dc3545 !important; font-weight: bold; border-radius: 20px; padding: 2px 10px; font-size: 0.7rem; }
+
         @media print {
             .filter-panel, .btn-print { display: none !important; }
             .card { page-break-inside: avoid; }
             * { -webkit-print-color-adjust: exact !important; }
+            table { width: 100% !important; font-size: 8pt; }
         }
     </style>
 </head>
@@ -92,19 +95,21 @@
 
     <div id="ringkasanSection" class="card p-3 mb-4 d-none">
         <h6 class="fw-bold text-success border-bottom pb-2">RINGKASAN PRESTASI MENGIKUT TINGKATAN</h6>
-        <table class="table table-bordered text-center align-middle">
-            <thead class="table-dark">
-                <tr>
-                    <th>Tingkatan</th>
-                    <th>Jumlah</th>
-                    <th class="bg-success">Khatam</th>
-                    <th class="bg-primary">Lebih Sukatan</th>
-                    <th class="bg-danger">Bawah Sukatan</th>
-                    <th class="bg-warning text-dark">Skip Hafazan</th>
-                </tr>
-            </thead>
-            <tbody id="isiRingkasan"></tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="table table-bordered text-center align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Tingkatan</th>
+                        <th>Jumlah</th>
+                        <th class="bg-success">Khatam</th>
+                        <th class="bg-primary">Lebih Sukatan</th>
+                        <th class="bg-danger">Bawah Sukatan</th>
+                        <th class="bg-warning text-dark">Skip</th>
+                    </tr>
+                </thead>
+                <tbody id="isiRingkasan"></tbody>
+            </table>
+        </div>
     </div>
 
     <div class="card p-3 mb-4">
@@ -124,7 +129,7 @@
         <div class="table-responsive">
             <table class="table table-bordered align-middle">
                 <thead>
-                    <tr><th>Bil.</th><th>Nama</th><th>Kelas</th><th>Sukatan</th><th>Ms</th><th>Hutang</th><th>Guru Halaqah</th><th>Pencapaian</th></tr>
+                    <tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Sukatan</th><th>Ms</th><th>Hutang</th><th>Guru Halaqah</th><th>Pencapaian</th></tr>
                 </thead>
                 <tbody id="isiJadual"></tbody>
             </table>
@@ -200,10 +205,9 @@
                 let ind = (cari('indikator') || "").toUpperCase();
                 let ms = parseFloat(cari('mukasurat')) || 0;
                 let sukatan = parseFloat(cari('sukatansemasa')) || 0;
-                let skipVal = cari('skip'); // Kolum SKIP
-                let catatan = cari('catatan'); // Kolum CATATAN
+                let skipVal = cari('skip');
+                let catatan = cari('catatan');
 
-                // Kesan Skip: Jika kolum SKIP ada isi ATAU Indikator ada perkataan "SKIP"
                 let isSkip = (skipVal && skipVal !== "" && skipVal !== "0") || ind.includes("SKIP");
 
                 if (tingSummary[tingData]) {
@@ -216,7 +220,7 @@
 
                 if (isSkip) {
                     s.Skip++; skipCount++;
-                    tSkip.innerHTML += `<tr><td>${skipCount}</td><td class="fw-bold">${nama}</td><td>${kls}</td><td>${cari('guruhalaqah')}</td><td>${catatan || skipVal || 'Tiada Catatan'}</td></tr>`;
+                    tSkip.innerHTML += `<tr><td class="text-center">${skipCount}</td><td class="fw-bold">${nama}</td><td class="text-center">${kls}</td><td>${cari('guruhalaqah')}</td><td>${catatan || skipVal || 'Tiada Catatan'}</td></tr>`;
                 } else {
                     if (ms >= 604) juzukCounts[30]++;
                     else { let cJ = ms <= 1 ? 0 : Math.ceil((ms - 1) / 20); if (cJ >= 1 && cJ <= 30) juzukCounts[cJ]++; }
@@ -224,7 +228,7 @@
                     else if(ind.includes('LEBIH')) s.Lebih++;
                     else if(ind.includes('BAWAH')) {
                         s.Bawah++; bawahCount++;
-                        tbody.innerHTML += `<tr><td>${bawahCount}</td><td class="fw-bold">${nama}</td><td>${kls}</td><td>${sukatan}</td><td>${ms}</td><td class="text-hutang">${Math.max(0, sukatan-ms)}</td><td>${cari('guruhalaqah')}</td><td><span class="badge-bawah">${ind}</span></td></tr>`;
+                        tbody.innerHTML += `<tr><td class="text-center">${bawahCount}</td><td class="fw-bold" style="font-size:0.75rem;">${nama}</td><td class="text-center small">${kls}</td><td class="text-center">${sukatan}</td><td class="text-center">${ms}</td><td class="text-center text-hutang">${Math.max(0, sukatan-ms)}</td><td class="small">${cari('guruhalaqah')}</td><td class="text-center"><span class="badge-bawah">${ind}</span></td></tr>`;
                     }
                 }
             }
@@ -253,14 +257,14 @@
         bChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['Khatam', 'Lebih Sukatan', 'Bawah Sukatan', 'Skip Hafazan'],
+                labels: ['Khatam', 'Lebih Sukatan', 'Bawah Sukatan'], // SKIP DIKELUARKAN DARI SINI
                 datasets: [{
                     label: 'Bilangan Pelajar',
-                    data: [s.Khatam, s.Lebih, s.Bawah, s.Skip],
-                    backgroundColor: ['#198754', '#0d6efd', '#dc3545', '#fd7e14']
+                    data: [s.Khatam, s.Lebih, s.Bawah], // DATA SKIP TIDAK DIMASUKKAN
+                    backgroundColor: ['#198754', '#0d6efd', '#dc3545']
                 }]
             },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { color: 'white', font: { weight: 'bold' } } } }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { color: 'white', font: { weight: 'bold', size: 14 } } } }
         });
     }
     window.onload = muatData;
