@@ -17,7 +17,6 @@
         .card { border-radius: 15px; border: 1px solid #eee; margin-bottom: 20px; background: white; }
         .chart-container { position: relative; height: 350px; width: 100%; }
         
-        /* Stats Boxes */
         .total-box { background: #1a4d2e !important; color: white !important; padding: 10px 20px; border-radius: 30px; display: inline-block; margin: 10px 5px; -webkit-print-color-adjust: exact; font-weight: bold; }
         .skip-box { background: #fd7e14 !important; }
 
@@ -103,8 +102,8 @@
                         <th>Jumlah</th>
                         <th class="bg-success">Khatam</th>
                         <th class="bg-primary">Lebih Sukatan</th>
-                        <th class="bg-danger">Bawah Sukatan</th>
-                        <th class="bg-warning text-dark">Skip</th>
+                        <th class="bg-danger">Bawah SUkatan</th>
+                        <th class="bg-warning text-dark">Skip Hafazan</th>
                     </tr>
                 </thead>
                 <tbody id="isiRingkasan"></tbody>
@@ -141,7 +140,7 @@
         <div class="table-responsive">
             <table class="table table-bordered align-middle">
                 <thead>
-                    <tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Guru Halaqah</th><th>Jumlah M/S Skip</th></tr>
+                    <tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Pencapaian Semasa</th><th>Guru Halaqah</th><th>Jumlah M/S Skip</th></tr>
                 </thead>
                 <tbody id="isiSkip"></tbody>
             </table>
@@ -183,7 +182,7 @@
         
         tbody.innerHTML = ""; tSkip.innerHTML = ""; jGrid.innerHTML = ""; rBody.innerHTML = "";
 
-        let s = { "Khatam": 0, "Lebih": 0, "Bawah": 0, "Skip": 0 };
+        let s = { "Khatam": 0, "Lebih": 0, "Bawah": 0 };
         let juzukCounts = Array(31).fill(0); 
         let tingSummary = {"1":{t:0,k:0,l:0,b:0,s:0},"2":{t:0,k:0,l:0,b:0,s:0},"3":{t:0,k:0,l:0,b:0,s:0},"4":{t:0,k:0,l:0,b:0,s:0},"5":{t:0,k:0,l:0,b:0,s:0}};
         
@@ -210,27 +209,33 @@
 
                 let isSkip = (skipVal && skipVal !== "" && skipVal !== "0") || ind.includes("SKIP");
 
+                // LOGIK BARU: Pengiraan Carta & Ringkasan tetap ikut prestasi
                 if (tingSummary[tingData]) {
                     tingSummary[tingData].t++;
-                    if(isSkip) tingSummary[tingData].s++;
-                    else if(ind.includes('KHATAM')) tingSummary[tingData].k++;
+                    if(isSkip) tingSummary[tingData].s++; // Tetap kira jumlah skip untuk ringkasan
+                    
+                    if(ind.includes('KHATAM')) tingSummary[tingData].k++;
                     else if(ind.includes('LEBIH')) tingSummary[tingData].l++;
                     else if(ind.includes('BAWAH')) tingSummary[tingData].b++;
                 }
 
-                if (isSkip) {
-                    s.Skip++; skipCount++;
-                    tSkip.innerHTML += `<tr><td class="text-center">${skipCount}</td><td class="fw-bold">${nama}</td><td class="text-center">${kls}</td><td>${cari('guruhalaqah')}</td><td>${catatan || skipVal || 'Tiada Catatan'}</td></tr>`;
-                } else {
-                    if (ms >= 604) juzukCounts[30]++;
-                    else { let cJ = ms <= 1 ? 0 : Math.ceil((ms - 1) / 20); if (cJ >= 1 && cJ <= 30) juzukCounts[cJ]++; }
-                    if(ind.includes('KHATAM')) s.Khatam++;
-                    else if(ind.includes('LEBIH')) s.Lebih++;
-                    else if(ind.includes('BAWAH')) {
-                        s.Bawah++; bawahCount++;
-                        tbody.innerHTML += `<tr><td class="text-center">${bawahCount}</td><td class="fw-bold" style="font-size:0.75rem;">${nama}</td><td class="text-center small">${kls}</td><td class="text-center">${sukatan}</td><td class="text-center">${ms}</td><td class="text-center text-hutang">${Math.max(0, sukatan-ms)}</td><td class="small">${cari('guruhalaqah')}</td><td class="text-center"><span class="badge-bawah">${ind}</span></td></tr>`;
-                    }
+                // Masuk ke dalam pengiraan carta (Khatam/Lebih/Bawah) walaupun dia skip
+                if(ind.includes('KHATAM')) s.Khatam++;
+                else if(ind.includes('LEBIH')) s.Lebih++;
+                else if(ind.includes('BAWAH')) {
+                    s.Bawah++; bawahCount++;
+                    tbody.innerHTML += `<tr><td class="text-center">${bawahCount}</td><td class="fw-bold" style="font-size:0.75rem;">${nama}</td><td class="text-center small">${kls}</td><td class="text-center">${sukatan}</td><td class="text-center">${ms}</td><td class="text-center text-hutang">${Math.max(0, sukatan-ms)}</td><td class="small">${cari('guruhalaqah')}</td><td class="text-center"><span class="badge-bawah">${ind}</span></td></tr>`;
                 }
+
+                // Logik Jadual Skip (Asingkan dari logik carta)
+                if (isSkip) {
+                    skipCount++;
+                    tSkip.innerHTML += `<tr><td class="text-center">${skipCount}</td><td class="fw-bold">${nama}</td><td class="text-center">${kls}</td><td class="text-center small">${ind}</td><td>${cari('guruhalaqah')}</td><td>${catatan || skipVal || 'Tiada Catatan'}</td></tr>`;
+                }
+
+                // Pengiraan Juzuk
+                if (ms >= 604) juzukCounts[30]++;
+                else { let cJ = ms <= 1 ? 0 : Math.ceil((ms - 1) / 20); if (cJ >= 1 && cJ <= 30) juzukCounts[cJ]++; }
             }
         });
 
@@ -257,10 +262,10 @@
         bChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['Khatam', 'Lebih Sukatan', 'Bawah Sukatan'], // SKIP DIKELUARKAN DARI SINI
+                labels: ['Khatam', 'Lebih Sukatan', 'Bawah Sukatan'],
                 datasets: [{
                     label: 'Bilangan Pelajar',
-                    data: [s.Khatam, s.Lebih, s.Bawah], // DATA SKIP TIDAK DIMASUKKAN
+                    data: [s.Khatam, s.Lebih, s.Bawah],
                     backgroundColor: ['#198754', '#0d6efd', '#dc3545']
                 }]
             },
