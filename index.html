@@ -28,7 +28,17 @@
         .table-skip { background-color: #fff5eb !important; border: 1px solid #fd7e14 !important; }
         .table thead th { background-color: #212529 !important; color: white !important; text-align: center; font-size: 0.8rem; }
         .badge-bawah { border: 2px solid #dc3545 !important; color: #dc3545 !important; font-weight: bold; border-radius: 20px; padding: 2px 10px; font-size: 0.7rem; }
-        @media print { .filter-panel, .btn-print { display: none !important; } .card { page-break-inside: avoid; } * { -webkit-print-color-adjust: exact !important; } table { width: 100% !important; font-size: 8pt; } }
+        
+        /* GAYA PRINT BARU */
+        @media print { 
+            .filter-panel, .btn-print { display: none !important; } 
+            .card { page-break-inside: avoid; border: 1px solid #ddd !important; } 
+            * { -webkit-print-color-adjust: exact !important; } 
+            table { width: 100% !important; font-size: 8pt; }
+            .juzuk-grid { grid-template-columns: repeat(10, 1fr) !important; }
+            #infoCetak { display: block !important; font-weight: bold; color: #1a4d2e; margin-top: 10px; }
+        }
+        #infoCetak { display: none; } /* Sembunyi dalam skrin, muncul dalam print */
     </style>
 </head>
 <body>
@@ -40,6 +50,9 @@
         </div>
         <h2 class="fw-bold text-uppercase">Dashboard Prestasi Hafazan Tahun 2026</h2>
         <h4 class="mb-0">SMK AGAMA TOK BACHOK</h4>
+        <div id="infoCetak" class="mt-2 text-white">
+            DATA : <span id="paparTing"></span> | BULAN : <span id="paparBulan"></span>
+        </div>
     </div>
 </div>
 
@@ -144,9 +157,18 @@
     Chart.register(ChartDataLabels);
 
     function muatData() {
-        const bulan = document.getElementById('selBulan').value;
+        const bulanCode = document.getElementById('selBulan').value;
+        const bulanText = document.getElementById('selBulan').options[document.getElementById('selBulan').selectedIndex].text;
         const ting = document.getElementById('selTing').value;
-        const url = pautanBulan[bulan];
+        const url = pautanBulan[bulanCode];
+
+        // Set Maklumat untuk Cetakan & Paparan
+        const labelTing = (ting === "ALL") ? "KESELURUHAN" : "TINGKATAN " + ting;
+        document.getElementById('labelTing').innerText = (ting === "ALL") ? "Keseluruhan Pelajar" : "Jumlah Pelajar Tingkatan " + ting;
+        document.getElementById('paparTing').innerText = labelTing;
+        document.getElementById('paparBulan').innerText = bulanText;
+        document.getElementById('tajukCarta').innerText = "Analisis " + labelTing + " : " + bulanText;
+
         Papa.parse(url, { download: true, header: true, skipEmptyLines: true, complete: function(res) { prosesAnalisis(res.data, ting); } });
     }
 
@@ -169,7 +191,6 @@
             };
 
             let nama = cari('namapelajar');
-            // SYARAT BARU: Abaikan baris jika Nama Pelajar kosong
             if (!nama || nama.trim() === "") return;
 
             let kls = cari('kelas');
