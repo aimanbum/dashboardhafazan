@@ -28,8 +28,6 @@
         .table-skip { background-color: #fff5eb !important; border: 1px solid #fd7e14 !important; }
         .table thead th { background-color: #212529 !important; color: white !important; text-align: center; font-size: 0.8rem; }
         .badge-bawah { border: 2px solid #dc3545 !important; color: #dc3545 !important; font-weight: bold; border-radius: 20px; padding: 2px 10px; font-size: 0.7rem; }
-        
-        /* Gaya Teks Peratusan */
         .txt-peratus { font-size: 0.75rem; display: block; color: #666; font-weight: normal; }
 
         @media print { 
@@ -139,7 +137,7 @@
         <h5 class="fw-bold text-warning text-dark mb-3">🟠 SENARAI PELAJAR SKIP HAFAZAN</h5>
         <div class="table-responsive">
             <table class="table table-bordered align-middle">
-                <thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Pencapaian Semasa</th><th>Guru Halaqah</th><th>Jumlah M/S Skip</th></tr></thead>
+                <thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Pencapaian Semasa</th><th>Guru Halaqah</th><th>Catatan Skip</th></tr></thead>
                 <tbody id="isiSkip"></tbody>
             </table>
         </div>
@@ -169,7 +167,9 @@
         const bulanCode = document.getElementById('selBulan').value;
         const bulanText = document.getElementById('selBulan').options[document.getElementById('selBulan').selectedIndex].text;
         const ting = document.getElementById('selTing').value;
-        const url = pautanBulan[bulanCode] + "?cb=" + new Date().getTime(); // Anti-cache
+        
+        // Anti-cache yang dibetulkan (Guna & bukan ?)
+        const url = pautanBulan[bulanCode] + "&cb=" + new Date().getTime();
 
         const labelTing = (ting === "ALL") ? "KESELURUHAN" : "TINGKATAN " + ting;
         document.getElementById('labelTing').innerText = (ting === "ALL") ? "Keseluruhan Pelajar" : "Jumlah Pelajar Tingkatan " + ting;
@@ -211,7 +211,6 @@
                 let ms = parseFloat(cari('mukasurat')) || 0;
                 let sukatan = parseFloat(cari('sukatansemasa')) || 0;
                 let skipVal = cari('skip');
-                let catatan = cari('catatan');
                 let isSkip = (skipVal && skipVal !== "" && skipVal !== "0") || ind.includes("SKIP");
 
                 if (tingSummary[tingData]) {
@@ -231,7 +230,7 @@
 
                 if (isSkip) {
                     skipCount++;
-                    tSkip.innerHTML += `<tr><td class="text-center">${skipCount}</td><td class="fw-bold">${nama}</td><td class="text-center">${kls}</td><td class="text-center small">${ind}</td><td>${cari('guruhalaqah')}</td><td>${catatan || skipVal || 'Tiada Catatan'}</td></tr>`;
+                    tSkip.innerHTML += `<tr><td class="text-center">${skipCount}</td><td class="fw-bold">${nama}</td><td class="text-center">${kls}</td><td class="text-center small">${ind}</td><td>${cari('guruhalaqah')}</td><td>${cari('catatan') || 'Tiada Catatan'}</td></tr>`;
                 }
 
                 if (ms >= 604) juzukCounts[30]++;
@@ -242,20 +241,12 @@
         if (filterTing === "ALL") {
             document.getElementById('ringkasanSection').classList.remove('d-none');
             for (let t in tingSummary) {
-                let rowTotal = tingSummary[t].t;
-                // Kira peratusan
-                let percLebih = rowTotal > 0 ? ((tingSummary[t].l / rowTotal) * 100).toFixed(1) : "0.0";
-                let percBawah = rowTotal > 0 ? ((tingSummary[t].b / rowTotal) * 100).toFixed(1) : "0.0";
-                let percSkip = rowTotal > 0 ? ((tingSummary[t].s / rowTotal) * 100).toFixed(1) : "0.0";
+                let rTotal = tingSummary[t].t;
+                let pL = rTotal > 0 ? ((tingSummary[t].l / rTotal) * 100).toFixed(1) : "0.0";
+                let pB = rTotal > 0 ? ((tingSummary[t].b / rTotal) * 100).toFixed(1) : "0.0";
+                let pS = rTotal > 0 ? ((tingSummary[t].s / rTotal) * 100).toFixed(1) : "0.0";
 
-                rBody.innerHTML += `<tr>
-                    <td class="fw-bold">TING ${t}</td>
-                    <td>${rowTotal}</td>
-                    <td class="text-success fw-bold">${tingSummary[t].k}</td>
-                    <td class="text-primary fw-bold">${tingSummary[t].l}<span class="txt-peratus">(${percLebih}%)</span></td>
-                    <td class="text-danger fw-bold">${tingSummary[t].b}<span class="txt-peratus">(${percBawah}%)</span></td>
-                    <td class="text-warning fw-bold" style="color:#fd7e14 !important;">${tingSummary[t].s}<span class="txt-peratus">(${percSkip}%)</span></td>
-                </tr>`;
+                rBody.innerHTML += `<tr><td class="fw-bold">TING ${t}</td><td>${rTotal}</td><td class="text-success">${tingSummary[t].k}</td><td class="text-primary">${tingSummary[t].l}<span class="txt-peratus">(${pL}%)</span></td><td class="text-danger">${tingSummary[t].b}<span class="txt-peratus">(${pB}%)</span></td><td class="text-warning fw-bold" style="color:#fd7e14 !important;">${tingSummary[t].s}<span class="txt-peratus">(${pS}%)</span></td></tr>`;
             }
         } else { document.getElementById('ringkasanSection').classList.add('d-none'); }
 
