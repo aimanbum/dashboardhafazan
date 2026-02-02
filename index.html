@@ -29,16 +29,15 @@
         .table thead th { background-color: #212529 !important; color: white !important; text-align: center; font-size: 0.8rem; }
         .badge-bawah { border: 2px solid #dc3545 !important; color: #dc3545 !important; font-weight: bold; border-radius: 20px; padding: 2px 10px; font-size: 0.7rem; }
         
-        /* CSS TAMBAHAN UNTUK PERATUS BOLD */
+        /* CSS KHAS PERATUS BOLD */
         .txt-peratus { 
             font-size: 0.75rem; 
             display: block; 
-            color: #495057; /* Warna kelabu gelap sikit */
-            font-weight: bold !important; /* INI YANG MEMBUATKAN DIA BOLD */
+            color: #495057; 
+            font-weight: bold !important; 
             margin-top: 2px;
         }
 
-        /* GAYA PRINT BARU */
         @media print { 
             .filter-panel, .btn-print { display: none !important; } 
             .card { page-break-inside: avoid; border: 1px solid #ddd !important; } 
@@ -47,7 +46,7 @@
             .juzuk-grid { grid-template-columns: repeat(10, 1fr) !important; }
             #infoCetak { display: block !important; font-weight: bold; color: #1a4d2e; margin-top: 10px; }
         }
-        #infoCetak { display: none; } /* Sembunyi dalam skrin, muncul dalam print */
+        #infoCetak { display: none; }
     </style>
 </head>
 <body>
@@ -108,7 +107,7 @@
         <div class="table-responsive">
             <table class="table table-bordered text-center align-middle">
                 <thead class="table-dark">
-                    <tr><th>Tingkatan</th><th>Jumlah</th><th class="bg-success">Khatam</th><th class="bg-primary">Lebih Sukatan</th><th class="bg-danger">Bawah Sukatan</th><th class="bg-warning text-dark">Skip Hafazan</th></tr>
+                    <tr><th>Tingkatan</th><th>Jumlah</th><th class="bg-success">Khatam</th><th class="bg-primary">Lebih Sukatan (%)</th><th class="bg-danger">Bawah Sukatan (%)</th><th class="bg-warning text-dark">Skip Hafazan (%)</th></tr>
                 </thead>
                 <tbody id="isiRingkasan"></tbody>
             </table>
@@ -169,9 +168,8 @@
         const bulanCode = document.getElementById('selBulan').value;
         const bulanText = document.getElementById('selBulan').options[document.getElementById('selBulan').selectedIndex].text;
         const ting = document.getElementById('selTing').value;
-        const url = pautanBulan[bulanCode] + "&cb=" + new Date().getTime(); // Tambah anti-cache
+        const url = pautanBulan[bulanCode] + "&cb=" + new Date().getTime();
 
-        // Set Maklumat untuk Cetakan & Paparan
         const labelTing = (ting === "ALL") ? "KESELURUHAN" : "TINGKATAN " + ting;
         document.getElementById('labelTing').innerText = (ting === "ALL") ? "Keseluruhan Pelajar" : "Jumlah Pelajar Tingkatan " + ting;
         document.getElementById('paparTing').innerText = labelTing;
@@ -243,15 +241,18 @@
         if (filterTing === "ALL") {
             document.getElementById('ringkasanSection').classList.remove('d-none');
             for (let t in tingSummary) {
-                let total = tingSummary[t].t;
-                // Pengiraan Peratusan
-                let perLebih = total > 0 ? ((tingSummary[t].l / total) * 100).toFixed(1) : 0;
-                let perBawah = total > 0 ? ((tingSummary[t].b / total) * 100).toFixed(1) : 0;
-                let perSkip = total > 0 ? ((tingSummary[t].s / total) * 100).toFixed(1) : 0;
+                let totalTing = tingSummary[t].t;
+                
+                // FORMULA PERATUS: (Lebih + Khatam) / Total
+                let totalCemerlang = tingSummary[t].l + tingSummary[t].k;
+                let perLebih = totalTing > 0 ? ((totalCemerlang / totalTing) * 100).toFixed(1) : 0;
+                
+                let perBawah = totalTing > 0 ? ((tingSummary[t].b / totalTing) * 100).toFixed(1) : 0;
+                let perSkip = totalTing > 0 ? ((tingSummary[t].s / totalTing) * 100).toFixed(1) : 0;
 
                 rBody.innerHTML += `<tr>
                     <td class="fw-bold">TING ${t}</td>
-                    <td>${total}</td>
+                    <td>${totalTing}</td>
                     <td class="text-success">${tingSummary[t].k}</td>
                     <td class="text-primary">${tingSummary[t].l}<span class="txt-peratus">(${perLebih}%)</span></td>
                     <td class="text-danger">${tingSummary[t].b}<span class="txt-peratus">(${perBawah}%)</span></td>
