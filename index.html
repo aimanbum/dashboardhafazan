@@ -24,21 +24,24 @@
         .juzuk-val { font-weight: bold; font-size: 1.1rem; color: #1a4d2e; }
         .juzuk-item.active { background: #e8f5e9; border-color: #2e7d32; }
         .juzuk-item.khatam-box { background: #fff3cd; border-color: #ffc107; }
-        .table-summary small { font-size: 0.7rem; display: block; margin-top: 2px; }
         .table-intervensi { background-color: #fff9e6 !important; border: 1px solid #ffeeba !important; }
         .table-skip { background-color: #fff5eb !important; border: 1px solid #fd7e14 !important; }
         .table thead th { background-color: #212529 !important; color: white !important; text-align: center; font-size: 0.8rem; }
         .badge-bawah { border: 2px solid #dc3545 !important; color: #dc3545 !important; font-weight: bold; border-radius: 20px; padding: 2px 10px; font-size: 0.7rem; }
         
+        /* Gaya untuk peratusan dalam jadual */
+        .txt-peratus { font-size: 0.75rem; display: block; color: #6c757d; font-weight: normal; margin-top: 2px; }
+
+        /* GAYA PRINT BARU */
         @media print { 
             .filter-panel, .btn-print { display: none !important; } 
             .card { page-break-inside: avoid; border: 1px solid #ddd !important; } 
             * { -webkit-print-color-adjust: exact !important; } 
             table { width: 100% !important; font-size: 8pt; }
             .juzuk-grid { grid-template-columns: repeat(10, 1fr) !important; }
-            #infoCetak { display: block !important; font-weight: bold; color: white; margin-top: 10px; }
+            #infoCetak { display: block !important; font-weight: bold; color: #1a4d2e; margin-top: 10px; }
         }
-        #infoCetak { display: none; }
+        #infoCetak { display: none; } /* Sembunyi dalam skrin, muncul dalam print */
     </style>
 </head>
 <body>
@@ -50,7 +53,7 @@
         </div>
         <h2 class="fw-bold text-uppercase">Dashboard Prestasi Hafazan Tahun 2026</h2>
         <h4 class="mb-0">SMK AGAMA TOK BACHOK</h4>
-        <div id="infoCetak" class="mt-2">
+        <div id="infoCetak" class="mt-2 text-white">
             DATA : <span id="paparTing"></span> | BULAN : <span id="paparBulan"></span>
         </div>
     </div>
@@ -97,16 +100,9 @@
     <div id="ringkasanSection" class="card p-3 mb-4 d-none">
         <h6 class="fw-bold text-success border-bottom pb-2">RINGKASAN PRESTASI MENGIKUT TINGKATAN</h6>
         <div class="table-responsive">
-            <table class="table table-bordered table-summary text-center align-middle">
+            <table class="table table-bordered text-center align-middle">
                 <thead class="table-dark">
-                    <tr>
-                        <th>Tingkatan</th>
-                        <th>Jumlah</th>
-                        <th class="bg-success">Khatam</th>
-                        <th class="bg-primary">Lebih Sukatan</th>
-                        <th class="bg-danger">Bawah Sukatan</th>
-                        <th class="bg-warning text-dark">Skip Hafazan</th>
-                    </tr>
+                    <tr><th>Tingkatan</th><th>Jumlah</th><th class="bg-success">Khatam</th><th class="bg-primary">Lebih Sukatan (%)</th><th class="bg-danger">Bawah Sukatan (%)</th><th class="bg-warning text-dark">Skip Hafazan (%)</th></tr>
                 </thead>
                 <tbody id="isiRingkasan"></tbody>
             </table>
@@ -167,8 +163,9 @@
         const bulanCode = document.getElementById('selBulan').value;
         const bulanText = document.getElementById('selBulan').options[document.getElementById('selBulan').selectedIndex].text;
         const ting = document.getElementById('selTing').value;
-        const url = pautanBulan[bulanCode] + "&cb=" + new Date().getTime();
+        const url = pautanBulan[bulanCode];
 
+        // Set Maklumat untuk Cetakan & Paparan
         const labelTing = (ting === "ALL") ? "KESELURUHAN" : "TINGKATAN " + ting;
         document.getElementById('labelTing').innerText = (ting === "ALL") ? "Keseluruhan Pelajar" : "Jumlah Pelajar Tingkatan " + ting;
         document.getElementById('paparTing').innerText = labelTing;
@@ -208,7 +205,9 @@
                 let ind = (cari('indikator') || "").toUpperCase();
                 let ms = parseFloat(cari('mukasurat')) || 0;
                 let sukatan = parseFloat(cari('sukatansemasa')) || 0;
-                let isSkip = (cari('skip') && cari('skip') !== "" && cari('skip') !== "0") || ind.includes("SKIP");
+                let skipVal = cari('skip');
+                let catatan = cari('catatan');
+                let isSkip = (skipVal && skipVal !== "" && skipVal !== "0") || ind.includes("SKIP");
 
                 if (tingSummary[tingData]) {
                     tingSummary[tingData].t++;
@@ -227,7 +226,7 @@
 
                 if (isSkip) {
                     skipCount++;
-                    tSkip.innerHTML += `<tr><td class="text-center">${skipCount}</td><td class="fw-bold">${nama}</td><td class="text-center">${kls}</td><td class="text-center small">${ind}</td><td>${cari('guruhalaqah')}</td><td>${cari('catatan') || 'Tiada Catatan'}</td></tr>`;
+                    tSkip.innerHTML += `<tr><td class="text-center">${skipCount}</td><td class="fw-bold">${nama}</td><td class="text-center">${kls}</td><td class="text-center small">${ind}</td><td>${cari('guruhalaqah')}</td><td>${catatan || skipVal || 'Tiada Catatan'}</td></tr>`;
                 }
 
                 if (ms >= 604) juzukCounts[30]++;
@@ -238,18 +237,19 @@
         if (filterTing === "ALL") {
             document.getElementById('ringkasanSection').classList.remove('d-none');
             for (let t in tingSummary) {
-                let total = tingSummary[t].t;
-                let pL = total > 0 ? ((tingSummary[t].l / total) * 100).toFixed(1) : 0;
-                let pB = total > 0 ? ((tingSummary[t].b / total) * 100).toFixed(1) : 0;
-                let pS = total > 0 ? ((tingSummary[t].s / total) * 100).toFixed(1) : 0;
+                let totalTing = tingSummary[t].t;
+                // Pengiraan peratusan
+                let perLebih = totalTing > 0 ? ((tingSummary[t].l / totalTing) * 100).toFixed(1) : 0;
+                let perBawah = totalTing > 0 ? ((tingSummary[t].b / totalTing) * 100).toFixed(1) : 0;
+                let perSkip = totalTing > 0 ? ((tingSummary[t].s / totalTing) * 100).toFixed(1) : 0;
 
                 rBody.innerHTML += `<tr>
                     <td class="fw-bold">TING ${t}</td>
-                    <td>${total}</td>
-                    <td class="text-success fw-bold">${tingSummary[t].k}</td>
-                    <td class="text-primary fw-bold">${tingSummary[t].l} <small class="text-muted">(${pL}%)</small></td>
-                    <td class="text-danger fw-bold">${tingSummary[t].b} <small class="text-muted">(${pB}%)</small></td>
-                    <td class="text-warning fw-bold" style="color:#fd7e14 !important;">${tingSummary[t].s} <small class="text-muted">(${pS}%)</small></td>
+                    <td>${totalTing}</td>
+                    <td class="text-success">${tingSummary[t].k}</td>
+                    <td class="text-primary">${tingSummary[t].l}<span class="txt-peratus">(${perLebih}%)</span></td>
+                    <td class="text-danger">${tingSummary[t].b}<span class="txt-peratus">(${perBawah}%)</span></td>
+                    <td class="text-warning fw-bold" style="color:#fd7e14 !important;">${tingSummary[t].s}<span class="txt-peratus">(${perSkip}%)</span></td>
                 </tr>`;
             }
         } else { document.getElementById('ringkasanSection').classList.add('d-none'); }
