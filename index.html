@@ -19,31 +19,23 @@
         .skip-box { background: #fd7e14 !important; }
         .juzuk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 10px; margin-top: 15px; }
         .juzuk-item { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 8px 5px; text-align: center; }
-        .juzuk-num { font-size: 0.7rem; color: #6c757d; display: block; text-transform: uppercase; }
         .juzuk-val { font-weight: bold; font-size: 1.1rem; color: #1a4d2e; }
-        .juzuk-item.active { background: #e8f5e9; border-color: #2e7d32; }
         .juzuk-item.khatam-box { background: #fff3cd; border-color: #ffc107; }
-        .table-intervensi { background-color: #fff9e6 !important; border: 1px solid #ffeeba !important; }
-        .table-skip { background-color: #fff5eb !important; border: 1px solid #fd7e14 !important; }
-        .badge-bawah { border: 2px solid #dc3545 !important; color: #dc3545 !important; font-weight: bold; border-radius: 20px; padding: 2px 10px; font-size: 0.7rem; }
         
+        /* Gaya Senarai Pelajar */
+        .header-jantina { padding: 10px; border-radius: 10px; font-weight: bold; margin-bottom: 10px; display: inline-block; width: 100%; text-align: center; }
+        .bg-putera { background-color: #e3f2fd; color: #0d6efd; border: 1px solid #0d6efd; }
+        .bg-puteri { background-color: #fce4ec; color: #d63384; border: 1px solid #d63384; }
+        
+        .table thead th { background-color: #212529 !important; color: white !important; text-align: center; font-size: 0.8rem; }
         .txt-peratus { font-size: 0.75rem; display: block; color: #495057; font-weight: bold !important; margin-top: 2px; }
-
-        /* WARNA HEADER KHAS UNTUK LELAKI/PEREMPUAN */
-        .header-lelaki { background-color: #0d6efd !important; color: white !important; text-align: center; }
-        .header-perempuan { background-color: #d63384 !important; color: white !important; text-align: center; }
-        .sub-title { font-weight: bold; margin-bottom: 10px; display: block; }
-        .text-lelaki { color: #0d6efd; }
-        .text-perempuan { color: #d63384; }
 
         @media print { 
             .filter-panel, .btn-print { display: none !important; } 
             .card { page-break-inside: avoid; border: 1px solid #ddd !important; } 
             * { -webkit-print-color-adjust: exact !important; } 
             table { width: 100% !important; font-size: 8pt; }
-            .juzuk-grid { grid-template-columns: repeat(10, 1fr) !important; }
             #infoCetak { display: block !important; font-weight: bold; color: #1a4d2e; margin-top: 10px; }
-            .col-md-6 { width: 50% !important; float: left !important; } /* Pastikan dua kolom semasa print */
         }
         #infoCetak { display: none; }
     </style>
@@ -52,14 +44,10 @@
 
 <div class="hero">
     <div class="container">
-        <div class="logo-container">
-            <img src="logo.png" alt="Logo SMKATB" class="school-logo">
-        </div>
+        <div class="logo-container"><img src="logo.png" alt="Logo SMKATB" class="school-logo"></div>
         <h2 class="fw-bold text-uppercase">Dashboard Prestasi Hafazan Tahun 2026</h2>
         <h4 class="mb-0">SMK AGAMA TOK BACHOK</h4>
-        <div id="infoCetak" class="mt-2 text-white">
-            DATA : <span id="paparTing"></span> | BULAN : <span id="paparBulan"></span>
-        </div>
+        <div id="infoCetak" class="mt-2 text-white">DATA : <span id="paparTing"></span> | BULAN : <span id="paparBulan"></span></div>
     </div>
 </div>
 
@@ -93,12 +81,8 @@
     </div>
 
     <div class="text-center">
-        <div class="total-box shadow-sm">
-            <span id="labelTing">Keseluruhan Pelajar</span>: <span id="totalPelajar">0</span> Orang
-        </div>
-        <div class="total-box skip-box shadow-sm">
-            Pelajar Skip: <span id="totalSkip">0</span> Orang
-        </div>
+        <div class="total-box shadow-sm"><span id="labelTing">Keseluruhan Pelajar</span>: <span id="totalPelajar">0</span> Orang</div>
+        <div class="total-box skip-box shadow-sm">Pelajar Skip: <span id="totalSkip">0</span> Orang</div>
     </div>
 
     <div id="ringkasanSection" class="card p-3 mb-4 d-none">
@@ -123,51 +107,43 @@
         <div class="chart-container"><canvas id="barChart"></canvas></div>
     </div>
 
-    <div class="card p-3 table-intervensi shadow-sm">
-        <h5 class="fw-bold text-danger mb-3 text-center">⚠️ SENARAI PELAJAR BAWAH SUKATAN</h5>
-        <div class="row">
-            <div class="col-md-6">
-                <span class="sub-title text-lelaki">PELAJAR LELAKI (PUTERA)</span>
-                <div class="table-responsive">
-                    <table class="table table-bordered align-middle table-sm">
-                        <thead class="header-lelaki"><tr><th>Bil</th><th>Nama</th><th>Kelas</th><th>Hutang</th></tr></thead>
-                        <tbody id="isiJadualL"></tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <span class="sub-title text-perempuan">PELAJAR PEREMPUAN (PUTERI)</span>
-                <div class="table-responsive">
-                    <table class="table table-bordered align-middle table-sm">
-                        <thead class="header-perempuan"><tr><th>Bil</th><th>Nama</th><th>Kelas</th><th>Hutang</th></tr></thead>
-                        <tbody id="isiJadualP"></tbody>
-                    </table>
-                </div>
-            </div>
+    <div class="card p-3 shadow-sm" style="background-color: #fff9e6;">
+        <h5 class="fw-bold text-danger mb-4 text-center">⚠️ SENARAI PELAJAR BAWAH SUKATAN</h5>
+        
+        <div class="header-jantina bg-putera">PUTERA (LELAKI)</div>
+        <div class="table-responsive mb-4">
+            <table class="table table-bordered align-middle">
+                <thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Sukatan</th><th>Ms</th><th>Hutang</th><th>Guru Halaqah</th><th>Pencapaian</th></tr></thead>
+                <tbody id="isiJadualL"></tbody>
+            </table>
+        </div>
+
+        <div class="header-jantina bg-puteri">PUTERI (PEREMPUAN)</div>
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+                <thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Sukatan</th><th>Ms</th><th>Hutang</th><th>Guru Halaqah</th><th>Pencapaian</th></tr></thead>
+                <tbody id="isiJadualP"></tbody>
+            </table>
         </div>
     </div>
 
-    <div class="card p-3 table-skip shadow-sm">
-        <h5 class="fw-bold text-warning text-dark mb-3 text-center">🟠 SENARAI PELAJAR SKIP HAFAZAN</h5>
-        <div class="row">
-            <div class="col-md-6">
-                <span class="sub-title text-lelaki">PELAJAR LELAKI (PUTERA)</span>
-                <div class="table-responsive">
-                    <table class="table table-bordered align-middle table-sm">
-                        <thead class="header-lelaki"><tr><th>Bil</th><th>Nama</th><th>Kelas</th><th>Catatan</th></tr></thead>
-                        <tbody id="isiSkipL"></tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <span class="sub-title text-perempuan">PELAJAR PEREMPUAN (PUTERI)</span>
-                <div class="table-responsive">
-                    <table class="table table-bordered align-middle table-sm">
-                        <thead class="header-perempuan"><tr><th>Bil</th><th>Nama</th><th>Kelas</th><th>Catatan</th></tr></thead>
-                        <tbody id="isiSkipP"></tbody>
-                    </table>
-                </div>
-            </div>
+    <div class="card p-3 shadow-sm mt-4" style="background-color: #fff5eb;">
+        <h5 class="fw-bold text-warning text-dark mb-4 text-center">🟠 SENARAI PELAJAR SKIP HAFAZAN</h5>
+        
+        <div class="header-jantina bg-putera">PUTERA (LELAKI)</div>
+        <div class="table-responsive mb-4">
+            <table class="table table-bordered align-middle">
+                <thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Pencapaian Semasa</th><th>Guru Halaqah</th><th>Jumlah M/S Skip</th></tr></thead>
+                <tbody id="isiSkipL"></tbody>
+            </table>
+        </div>
+
+        <div class="header-jantina bg-puteri">PUTERI (PEREMPUAN)</div>
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+                <thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Pencapaian Semasa</th><th>Guru Halaqah</th><th>Jumlah M/S Skip</th></tr></thead>
+                <tbody id="isiSkipP"></tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -197,37 +173,30 @@
         const ting = document.getElementById('selTing').value;
         const url = pautanBulan[bulanCode] + "&cb=" + new Date().getTime();
 
-        const labelTing = (ting === "ALL") ? "KESELURUHAN" : "TINGKATAN " + ting;
-        document.getElementById('labelTing').innerText = (ting === "ALL") ? "Keseluruhan Pelajar" : "Jumlah Pelajar Tingkatan " + ting;
-        document.getElementById('paparTing').innerText = labelTing;
+        document.getElementById('paparTing').innerText = (ting === "ALL") ? "KESELURUHAN" : "TINGKATAN " + ting;
         document.getElementById('paparBulan').innerText = bulanText;
-        document.getElementById('tajukCarta').innerText = "Analisis " + labelTing + " : " + bulanText;
+        document.getElementById('tajukCarta').innerText = "Analisis Pencapaian : " + bulanText;
 
         Papa.parse(url, { download: true, header: true, skipEmptyLines: true, complete: function(res) { prosesAnalisis(res.data, ting); } });
     }
 
     function prosesAnalisis(data, filterTing) {
-        // Bekas Asal (Kosongkan)
         const rBody = document.getElementById('isiRingkasan');
         const jGrid = document.getElementById('juzukGrid');
-        
-        // Bekas Baru (Lelaki vs Perempuan)
         const tBodyL = document.getElementById('isiJadualL');
         const tBodyP = document.getElementById('isiJadualP');
         const tSkipL = document.getElementById('isiSkipL');
         const tSkipP = document.getElementById('isiSkipP');
 
         rBody.innerHTML = ""; jGrid.innerHTML = "";
-        tBodyL.innerHTML = ""; tBodyP.innerHTML = ""; 
-        tSkipL.innerHTML = ""; tSkipP.innerHTML = "";
+        tBodyL.innerHTML = ""; tBodyP.innerHTML = ""; tSkipL.innerHTML = ""; tSkipP.innerHTML = "";
 
         let s = { "Khatam": 0, "Lebih": 0, "Bawah": 0 };
         let juzukCounts = Array(31).fill(0); 
         let tingSummary = {"1":{t:0,k:0,l:0,b:0,s:0},"2":{t:0,k:0,l:0,b:0,s:0},"3":{t:0,k:0,l:0,b:0,s:0},"4":{t:0,k:0,l:0,b:0,s:0},"5":{t:0,k:0,l:0,b:0,s:0}};
         
         let totalCount = 0; let skipCount = 0;
-        let bilL = 0; let bilP = 0; // Bilangan untuk numbering jadual
-        let bilSkipL = 0; let bilSkipP = 0;
+        let bilL = 0; let bilP = 0; let bilSL = 0; let bilSP = 0;
 
         data.forEach(d => {
             const cari = (k) => {
@@ -241,20 +210,15 @@
             let kls = cari('kelas');
             let match = kls.match(/\d+/);
             let tingData = match ? match[0] : '';
-            
-            // TEKNIK KESAN JANTINA (TANPA UBAH EXCEL)
-            let isPerempuan = nama.includes(" BINTI ") || nama.includes(" BT ") || nama.includes(" BT.");
+            let isP = nama.includes(" BINTI ") || nama.includes(" BT ") || nama.includes(" BT.");
 
             if (filterTing === "ALL" || (tingData && tingData.toString() === filterTing.toString())) {
                 totalCount++;
                 let ind = (cari('indikator') || "").toUpperCase();
                 let ms = parseFloat(cari('mukasurat')) || 0;
                 let sukatan = parseFloat(cari('sukatansemasa')) || 0;
-                let skipVal = cari('skip');
-                let catatan = cari('catatan');
-                let isSkip = (skipVal && skipVal !== "" && skipVal !== "0") || ind.includes("SKIP");
+                let isSkip = (cari('skip') && cari('skip') !== "" && cari('skip') !== "0") || ind.includes("SKIP");
 
-                // Isi Ringkasan (Kekal Gabung)
                 if (tingSummary[tingData]) {
                     tingSummary[tingData].t++;
                     if(isSkip) tingSummary[tingData].s++;
@@ -267,29 +231,16 @@
                 else if(ind.includes('LEBIH')) s.Lebih++;
                 else if(ind.includes('BAWAH')) {
                     s.Bawah++;
-                    let hutang = Math.max(0, sukatan - ms);
-                    let rowHtml = `<tr><td class="text-center">__BIL__</td><td class="fw-bold text-start" style="font-size:0.75rem;">${nama}</td><td class="text-center small">${kls}</td><td class="text-center text-danger fw-bold">${hutang}</td></tr>`;
-                    
-                    if(isPerempuan) {
-                        bilP++;
-                        tBodyP.innerHTML += rowHtml.replace('__BIL__', bilP);
-                    } else {
-                        bilL++;
-                        tBodyL.innerHTML += rowHtml.replace('__BIL__', bilL);
-                    }
+                    let row = `<tr><td>__BIL__</td><td class="fw-bold">${nama}</td><td class="text-center">${kls}</td><td class="text-center">${sukatan}</td><td class="text-center">${ms}</td><td class="text-center text-danger fw-bold">${Math.max(0, sukatan-ms)}</td><td>${cari('guruhalaqah')}</td><td class="text-center">${ind}</td></tr>`;
+                    if(isP) { bilP++; tBodyP.innerHTML += row.replace('__BIL__', bilP); }
+                    else { bilL++; tBodyL.innerHTML += row.replace('__BIL__', bilL); }
                 }
 
                 if (isSkip) {
                     skipCount++;
-                    let rowHtml = `<tr><td class="text-center">__BIL__</td><td class="fw-bold text-start" style="font-size:0.75rem;">${nama}</td><td class="text-center small">${kls}</td><td class="small">${catatan || 'Tiada'}</td></tr>`;
-                    
-                    if(isPerempuan) {
-                        bilSkipP++;
-                        tSkipP.innerHTML += rowHtml.replace('__BIL__', bilSkipP);
-                    } else {
-                        bilSkipL++;
-                        tSkipL.innerHTML += rowHtml.replace('__BIL__', bilSkipL);
-                    }
+                    let row = `<tr><td>__BIL__</td><td class="fw-bold">${nama}</td><td class="text-center">${kls}</td><td class="text-center">${ind}</td><td>${cari('guruhalaqah')}</td><td>${cari('catatan') || 'Tiada'}</td></tr>`;
+                    if(isP) { bilSP++; tSkipP.innerHTML += row.replace('__BIL__', bilSP); }
+                    else { bilSL++; tSkipL.innerHTML += row.replace('__BIL__', bilSL); }
                 }
 
                 if (ms >= 604) juzukCounts[30]++;
@@ -297,24 +248,14 @@
             }
         });
 
-        // BINA JADUAL RINGKASAN (GABUNG)
         if (filterTing === "ALL") {
             document.getElementById('ringkasanSection').classList.remove('d-none');
             for (let t in tingSummary) {
-                let total = tingSummary[t].t;
-                let totalCemerlang = tingSummary[t].l + tingSummary[t].k;
-                let perLebih = total > 0 ? ((totalCemerlang / total) * 100).toFixed(1) : 0;
-                let perBawah = total > 0 ? ((tingSummary[t].b / total) * 100).toFixed(1) : 0;
-                let perSkip = total > 0 ? ((tingSummary[t].s / total) * 100).toFixed(1) : 0;
-
-                rBody.innerHTML += `<tr>
-                    <td class="fw-bold">TING ${t}</td>
-                    <td>${total}</td>
-                    <td class="text-success">${tingSummary[t].k}</td>
-                    <td class="text-primary">${tingSummary[t].l}<span class="txt-peratus">(${perLebih}%)</span></td>
-                    <td class="text-danger">${tingSummary[t].b}<span class="txt-peratus">(${perBawah}%)</span></td>
-                    <td class="text-warning fw-bold" style="color:#fd7e14 !important;">${tingSummary[t].s}<span class="txt-peratus">(${perSkip}%)</span></td>
-                </tr>`;
+                let tot = tingSummary[t].t;
+                let pL = tot > 0 ? (((tingSummary[t].l + tingSummary[t].k) / tot) * 100).toFixed(1) : 0;
+                let pB = tot > 0 ? ((tingSummary[t].b / tot) * 100).toFixed(1) : 0;
+                let pS = tot > 0 ? ((tingSummary[t].s / tot) * 100).toFixed(1) : 0;
+                rBody.innerHTML += `<tr><td class="fw-bold">T${t}</td><td>${tot}</td><td class="text-success">${tingSummary[t].k}</td><td class="text-primary">${tingSummary[t].l}<span class="txt-peratus">(${pL}%)</span></td><td class="text-danger">${tingSummary[t].b}<span class="txt-peratus">(${pB}%)</span></td><td class="text-warning fw-bold" style="color:#fd7e14 !important;">${tingSummary[t].s}<span class="txt-peratus">(${pS}%)</span></td></tr>`;
             }
         } else { document.getElementById('ringkasanSection').classList.add('d-none'); }
 
@@ -322,7 +263,6 @@
             let label = (i === 30) ? "KHATAM" : "Juz " + i;
             jGrid.innerHTML += `<div class="juzuk-item ${(i===30?'khatam-box ':'')}${juzukCounts[i]>0?'active':''}"><span class="juzuk-num">${label}</span><span class="juzuk-val">${juzukCounts[i]}</span></div>`;
         }
-
         document.getElementById('totalPelajar').innerText = totalCount;
         document.getElementById('totalSkip').innerText = skipCount;
         updateChart(s);
@@ -333,8 +273,8 @@
         if(bChart) bChart.destroy();
         bChart = new Chart(ctx, {
             type: 'bar',
-            data: { labels: ['Khatam', 'Lebih Sukatan', 'Bawah Sukatan'], datasets: [{ label: 'Bilangan Pelajar', data: [s.Khatam, s.Lebih, s.Bawah], backgroundColor: ['#198754', '#0d6efd', '#dc3545'] }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { color: 'white', font: { weight: 'bold', size: 14 } } } }
+            data: { labels: ['Khatam', 'Lebih', 'Bawah'], datasets: [{ label: 'Bilangan Pelajar', data: [s.Khatam, s.Lebih, s.Bawah], backgroundColor: ['#198754', '#0d6efd', '#dc3545'] }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { color: 'white', font: { weight: 'bold' } } } }
         });
     }
     window.onload = muatData;
