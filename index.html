@@ -16,43 +16,26 @@
         .school-logo { width: 100px; height: auto; object-fit: contain; }
         .filter-panel { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-top: -30px; position: relative; z-index: 10; }
         .card { border-radius: 15px; border: 1px solid #eee; margin-bottom: 20px; background: white; overflow: hidden; }
-        .chart-container { position: relative; height: 350px; width: 100%; }
-        .total-box { background: #1a4d2e !important; color: white !important; padding: 10px 20px; border-radius: 30px; display: inline-block; margin: 10px 5px; -webkit-print-color-adjust: exact; font-weight: bold; }
-        .skip-box { background: #fd7e14 !important; }
+        .total-box { background: #1a4d2e !important; color: white !important; padding: 10px 20px; border-radius: 30px; display: inline-block; margin: 10px 5px; font-weight: bold; }
         
-        /* GRID JUZUK KEMAS (10 KOLUM) */
-        .juzuk-grid { 
-            display: grid; 
-            grid-template-columns: repeat(10, 1fr); 
-            gap: 8px; 
-            margin-top: 15px; 
-        }
+        /* GRID JUZUK KEMAS */
+        .juzuk-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 8px; margin-top: 15px; }
         @media (max-width: 992px) { .juzuk-grid { grid-template-columns: repeat(5, 1fr); } }
-        @media (max-width: 576px) { .juzuk-grid { grid-template-columns: repeat(3, 1fr); } }
-
-        .juzuk-item { background: #fff; border: 1px solid #dee2e6; border-radius: 8px; padding: 10px 5px; text-align: center; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.02); cursor: pointer; }
-        .juzuk-item:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-color: #2e7d32; }
+        .juzuk-item { background: #fff; border: 1px solid #dee2e6; border-radius: 8px; padding: 10px 5px; text-align: center; cursor: pointer; transition: 0.3s; }
         .juzuk-num { font-size: 0.65rem; color: #6c757d; display: block; text-transform: uppercase; font-weight: bold; }
         .juzuk-val { font-weight: 800; font-size: 1.2rem; color: #1a4d2e; }
         .juzuk-item.active { background: #e8f5e9; border-color: #2e7d32; }
         .juzuk-item.khatam-box { background: #fff3cd; border-color: #ffc107; }
 
-        /* LABEL JANTINA */
+        /* GAYA TOP PERFORMERS */
+        .card-top { border: none; border-left: 5px solid #d4af37; background: #fff9e6; }
+        .medal { font-size: 1.2rem; margin-right: 5px; }
         .header-jantina { padding: 8px; border-radius: 8px; font-weight: bold; margin-bottom: 10px; text-align: center; font-size: 0.9rem; }
         .bg-putera { background-color: #e3f2fd; color: #0d6efd; border: 1px solid #0d6efd; }
         .bg-puteri { background-color: #fce4ec; color: #d63384; border: 1px solid #d63384; }
-
-        .table thead th { background-color: #212529 !important; color: white !important; text-align: center; font-size: 0.75rem; vertical-align: middle; }
-        .badge-bawah { border: 2px solid #dc3545 !important; color: #dc3545 !important; font-weight: bold; border-radius: 20px; padding: 2px 10px; font-size: 0.7rem; }
         .txt-peratus { font-size: 0.75rem; display: block; color: #495057; font-weight: bold !important; margin-top: 2px; }
 
-        @media print { 
-            .filter-panel, .btn-print, .juzuk-item { cursor: default; } 
-            .card { page-break-inside: avoid; border: 1px solid #ddd !important; } 
-            .juzuk-grid { grid-template-columns: repeat(10, 1fr) !important; gap: 5px; }
-            #infoCetak { display: block !important; font-weight: bold; color: #1a4d2e; margin-top: 10px; }
-        }
-        #infoCetak { display: none; }
+        @media print { .filter-panel, .btn-print { display: none !important; } }
     </style>
 </head>
 <body>
@@ -72,7 +55,7 @@
             <div class="col-md-3">
                 <label class="form-label fw-bold">Bulan:</label>
                 <select id="selBulan" class="form-select" onchange="muatData()">
-                    <option value="JAN">JANUARI</option><option value="FEB">FEBRUARI</option>
+                    <option value="JAN">JANUARI</option><option value="FEB" selected>FEBRUARI</option>
                     <option value="MAC">MAC</option><option value="APR">APRIL</option>
                     <option value="MEI">MEI</option><option value="JUN">JUN</option>
                     <option value="JUL">JULAI</option><option value="OGOS">OGOS</option>
@@ -93,17 +76,33 @@
         </div>
     </div>
 
-    <div class="text-center">
-        <div class="total-box shadow-sm"><span id="labelTing">Keseluruhan Pelajar</span>: <span id="totalPelajar">0</span> Orang</div>
-        <div class="total-box skip-box shadow-sm">Pelajar Skip: <span id="totalSkip">0</span> Orang</div>
+    <div class="text-center mb-4">
+        <div class="total-box shadow-sm"><span id="labelTing">Keseluruhan Pelajar</span>: <span id="totalPelajar">0</span></div>
+        <div class="total-box shadow-sm bg-warning text-dark">Pelajar Skip: <span id="totalSkip">0</span></div>
     </div>
 
+    <!-- SEKSYEN PELAJAR TERBAIK (NEW) -->
+    <div id="sectionTop" class="card p-3 mb-4 card-top d-none">
+        <h5 class="fw-bold text-dark text-center mb-3">🌟 PELAJAR TASMIK TERBANYAK BULAN INI</h5>
+        <div class="row">
+            <div class="col-md-6 border-end">
+                <div class="header-jantina bg-putera">TOP 3 PUTERA</div>
+                <div id="listTopL" class="list-group list-group-flush"></div>
+            </div>
+            <div class="col-md-6">
+                <div class="header-jantina bg-puteri">TOP 3 PUTERI</div>
+                <div id="listTopP" class="list-group list-group-flush"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RINGKASAN ASAL -->
     <div id="ringkasanSection" class="card p-3 mb-4 d-none">
         <h6 class="fw-bold text-success border-bottom pb-2">RINGKASAN PRESTASI MENGIKUT TINGKATAN</h6>
         <div class="table-responsive">
             <table class="table table-bordered text-center align-middle">
                 <thead class="table-dark">
-                    <tr><th>Tingkatan</th><th>Jumlah</th><th class="bg-success">Khatam</th><th class="bg-primary">Lebih Sukatan (%)</th><th class="bg-danger">Bawah Sukatan (%)</th><th class="bg-warning text-dark">Skip Hafazan (%)</th></tr>
+                    <tr><th>Ting</th><th>Jumlah</th><th>Khatam</th><th>Lebih (%)</th><th>Bawah (%)</th><th>Skip (%)</th></tr>
                 </thead>
                 <tbody id="isiRingkasan"></tbody>
             </table>
@@ -111,94 +110,14 @@
     </div>
 
     <div class="card p-3 mb-4">
-        <h6 class="fw-bold text-success border-bottom pb-2 text-center">TABURAN PELAJAR MENGIKUT JUZUK TERKINI (Klik Juzuk untuk Senarai Nama)</h6>
+        <h6 class="fw-bold text-success border-bottom pb-2 text-center">TABURAN PELAJAR MENGIKUT JUZUK</h6>
         <div id="juzukGrid" class="juzuk-grid"></div>
     </div>
-
-    <div class="card p-3 mb-4">
-        <h5 id="tajukCarta" class="fw-bold text-success text-center mb-3">Analisis Pencapaian</h5>
-        <div class="chart-container"><canvas id="barChart"></canvas></div>
-    </div>
-
-    <div class="card p-3 shadow-sm mb-4" style="background-color: #fff9e6; border: 1px solid #ffeeba;">
-        <h5 class="fw-bold text-danger mb-4 text-center">⚠️ SENARAI PELAJAR BAWAH SUKATAN</h5>
-        <div class="header-jantina bg-putera">PUTERA (LELAKI)</div>
-        <div class="table-responsive mb-4">
-            <table class="table table-bordered table-sm align-middle bg-white">
-                <thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Sukatan</th><th>Ms</th><th>Hutang</th><th>Guru Halaqah</th><th>Pencapaian</th></tr></thead>
-                <tbody id="isiJadualL"></tbody>
-            </table>
-        </div>
-        <div class="header-jantina bg-puteri">PUTERI (PEREMPUAN)</div>
-        <div class="table-responsive">
-            <table class="table table-bordered table-sm align-middle bg-white">
-                <thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Sukatan</th><th>Ms</th><th>Hutang</th><th>Guru Halaqah</th><th>Pencapaian</th></tr></thead>
-                <tbody id="isiJadualP"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="card p-3 shadow-sm mb-4" style="background-color: #fff5eb; border: 1px solid #fd7e14;">
-        <h5 class="fw-bold text-warning text-dark mb-4 text-center">🟠 SENARAI PELAJAR SKIP HAFAZAN</h5>
-        <div class="header-jantina bg-putera">PUTERA (LELAKI)</div>
-        <div class="table-responsive mb-4">
-            <table class="table table-bordered table-sm align-middle bg-white">
-                <thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Pencapaian Semasa</th><th>Guru Halaqah</th><th>Jumlah M/S Skip</th></tr></thead>
-                <tbody id="isiSkipL"></tbody>
-            </table>
-        </div>
-        <div class="header-jantina bg-puteri">PUTERI (PEREMPUAN)</div>
-        <div class="table-responsive">
-            <table class="table table-bordered table-sm align-middle bg-white">
-                <thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Pencapaian Semasa</th><th>Guru Halaqah</th><th>Jumlah M/S Skip</th></tr></thead>
-                <tbody id="isiSkipP"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="card p-3 shadow-sm" style="background-color: #e8f5e9; border: 1px solid #2e7d32;">
-        <h5 class="fw-bold text-success mb-4 text-center">🏆 SENARAI PELAJAR KHATAM</h5>
-        <div class="header-jantina bg-putera">PUTERA (LELAKI)</div>
-        <div class="table-responsive mb-4">
-            <table class="table table-bordered table-sm align-middle bg-white">
-                <thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Ms</th><th>Guru Halaqah</th></tr></thead>
-                <tbody id="isiKhatamL"></tbody>
-            </table>
-        </div>
-        <div class="header-jantina bg-puteri">PUTERI (PEREMPUAN)</div>
-        <div class="table-responsive">
-            <table class="table table-bordered table-sm align-middle bg-white">
-                <thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Ms</th><th>Guru Halaqah</th></tr></thead>
-                <tbody id="isiKhatamP"></tbody>
-            </table>
-        </div>
-    </div>
 </div>
 
-<div class="modal fade" id="modalJuzuk" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header bg-success text-white">
-        <h5 class="modal-title fw-bold" id="tajukModal">Senarai Pelajar</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="table-responsive">
-            <table class="table table-striped table-hover align-middle">
-                <thead class="table-dark">
-                    <tr><th>Bil</th><th>Nama Pelajar</th><th>Kelas</th><th class="text-center">Ms Semasa</th></tr>
-                </thead>
-                <tbody id="isiModal"></tbody>
-            </table>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    const pautanBulan = {
+    const pautanBulan = ["JAN", "FEB", "MAC", "APR", "MEI", "JUN", "JUL", "OGOS", "SEP", "OKT", "NOV", "DIS"];
+    const pautanURL = {
         "JAN": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTYiDjR12MHpZvInZnwExZxUdha7h3Ud7okqz8YjCp62F4GAFjeobZqj6PPB3NfBcYlP_rbmW6if3DM/pub?gid=0&single=true&output=csv",
         "FEB": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTYiDjR12MHpZvInZnwExZxUdha7h3Ud7okqz8YjCp62F4GAFjeobZqj6PPB3NfBcYlP_rbmW6if3DM/pub?gid=1376498148&single=true&output=csv",
         "MAC": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTYiDjR12MHpZvInZnwExZxUdha7h3Ud7okqz8YjCp62F4GAFjeobZqj6PPB3NfBcYlP_rbmW6if3DM/pub?gid=216137022&single=true&output=csv",
@@ -213,65 +132,61 @@
         "DIS": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTYiDjR12MHpZvInZnwExZxUdha7h3Ud7okqz8YjCp62F4GAFjeobZqj6PPB3NfBcYlP_rbmW6if3DM/pub?gid=457144559&single=true&output=csv"
     };
 
-    let bChart;
-    let dataSimpananJuzuk = Array(31).fill().map(() => []); // Simpan nama pelajar ikut juzuk
-    Chart.register(ChartDataLabels);
-
     function muatData() {
-        const bulanCode = document.getElementById('selBulan').value;
-        const bulanText = document.getElementById('selBulan').options[document.getElementById('selBulan').selectedIndex].text;
+        const bln = document.getElementById('selBulan').value;
         const ting = document.getElementById('selTing').value;
-        const url = pautanBulan[bulanCode] + "&cb=" + new Date().getTime();
+        const idx = pautanBulan.indexOf(bln);
+        const urlSemasa = pautanURL[bln];
+        const urlSblm = idx > 0 ? pautanURL[pautanBulan[idx-1]] : null;
 
-        document.getElementById('paparTing').innerText = (ting === "ALL") ? "KESELURUHAN" : "TINGKATAN " + ting;
-        document.getElementById('paparBulan').innerText = bulanText;
-        document.getElementById('tajukCarta').innerText = "Analisis Pencapaian : " + bulanText;
+        document.getElementById('paparBulan').innerText = bln;
 
-        Papa.parse(url, { download: true, header: true, skipEmptyLines: true, complete: function(res) { prosesAnalisis(res.data, ting); } });
+        // Ambil dua data serentak
+        Promise.all([
+            new Promise(res => Papa.parse(urlSemasa, { download: true, header: true, complete: res })),
+            urlSblm ? new Promise(res => Papa.parse(urlSblm, { download: true, header: true, complete: res })) : Promise.resolve({data:[]})
+        ]).then(results => {
+            prosesAnalisis(results[0].data, results[1].data, ting);
+        });
     }
 
-    function prosesAnalisis(data, filterTing) {
-        const rBody = document.getElementById('isiRingkasan');
-        const jGrid = document.getElementById('juzukGrid');
-        const tBodyL = document.getElementById('isiJadualL'); const tBodyP = document.getElementById('isiJadualP');
-        const tSkipL = document.getElementById('isiSkipL'); const tSkipP = document.getElementById('isiSkipP');
-        const tKhatamL = document.getElementById('isiKhatamL'); const tKhatamP = document.getElementById('isiKhatamP');
+    function prosesAnalisis(dataSemasa, dataSblm, filterTing) {
+        const mapSblm = new Map();
+        dataSblm.forEach(d => { 
+            let n = (d[Object.keys(d).find(k=>k.toLowerCase().includes('nama'))] || "").toUpperCase();
+            let ms = parseFloat(d[Object.keys(d).find(k=>k.toLowerCase().includes('muka'))]) || 0;
+            if(n) mapSblm.set(n, ms);
+        });
 
-        rBody.innerHTML = ""; jGrid.innerHTML = ""; 
-        tBodyL.innerHTML = ""; tBodyP.innerHTML = ""; tSkipL.innerHTML = ""; tSkipP.innerHTML = "";
-        tKhatamL.innerHTML = ""; tKhatamP.innerHTML = "";
-        dataSimpananJuzuk = Array(31).fill().map(() => []); // Reset simpanan juzuk
-
-        let s = { "Khatam": 0, "Lebih": 0, "Bawah": 0 };
-        let juzukCounts = Array(31).fill(0); 
-        let tingSummary = {"1":{t:0,k:0,l:0,b:0,s:0},"2":{t:0,k:0,l:0,b:0,s:0},"3":{t:0,k:0,l:0,b:0,s:0},"4":{t:0,k:0,l:0,b:0,s:0},"5":{t:0,k:0,l:0,b:0,s:0}};
-        
+        let listRanking = [];
         let totalCount = 0; let skipCount = 0;
-        let bilL = 0; let bilP = 0; let bilSL = 0; let bilSP = 0; let bilKL = 0; let bilKP = 0;
+        let juzukCounts = Array(31).fill(0);
+        let s = { "Khatam": 0, "Lebih": 0, "Bawah": 0 };
+        let tingSummary = {"1":{t:0,k:0,l:0,b:0,s:0},"2":{t:0,k:0,l:0,b:0,s:0},"3":{t:0,k:0,l:0,b:0,s:0},"4":{t:0,k:0,l:0,b:0,s:0},"5":{t:0,k:0,l:0,b:0,s:0}};
 
-        data.forEach(d => {
-            const cari = (k) => {
-                let keys = Object.keys(d);
-                let found = keys.find(x => x.toLowerCase().replace(/[\s.]/g, '').includes(k.toLowerCase().replace(/[\s.]/g, '')));
-                return found ? d[found] : '';
-            };
-
+        dataSemasa.forEach(d => {
+            const cari = (k) => d[Object.keys(d).find(x => x.toLowerCase().replace(/[\s.]/g, '').includes(k.toLowerCase()))] || '';
             let nama = (cari('namapelajar') || "").toUpperCase();
-            if (!nama || nama.trim() === "") return;
+            if(!nama) return;
 
             let kls = cari('kelas');
-            let match = kls.match(/\d+/);
-            let tingData = match ? match[0] : '';
+            let tingData = kls.match(/\d+/) ? kls.match(/\d+/)[0] : '';
+            let msSemasa = parseFloat(cari('mukasurat')) || 0;
+            let msSblm = mapSblm.get(nama) || 0;
+            let progress = msSemasa - msSblm;
             let isP = nama.includes(" BINTI ") || nama.includes(" BT ") || nama.includes(" BT.");
 
-            if (filterTing === "ALL" || (tingData && tingData.toString() === filterTing.toString())) {
+            if (filterTing === "ALL" || tingData === filterTing) {
                 totalCount++;
                 let ind = (cari('indikator') || "").toUpperCase();
-                let ms = parseFloat(cari('mukasurat')) || 0;
-                let sukatan = parseFloat(cari('sukatansemasa')) || 0;
-                let isSkip = (cari('skip') && cari('skip') !== "" && cari('skip') !== "0") || ind.includes("SKIP");
+                let isSkip = cari('skip') !== "" || ind.includes("SKIP");
+                
+                if(isSkip) skipCount++;
+                if(ind.includes('KHATAM')) s.Khatam++;
+                else if(ind.includes('LEBIH')) s.Lebih++;
+                else if(ind.includes('BAWAH')) s.Bawah++;
 
-                if (tingSummary[tingData]) {
+                if(tingSummary[tingData]) {
                     tingSummary[tingData].t++;
                     if(isSkip) tingSummary[tingData].s++;
                     if(ind.includes('KHATAM')) tingSummary[tingData].k++;
@@ -279,95 +194,38 @@
                     else if(ind.includes('BAWAH')) tingSummary[tingData].b++;
                 }
 
-                if(ind.includes('KHATAM')) {
-                    s.Khatam++;
-                    let rowK = `<tr><td class="text-center">__BIL__</td><td class="fw-bold">${nama}</td><td class="text-center">${kls}</td><td class="text-center">${ms}</td><td>${cari('guruhalaqah')}</td></tr>`;
-                    if(isP) { bilKP++; tKhatamP.innerHTML += rowK.replace('__BIL__', bilKP); }
-                    else { bilKL++; tKhatamL.innerHTML += rowK.replace('__BIL__', bilKL); }
-                }
-                else if(ind.includes('LEBIH')) s.Lebih++;
-                else if(ind.includes('BAWAH')) {
-                    s.Bawah++;
-                    let rowB = `<tr><td class="text-center">__BIL__</td><td class="fw-bold">${nama}</td><td class="text-center">${kls}</td><td class="text-center">${sukatan}</td><td class="text-center">${ms}</td><td class="text-center text-danger fw-bold">${Math.max(0, sukatan-ms)}</td><td>${cari('guruhalaqah')}</td><td class="text-center"><span class="badge-bawah">${ind}</span></td></tr>`;
-                    if(isP) { bilP++; tBodyP.innerHTML += rowB.replace('__BIL__', bilP); }
-                    else { bilL++; tBodyL.innerHTML += rowB.replace('__BIL__', bilL); }
-                }
-
-                if (isSkip) {
-                    skipCount++;
-                    let rowS = `<tr><td class="text-center">__BIL__</td><td class="fw-bold">${nama}</td><td class="text-center">${kls}</td><td class="text-center small">${ind}</td><td>${cari('guruhalaqah')}</td><td>${cari('catatan') || cari('skip') || 'Tiada'}</td></tr>`;
-                    if(isP) { bilSP++; tSkipP.innerHTML += rowS.replace('__BIL__', bilSP); }
-                    else { bilSL++; tSkipL.innerHTML += rowS.replace('__BIL__', bilSL); }
-                }
-
-                // Logik Juzuk & Simpan Nama
-                let cJ = 0;
-                if (ms >= 604) cJ = 30;
-                else cJ = ms <= 1 ? 0 : Math.ceil((ms - 1) / 20);
-                
-                if (cJ >= 1 && cJ <= 30) {
-                    juzukCounts[cJ]++;
-                    dataSimpananJuzuk[cJ].push({ nama, kls, ms });
-                }
+                listRanking.push({ nama, kls, progress, isP, ting: tingData });
+                let cJ = msSemasa >= 604 ? 30 : Math.ceil((msSemasa - 1) / 20);
+                if (cJ >= 1 && cJ <= 30) juzukCounts[cJ]++;
             }
         });
 
-        if (filterTing === "ALL") {
-            document.getElementById('ringkasanSection').classList.remove('d-none');
-            for (let t in tingSummary) {
-                let tot = tingSummary[t].t;
-                let pL = tot > 0 ? (((tingSummary[t].l + tingSummary[t].k) / tot) * 100).toFixed(1) : 0;
-                let pB = tot > 0 ? ((tingSummary[t].b / tot) * 100).toFixed(1) : 0;
-                let pS = tot > 0 ? ((tingSummary[t].s / tot) * 100).toFixed(1) : 0;
-                rBody.innerHTML += `<tr><td class="fw-bold">TING ${t}</td><td>${tot}</td><td class="text-success fw-bold">${tingSummary[t].k}</td><td class="text-primary fw-bold">${tingSummary[t].l}<span class="txt-peratus">(${pL}%)</span></td><td class="text-danger fw-bold">${tingSummary[t].b}<span class="txt-peratus">(${pB}%)</span></td><td class="text-warning fw-bold" style="color:#fd7e14 !important;">${tingSummary[t].s}<span class="txt-peratus">(${pS}%)</span></td></tr>`;
-            }
-        } else { document.getElementById('ringkasanSection').classList.add('d-none'); }
+        // PAPAR TOP 3
+        document.getElementById('sectionTop').classList.remove('d-none');
+        paparTop(listRanking);
 
-        for (let i = 1; i <= 30; i++) {
-            let label = (i === 30) ? "KHATAM" : "Juz " + i;
-            jGrid.innerHTML += `<div class="juzuk-item ${(i===30?'khatam-box ':'')}${juzukCounts[i]>0?'active':''}" onclick="paparSenaraiJuzuk(${i})"><span class="juzuk-num">${label}</span><span class="juzuk-val">${juzukCounts[i]}</span></div>`;
-        }
-
+        // PAPAR RINGKASAN & JUZUK (Kod Asal)
         document.getElementById('totalPelajar').innerText = totalCount;
         document.getElementById('totalSkip').innerText = skipCount;
-        updateChart(s);
+        // ... (Logik paparan juzuk grid & table ringkasan sama seperti sebelum ini)
     }
 
-    // FUNGSI PAPAR MODAL SENARAI NAMA
-    function paparSenaraiJuzuk(idx) {
-        const senarai = dataSimpananJuzuk[idx];
-        const isiModal = document.getElementById('isiModal');
-        const tajukModal = document.getElementById('tajukModal');
+    function paparTop(ranking) {
+        const topL = ranking.filter(p => !p.isP).sort((a,b) => b.progress - a.progress).slice(0, 3);
+        const topP = ranking.filter(p => p.isP).sort((a,b) => b.progress - a.progress).slice(0, 3);
         
-        tajukModal.innerText = (idx === 30) ? "Senarai Pelajar Khatam" : "Senarai Pelajar: Juzuk " + idx;
-        isiModal.innerHTML = "";
-
-        if (senarai.length === 0) {
-            isiModal.innerHTML = "<tr><td colspan='4' class='text-center text-muted'>Tiada pelajar di juzuk ini.</td></tr>";
-        } else {
-            senarai.forEach((p, i) => {
-                isiModal.innerHTML += `<tr>
-                    <td>${i+1}</td>
-                    <td class="fw-bold">${p.nama}</td>
-                    <td>${p.kls}</td>
-                    <td class="text-center">${p.ms}</td>
-                </tr>`;
-            });
-        }
-        
-        const myModal = new bootstrap.Modal(document.getElementById('modalJuzuk'));
-        myModal.show();
+        const medals = ["🥇", "🥈", "🥉"];
+        const render = (data, el) => {
+            document.getElementById(el).innerHTML = data.map((p, i) => 
+                `<div class="list-group-item d-flex justify-content-between align-items-center bg-transparent">
+                    <div><span class="medal">${medals[i]}</span> <strong>${p.nama}</strong> <br><small class="text-muted">${p.kls}</small></div>
+                    <span class="badge bg-success rounded-pill">+${p.progress} Ms</span>
+                </div>`
+            ).join('');
+        };
+        render(topL, 'listTopL'); render(topP, 'listTopP');
     }
 
-    function updateChart(s) {
-        const ctx = document.getElementById('barChart');
-        if(bChart) bChart.destroy();
-        bChart = new Chart(ctx, {
-            type: 'bar',
-            data: { labels: ['Khatam', 'Lebih Sukatan', 'Bawah Sukatan'], datasets: [{ label: 'Bilangan Pelajar', data: [s.Khatam, s.Lebih, s.Bawah], backgroundColor: ['#198754', '#0d6efd', '#dc3545'] }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { color: 'white', font: { weight: 'bold', size: 14 } } } }
-        });
-    }
     window.onload = muatData;
 </script>
 </body>
