@@ -19,13 +19,7 @@
         .chart-container { position: relative; height: 350px; width: 100%; }
         .total-box { background: #1a4d2e !important; color: white !important; padding: 10px 20px; border-radius: 30px; display: inline-block; margin: 10px 5px; font-weight: bold; }
         
-        /* GRID JUZUK KEMAS (10 KOLUM) */
-        .juzuk-grid { 
-            display: grid; 
-            grid-template-columns: repeat(10, 1fr); 
-            gap: 8px; 
-            margin-top: 15px; 
-        }
+        .juzuk-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 8px; margin-top: 15px; }
         @media (max-width: 992px) { .juzuk-grid { grid-template-columns: repeat(5, 1fr); } }
         @media (max-width: 576px) { .juzuk-grid { grid-template-columns: repeat(3, 1fr); } }
 
@@ -36,8 +30,7 @@
         .juzuk-item.active { background: #e8f5e9; border-color: #2e7d32; }
         .juzuk-item.khatam-box { background: #fff3cd; border-color: #ffc107; }
 
-        /* LABEL JANTINA */
-        .header-jantina { padding: 8px; border-radius: 8px; font-weight: bold; margin-bottom: 10px; text-align: center; font-size: 0.9rem; }
+        .header-jantina { padding: 6px; border-radius: 8px; font-weight: bold; margin-bottom: 8px; text-align: center; font-size: 0.8rem; }
         .bg-putera { background-color: #e3f2fd; color: #0d6efd; border: 1px solid #0d6efd; }
         .bg-puteri { background-color: #fce4ec; color: #d63384; border: 1px solid #d63384; }
 
@@ -45,11 +38,12 @@
         .badge-bawah { border: 2px solid #dc3545 !important; color: #dc3545 !important; font-weight: bold; border-radius: 20px; padding: 2px 10px; font-size: 0.7rem; }
         .txt-peratus { font-size: 0.75rem; display: block; color: #495057; font-weight: bold !important; margin-top: 2px; }
 
-        /* GAYA RANKING */
-        .card-ranking { border-left: 5px solid #d4af37; background-color: #fffdf2; }
-        .rank-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-bottom: 1px solid #f1f1f1; }
+        /* GAYA RANKING DINAMIK */
+        .card-ranking { border-top: 5px solid #d4af37; background-color: #fffdf2; }
+        .rank-item { display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; border-bottom: 1px solid #f1f1f1; font-size: 0.85rem; }
         .rank-item:last-child { border-bottom: none; }
-        .medal { font-size: 1.2rem; margin-right: 10px; }
+        .medal { font-size: 1.1rem; margin-right: 8px; }
+        .ting-title { background: #d4af37; color: white; padding: 2px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; display: inline-block; margin-bottom: 10px; }
 
         @media print { 
             .filter-panel, .btn-print, .juzuk-item { cursor: default; } 
@@ -101,22 +95,12 @@
         <div class="total-box shadow-sm bg-warning text-dark">Pelajar Skip: <span id="totalSkip">0</span> Orang</div>
     </div>
 
-    <!-- SEKSYEN RANKING TASMIK TERBANYAK -->
+    <!-- SEKSYEN RANKING TASMIK DINAMIK -->
     <div id="rankingSection" class="card p-3 mb-4 card-ranking d-none shadow-sm">
-        <h5 class="fw-bold text-center mb-3 text-dark">🌟 PELAJAR TASMIK TERBANYAK BULAN INI</h5>
-        <div class="row">
-            <div class="col-md-6 border-end">
-                <div class="header-jantina bg-putera">TOP 3 PUTERA</div>
-                <div id="isiRankL"></div>
-            </div>
-            <div class="col-md-6">
-                <div class="header-jantina bg-puteri">TOP 3 PUTERI</div>
-                <div id="isiRankP"></div>
-            </div>
-        </div>
+        <h5 class="fw-bold text-center mb-3 text-dark">🌟 PELAJAR TASMIK TERBANYAK BULAN INI (IKUT TINGKATAN)</h5>
+        <div id="rankingContent"></div>
     </div>
 
-    <!-- RINGKASAN PRESTASI -->
     <div id="ringkasanSection" class="card p-3 mb-4 d-none">
         <h6 class="fw-bold text-success border-bottom pb-2">RINGKASAN PRESTASI MENGIKUT TINGKATAN</h6>
         <div class="table-responsive">
@@ -129,19 +113,16 @@
         </div>
     </div>
 
-    <!-- JUZUK GRID -->
     <div class="card p-3 mb-4">
         <h6 class="fw-bold text-success border-bottom pb-2 text-center">TABURAN PELAJAR MENGIKUT JUZUK TERKINI (Klik Juzuk untuk Senarai Nama)</h6>
         <div id="juzukGrid" class="juzuk-grid"></div>
     </div>
 
-    <!-- CARTA ANALISIS -->
     <div class="card p-3 mb-4">
         <h5 id="tajukCarta" class="fw-bold text-success text-center mb-3">Analisis Pencapaian</h5>
         <div class="chart-container"><canvas id="barChart"></canvas></div>
     </div>
 
-    <!-- SENARAI LAIN (BAWAH, SKIP, KHATAM) -->
     <div class="card p-3 shadow-sm mb-4" style="background-color: #fff9e6; border: 1px solid #ffeeba;">
         <h5 class="fw-bold text-danger mb-4 text-center">⚠️ SENARAI PELAJAR BAWAH SUKATAN</h5>
         <div class="header-jantina bg-putera">PUTERA (LELAKI)</div>
@@ -167,14 +148,8 @@
     </div>
 </div>
 
-<!-- MODAL JUZUK -->
 <div class="modal fade" id="modalJuzuk" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header bg-success text-white"><h5 class="modal-title fw-bold" id="tajukModal">Senarai Pelajar</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
-      <div class="modal-body"><div class="table-responsive"><table class="table table-striped align-middle"><thead class="table-dark"><tr><th>Bil</th><th>Nama Pelajar</th><th>Kelas</th><th class="text-center">Ms Semasa</th></tr></thead><tbody id="isiModal"></tbody></table></div></div>
-    </div>
-  </div>
+  <div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header bg-success text-white"><h5 class="modal-title fw-bold" id="tajukModal">Senarai Pelajar</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="table-responsive"><table class="table table-striped align-middle"><thead class="table-dark"><tr><th>Bil</th><th>Nama Pelajar</th><th>Kelas</th><th class="text-center">Ms Semasa</th></tr></thead><tbody id="isiModal"></tbody></table></div></div></div></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -221,11 +196,9 @@
         const tBodyL = document.getElementById('isiJadualL'); const tBodyP = document.getElementById('isiJadualP');
         const tSkipL = document.getElementById('isiSkipL'); const tSkipP = document.getElementById('isiSkipP');
         const tKhatamL = document.getElementById('isiKhatamL'); const tKhatamP = document.getElementById('isiKhatamP');
-        const iRankL = document.getElementById('isiRankL'); const iRankP = document.getElementById('isiRankP');
 
         rBody.innerHTML = ""; jGrid.innerHTML = ""; tBodyL.innerHTML = ""; tBodyP.innerHTML = ""; 
         tSkipL.innerHTML = ""; tSkipP.innerHTML = ""; tKhatamL.innerHTML = ""; tKhatamP.innerHTML = "";
-        iRankL.innerHTML = ""; iRankP.innerHTML = "";
         dataSimpananJuzuk = Array(31).fill().map(() => []); 
 
         const mapSblm = new Map();
@@ -260,7 +233,7 @@
                 let guru = cari('guruhalaqah');
 
                 let progress = ms - (mapSblm.get(nama) || 0);
-                listProgress.push({ nama, kls, progress, isP, guru });
+                listProgress.push({ nama, kls, progress, isP, guru, ting: tingData });
 
                 if (tingSummary[tingData]) {
                     tingSummary[tingData].t++;
@@ -271,7 +244,7 @@
                 }
 
                 if(ind.includes('KHATAM')) {
-                    s.Khatam++; bilKL = isP ? bilKL : bilKL + 1; bilKP = isP ? bilKP + 1 : bilKP;
+                    s.Khatam++; bilKL = isP ? bilKL : bilKL + 1; bilKP = isP ? bilKP + 1 : bilKL;
                     let rK = `<tr><td class="text-center">${isP ? bilKP : bilKL}</td><td class="fw-bold">${nama}</td><td class="text-center">${kls}</td><td class="text-center">${ms}</td><td>${guru}</td></tr>`;
                     if(isP) tKhatamP.innerHTML += rK; else tKhatamL.innerHTML += rK;
                 } else if(ind.includes('LEBIH')) s.Lebih++;
@@ -292,8 +265,7 @@
             }
         });
 
-        document.getElementById('rankingSection').classList.remove('d-none');
-        paparRanking(listProgress, iRankL, iRankP);
+        paparRankingDinamik(listProgress, filterTing);
 
         if (filterTing === "ALL") {
             document.getElementById('ringkasanSection').classList.remove('d-none');
@@ -316,19 +288,42 @@
         updateChart(s);
     }
 
-    function paparRanking(list, elL, elP) {
-        const topL = list.filter(x => !x.isP).sort((a,b) => b.progress - a.progress).slice(0, 3);
-        const topP = list.filter(x => x.isP).sort((a,b) => b.progress - a.progress).slice(0, 3);
-        const medal = ["🥇", "🥈", "🥉"];
+    function paparRankingDinamik(list, filterTing) {
+        const container = document.getElementById('rankingContent');
+        container.innerHTML = "";
+        document.getElementById('rankingSection').classList.remove('d-none');
 
-        const html = (data) => data.map((p, i) => `
+        const medals = ["🥇", "🥈", "🥉"];
+        const buildList = (data) => data.map((p, i) => `
             <div class="rank-item">
-                <div><span class="medal">${medal[i]}</span> <strong>${p.nama}</strong> <br> <small class="text-muted">${p.kls} • Guru: ${p.guru || 'Tiada Data'}</small></div>
+                <div><span class="medal">${medals[i]}</span> <strong>${p.nama}</strong> <br> <small class="text-muted">${p.kls} • Guru: ${p.guru || 'Tiada'}</small></div>
                 <span class="badge bg-success">+${p.progress} Ms</span>
             </div>`).join('');
 
-        elL.innerHTML = topL.length ? html(topL) : "Tiada data";
-        elP.innerHTML = topP.length ? html(topP) : "Tiada data";
+        const tings = filterTing === "ALL" ? ["1", "2", "3", "4", "5"] : [filterTing];
+
+        tings.forEach(t => {
+            const listTing = list.filter(x => x.ting === t);
+            const topL = listTing.filter(x => !x.isP).sort((a,b) => b.progress - a.progress).slice(0, 3);
+            const topP = listTing.filter(x => x.isP).sort((a,b) => b.progress - a.progress).slice(0, 3);
+
+            if (topL.length || topP.length) {
+                container.innerHTML += `
+                <div class="mb-4">
+                    <div class="text-center"><span class="ting-title">TINGKATAN ${t}</span></div>
+                    <div class="row">
+                        <div class="col-md-6 border-end">
+                            <div class="header-jantina bg-putera">TOP 3 PUTERA</div>
+                            ${topL.length ? buildList(topL) : '<div class="text-center small py-2">Tiada Data</div>'}
+                        </div>
+                        <div class="col-md-6">
+                            <div class="header-jantina bg-puteri">TOP 3 PUTERI</div>
+                            ${topP.length ? buildList(topP) : '<div class="text-center small py-2">Tiada Data</div>'}
+                        </div>
+                    </div>
+                </div>`;
+            }
+        });
     }
 
     function paparSenaraiJuzuk(idx) {
