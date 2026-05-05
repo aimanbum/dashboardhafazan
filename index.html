@@ -38,7 +38,6 @@
         .badge-bawah { border: 2px solid #dc3545 !important; color: #dc3545 !important; font-weight: bold; border-radius: 20px; padding: 2px 10px; font-size: 0.7rem; }
         .txt-peratus { font-size: 0.75rem; display: block; color: #495057; font-weight: bold !important; margin-top: 2px; }
 
-        /* GAYA RANKING DINAMIK */
         .card-ranking { border-top: 5px solid #d4af37; background-color: #fffdf2; }
         .rank-item { display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; border-bottom: 1px solid #f1f1f1; font-size: 0.85rem; }
         .rank-item:last-child { border-bottom: none; }
@@ -95,9 +94,9 @@
         <div class="total-box shadow-sm bg-warning text-dark">Pelajar Skip: <span id="totalSkip">0</span> Orang</div>
     </div>
 
-    <!-- SEKSYEN RANKING TASMIK DINAMIK -->
+    <!-- SEKSYEN RANKING TASMIK DINAMIK (TINGKATAN 5 DIKECUALIKAN) -->
     <div id="rankingSection" class="card p-3 mb-4 card-ranking d-none shadow-sm">
-        <h5 class="fw-bold text-center mb-3 text-dark">🌟 PELAJAR TASMIK TERBANYAK BULAN INI (IKUT TINGKATAN)</h5>
+        <h5 class="fw-bold text-center mb-3 text-dark">🌟 PELAJAR TASMIK TERBANYAK BULAN INI</h5>
         <div id="rankingContent"></div>
     </div>
 
@@ -134,9 +133,9 @@
     <div class="card p-3 shadow-sm mb-4" style="background-color: #fff5eb; border: 1px solid #fd7e14;">
         <h5 class="fw-bold text-warning text-dark mb-4 text-center">🟠 SENARAI PELAJAR SKIP HAFAZAN</h5>
         <div class="header-jantina bg-putera">PUTERA (LELAKI)</div>
-        <div class="table-responsive mb-4"><table class="table table-bordered table-sm align-middle bg-white"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Pencapaian Semasa</th><th>Guru Halaqah</th><th>Catatan</th></tr></thead><tbody id="isiSkipL"></tbody></table></div>
+        <div class="table-responsive mb-4"><table class="table table-bordered table-sm align-middle bg-white"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Pencapaian Semasa</th><th>Guru Halaqah</th><th>Jumlah M/S Skip</th></tr></thead><tbody id="isiSkipL"></tbody></table></div>
         <div class="header-jantina bg-puteri">PUTERI (PEREMPUAN)</div>
-        <div class="table-responsive"><table class="table table-bordered table-sm align-middle bg-white"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Pencapaian Semasa</th><th>Guru Halaqah</th><th>Catatan</th></tr></thead><tbody id="isiSkipP"></tbody></table></div>
+        <div class="table-responsive"><table class="table table-bordered table-sm align-middle bg-white"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Pencapaian Semasa</th><th>Guru Halaqah</th><th>Jumlah M/S Skip</th></tr></thead><tbody id="isiSkipP"></tbody></table></div>
     </div>
 
     <div class="card p-3 shadow-sm" style="background-color: #e8f5e9; border: 1px solid #2e7d32;">
@@ -244,7 +243,7 @@
                 }
 
                 if(ind.includes('KHATAM')) {
-                    s.Khatam++; bilKL = isP ? bilKL : bilKL + 1; bilKP = isP ? bilKP + 1 : bilKL;
+                    s.Khatam++; bilKL = isP ? bilKL : bilKL + 1; bilKP = isP ? bilKP + 1 : bilKP;
                     let rK = `<tr><td class="text-center">${isP ? bilKP : bilKL}</td><td class="fw-bold">${nama}</td><td class="text-center">${kls}</td><td class="text-center">${ms}</td><td>${guru}</td></tr>`;
                     if(isP) tKhatamP.innerHTML += rK; else tKhatamL.innerHTML += rK;
                 } else if(ind.includes('LEBIH')) s.Lebih++;
@@ -290,17 +289,25 @@
 
     function paparRankingDinamik(list, filterTing) {
         const container = document.getElementById('rankingContent');
+        const section = document.getElementById('rankingSection');
         container.innerHTML = "";
-        document.getElementById('rankingSection').classList.remove('d-none');
+        
+        // 💡 LOGIK BARU: Kecualikan Tingkatan 5 daripada senarai tingkatan yang dipaparkan
+        let tings = filterTing === "ALL" ? ["1", "2", "3", "4"] : (filterTing === "5" ? [] : [filterTing]);
 
+        // Jika tiada tingkatan (kerana pilih T5), sembunyikan seksyen ranking
+        if (tings.length === 0) {
+            section.classList.add('d-none');
+            return;
+        }
+
+        section.classList.remove('d-none');
         const medals = ["🥇", "🥈", "🥉"];
         const buildList = (data) => data.map((p, i) => `
             <div class="rank-item">
                 <div><span class="medal">${medals[i]}</span> <strong>${p.nama}</strong> <br> <small class="text-muted">${p.kls} • Guru: ${p.guru || 'Tiada'}</small></div>
                 <span class="badge bg-success">+${p.progress} Ms</span>
             </div>`).join('');
-
-        const tings = filterTing === "ALL" ? ["1", "2", "3", "4", "5"] : [filterTing];
 
         tings.forEach(t => {
             const listTing = list.filter(x => x.ting === t);
