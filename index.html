@@ -15,7 +15,6 @@
         .logo-container { width: 120px; height: 120px; background: white !important; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto; border: 3px solid #d4af37; overflow: hidden; }
         .school-logo { width: 100px; height: auto; object-fit: contain; }
         .filter-panel { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-top: -30px; position: relative; z-index: 10; }
-        .card { border-radius: 15px; border: 1px solid #eee; margin-bottom: 20px; background: white; overflow: hidden; }
         .chart-container { position: relative; height: 350px; width: 100%; }
         .total-box { background: #1a4d2e !important; color: white !important; padding: 10px 20px; border-radius: 30px; display: inline-block; margin: 10px 5px; font-weight: bold; }
         
@@ -38,16 +37,25 @@
         .badge-bawah { border: 2px solid #dc3545 !important; color: #dc3545 !important; font-weight: bold; border-radius: 20px; padding: 2px 10px; font-size: 0.7rem; }
         .txt-peratus { font-size: 0.75rem; display: block; color: #495057; font-weight: bold !important; margin-top: 2px; }
 
-        .card-ranking { border-top: 5px solid #d4af37; background-color: #fffdf2; }
         .rank-item { display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; border-bottom: 1px solid #f1f1f1; font-size: 0.85rem; }
         .rank-item:last-child { border-bottom: none; }
         .medal { font-size: 1.1rem; margin-right: 8px; }
         .ting-title { background: #d4af37; color: white; padding: 2px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; display: inline-block; margin-bottom: 10px; }
 
+        /* GAYA MENU COLLAPSIBLE */
+        .card-menu { border: none; margin-bottom: 15px; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .menu-header { padding: 15px 20px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; letter-spacing: 0.5px; }
+        .menu-header:hover { opacity: 0.9; }
+        .toggle-icon { font-size: 0.8rem; transition: transform 0.3s ease; }
+        .menu-header[aria-expanded="true"] .toggle-icon { transform: rotate(180deg); }
+
         @media print { 
             .filter-panel, .btn-print, .juzuk-item { cursor: default; } 
-            .card { page-break-inside: avoid; border: 1px solid #ddd !important; } 
+            .card-menu { page-break-inside: avoid; border: 1px solid #ddd !important; margin-bottom: 20px; } 
             .juzuk-grid { grid-template-columns: repeat(10, 1fr) !important; gap: 5px; }
+            .toggle-icon { display: none !important; }
+            /* PAKSA SEMUA MENU TERBUKA KETIKA PRINT */
+            .collapse { display: block !important; height: auto !important; }
         }
     </style>
 </head>
@@ -58,7 +66,7 @@
         <div class="logo-container"><img src="logo.png" alt="Logo SMKATB" class="school-logo"></div>
         <h2 class="fw-bold text-uppercase">Dashboard Prestasi Hafazan Tahun 2026</h2>
         <h4 class="mb-0">SMK AGAMA TOK BACHOK</h4>
-        <div id="infoCetak" class="mt-2 text-white">DATA : <span id="paparTing"></span> | BULAN : <span id="paparBulan"></span></div>
+        <div id="infoCetak" class="mt-2 text-white d-none d-print-block">DATA : <span id="paparTing"></span> | BULAN : <span id="paparBulan"></span></div>
     </div>
 </div>
 
@@ -89,61 +97,89 @@
         </div>
     </div>
 
-    <div class="text-center">
+    <div class="text-center mb-4">
         <div class="total-box shadow-sm"><span id="labelTing">Keseluruhan Pelajar</span>: <span id="totalPelajar">0</span> Orang</div>
         <div class="total-box shadow-sm bg-warning text-dark">Pelajar Skip: <span id="totalSkip">0</span> Orang</div>
     </div>
 
-    <!-- SEKSYEN RANKING TASMIK DINAMIK (TINGKATAN 5 DIKECUALIKAN) -->
-    <div id="rankingSection" class="card p-3 mb-4 card-ranking d-none shadow-sm">
-        <h5 class="fw-bold text-center mb-3 text-dark">🌟 PELAJAR TASMIK TERBANYAK BULAN INI</h5>
-        <div id="rankingContent"></div>
-    </div>
-
-    <div id="ringkasanSection" class="card p-3 mb-4 d-none">
-        <h6 class="fw-bold text-success border-bottom pb-2">RINGKASAN PRESTASI MENGIKUT TINGKATAN</h6>
-        <div class="table-responsive">
-            <table class="table table-bordered text-center align-middle">
-                <thead class="table-dark">
-                    <tr><th>Tingkatan</th><th>Jumlah</th><th class="bg-success">Khatam</th><th class="bg-primary">Lebih Sukatan (%)</th><th class="bg-danger">Bawah Sukatan (%)</th><th class="bg-warning text-dark">Skip Hafazan (%)</th></tr>
-                </thead>
-                <tbody id="isiRingkasan"></tbody>
-            </table>
+    <div id="rankingContainer" class="card card-menu d-none">
+        <div class="menu-header" style="background-color: #fffdf2; color: #b8860b; border-left: 5px solid #d4af37;" data-bs-toggle="collapse" data-bs-target="#collapseRanking">
+            <span>🌟 Pelajar Tasmik Terbanyak (Top 3)</span><span class="toggle-icon">▼</span>
+        </div>
+        <div id="collapseRanking" class="collapse">
+            <div class="card-body" id="rankingContent"></div>
         </div>
     </div>
 
-    <div class="card p-3 mb-4">
-        <h6 class="fw-bold text-success border-bottom pb-2 text-center">TABURAN PELAJAR MENGIKUT JUZUK TERKINI (Klik Juzuk untuk Senarai Nama)</h6>
-        <div id="juzukGrid" class="juzuk-grid"></div>
+    <div id="ringkasanContainer" class="card card-menu d-none">
+        <div class="menu-header bg-success text-white" data-bs-toggle="collapse" data-bs-target="#collapseRingkasan">
+            <span>📊 Ringkasan Prestasi & Analisis</span><span class="toggle-icon">▼</span>
+        </div>
+        <div id="collapseRingkasan" class="collapse">
+            <div class="card-body p-3">
+                <div class="table-responsive mb-4">
+                    <table class="table table-bordered text-center align-middle">
+                        <thead class="table-dark"><tr><th>Tingkatan</th><th>Jumlah</th><th class="bg-success">Khatam</th><th class="bg-primary">Lebih Sukatan (%)</th><th class="bg-danger">Bawah Sukatan (%)</th><th class="bg-warning text-dark">Skip Hafazan (%)</th></tr></thead>
+                        <tbody id="isiRingkasan"></tbody>
+                    </table>
+                </div>
+                <h5 id="tajukCarta" class="fw-bold text-success text-center mb-3">Analisis Pencapaian</h5>
+                <div class="chart-container"><canvas id="barChart"></canvas></div>
+            </div>
+        </div>
     </div>
 
-    <div class="card p-3 mb-4">
-        <h5 id="tajukCarta" class="fw-bold text-success text-center mb-3">Analisis Pencapaian</h5>
-        <div class="chart-container"><canvas id="barChart"></canvas></div>
+    <div class="card card-menu">
+        <div class="menu-header bg-success text-white" data-bs-toggle="collapse" data-bs-target="#collapseJuzuk">
+            <span>📖 Taburan Pelajar Mengikut Juzuk</span><span class="toggle-icon">▼</span>
+        </div>
+        <div id="collapseJuzuk" class="collapse show"> <div class="card-body p-3">
+                <div class="text-center text-muted small mb-2">Klik pada kotak juzuk untuk lihat senarai nama pelajar.</div>
+                <div id="juzukGrid" class="juzuk-grid"></div>
+            </div>
+        </div>
     </div>
 
-    <div class="card p-3 shadow-sm mb-4" style="background-color: #fff9e6; border: 1px solid #ffeeba;">
-        <h5 class="fw-bold text-danger mb-4 text-center">⚠️ SENARAI PELAJAR BAWAH SUKATAN</h5>
-        <div class="header-jantina bg-putera">PUTERA (LELAKI)</div>
-        <div class="table-responsive mb-4"><table class="table table-bordered table-sm align-middle bg-white"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Sukatan</th><th>Ms</th><th>Hutang</th><th>Guru Halaqah</th><th>Pencapaian</th></tr></thead><tbody id="isiJadualL"></tbody></table></div>
-        <div class="header-jantina bg-puteri">PUTERI (PEREMPUAN)</div>
-        <div class="table-responsive"><table class="table table-bordered table-sm align-middle bg-white"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Sukatan</th><th>Ms</th><th>Hutang</th><th>Guru Halaqah</th><th>Pencapaian</th></tr></thead><tbody id="isiJadualP"></tbody></table></div>
+    <div class="card card-menu">
+        <div class="menu-header text-white" style="background-color: #dc3545;" data-bs-toggle="collapse" data-bs-target="#collapseBawah">
+            <span>⚠️ Senarai Pelajar Bawah Sukatan</span><span class="toggle-icon">▼</span>
+        </div>
+        <div id="collapseBawah" class="collapse" style="background-color: #fff9e6;">
+            <div class="card-body p-3">
+                <div class="header-jantina bg-putera">PUTERA (LELAKI)</div>
+                <div class="table-responsive mb-4"><table class="table table-bordered table-sm align-middle bg-white"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Sukatan</th><th>Ms</th><th>Hutang</th><th>Guru Halaqah</th><th>Pencapaian</th></tr></thead><tbody id="isiJadualL"></tbody></table></div>
+                <div class="header-jantina bg-puteri">PUTERI (PEREMPUAN)</div>
+                <div class="table-responsive"><table class="table table-bordered table-sm align-middle bg-white"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Sukatan</th><th>Ms</th><th>Hutang</th><th>Guru Halaqah</th><th>Pencapaian</th></tr></thead><tbody id="isiJadualP"></tbody></table></div>
+            </div>
+        </div>
     </div>
 
-    <div class="card p-3 shadow-sm mb-4" style="background-color: #fff5eb; border: 1px solid #fd7e14;">
-        <h5 class="fw-bold text-warning text-dark mb-4 text-center">🟠 SENARAI PELAJAR SKIP HAFAZAN</h5>
-        <div class="header-jantina bg-putera">PUTERA (LELAKI)</div>
-        <div class="table-responsive mb-4"><table class="table table-bordered table-sm align-middle bg-white"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Pencapaian Semasa</th><th>Guru Halaqah</th><th>Jumlah M/S Skip</th></tr></thead><tbody id="isiSkipL"></tbody></table></div>
-        <div class="header-jantina bg-puteri">PUTERI (PEREMPUAN)</div>
-        <div class="table-responsive"><table class="table table-bordered table-sm align-middle bg-white"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Pencapaian Semasa</th><th>Guru Halaqah</th><th>Jumlah M/S Skip</th></tr></thead><tbody id="isiSkipP"></tbody></table></div>
+    <div class="card card-menu">
+        <div class="menu-header text-dark" style="background-color: #ffc107;" data-bs-toggle="collapse" data-bs-target="#collapseSkip">
+            <span>🟠 Senarai Pelajar Skip Hafazan</span><span class="toggle-icon">▼</span>
+        </div>
+        <div id="collapseSkip" class="collapse" style="background-color: #fff5eb;">
+            <div class="card-body p-3">
+                <div class="header-jantina bg-putera">PUTERA (LELAKI)</div>
+                <div class="table-responsive mb-4"><table class="table table-bordered table-sm align-middle bg-white"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Pencapaian Semasa</th><th>Guru Halaqah</th><th>Catatan</th></tr></thead><tbody id="isiSkipL"></tbody></table></div>
+                <div class="header-jantina bg-puteri">PUTERI (PEREMPUAN)</div>
+                <div class="table-responsive"><table class="table table-bordered table-sm align-middle bg-white"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Pencapaian Semasa</th><th>Guru Halaqah</th><th>Catatan</th></tr></thead><tbody id="isiSkipP"></tbody></table></div>
+            </div>
+        </div>
     </div>
 
-    <div class="card p-3 shadow-sm" style="background-color: #e8f5e9; border: 1px solid #2e7d32;">
-        <h5 class="fw-bold text-success mb-4 text-center">🏆 SENARAI PELAJAR KHATAM</h5>
-        <div class="header-jantina bg-putera">PUTERA (LELAKI)</div>
-        <div class="table-responsive mb-4"><table class="table table-bordered table-sm align-middle bg-white"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Ms</th><th>Guru Halaqah</th></tr></thead><tbody id="isiKhatamL"></tbody></table></div>
-        <div class="header-jantina bg-puteri">PUTERI (PEREMPUAN)</div>
-        <div class="table-responsive"><table class="table table-bordered table-sm align-middle bg-white"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Ms</th><th>Guru Halaqah</th></tr></thead><tbody id="isiKhatamP"></tbody></table></div>
+    <div class="card card-menu">
+        <div class="menu-header text-white" style="background-color: #198754;" data-bs-toggle="collapse" data-bs-target="#collapseKhatam">
+            <span>🏆 Senarai Pelajar Khatam</span><span class="toggle-icon">▼</span>
+        </div>
+        <div id="collapseKhatam" class="collapse" style="background-color: #e8f5e9;">
+            <div class="card-body p-3">
+                <div class="header-jantina bg-putera">PUTERA (LELAKI)</div>
+                <div class="table-responsive mb-4"><table class="table table-bordered table-sm align-middle bg-white"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Ms</th><th>Guru Halaqah</th></tr></thead><tbody id="isiKhatamL"></tbody></table></div>
+                <div class="header-jantina bg-puteri">PUTERI (PEREMPUAN)</div>
+                <div class="table-responsive"><table class="table table-bordered table-sm align-middle bg-white"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Ms</th><th>Guru Halaqah</th></tr></thead><tbody id="isiKhatamP"></tbody></table></div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -179,6 +215,7 @@
         const urlSemasa = pautanBulan[bln] + "&cb=" + new Date().getTime();
         const urlSebelum = (idx > 0) ? pautanBulan[keys[idx - 1]] + "&cb=" + new Date().getTime() : null;
 
+        document.getElementById('paparTing').innerText = (document.getElementById('selTing').value === "ALL") ? "KESELURUHAN" : "TINGKATAN " + document.getElementById('selTing').value;
         document.getElementById('paparBulan').innerText = document.getElementById('selBulan').options[document.getElementById('selBulan').selectedIndex].text;
         
         Promise.all([
@@ -267,7 +304,7 @@
         paparRankingDinamik(listProgress, filterTing);
 
         if (filterTing === "ALL") {
-            document.getElementById('ringkasanSection').classList.remove('d-none');
+            document.getElementById('ringkasanContainer').classList.remove('d-none');
             for (let t in tingSummary) {
                 let tot = tingSummary[t].t;
                 let pL = tot > 0 ? (((tingSummary[t].l + tingSummary[t].k) / tot) * 100).toFixed(1) : 0;
@@ -275,7 +312,7 @@
                 let pS = tot > 0 ? ((tingSummary[t].s / tot) * 100).toFixed(1) : 0;
                 rBody.innerHTML += `<tr><td class="fw-bold">TING ${t}</td><td>${tot}</td><td class="text-success fw-bold">${tingSummary[t].k}</td><td class="text-primary fw-bold">${tingSummary[t].l}<span class="txt-peratus">(${pL}%)</span></td><td class="text-danger fw-bold">${tingSummary[t].b}<span class="txt-peratus">(${pB}%)</span></td><td class="text-warning fw-bold" style="color:#fd7e14 !important;">${tingSummary[t].s}<span class="txt-peratus">(${pS}%)</span></td></tr>`;
             }
-        } else { document.getElementById('ringkasanSection').classList.add('d-none'); }
+        } else { document.getElementById('ringkasanContainer').classList.add('d-none'); }
 
         for (let i = 1; i <= 30; i++) {
             let label = (i === 30) ? "KHATAM" : "Juz " + i;
@@ -289,18 +326,12 @@
 
     function paparRankingDinamik(list, filterTing) {
         const container = document.getElementById('rankingContent');
-        const section = document.getElementById('rankingSection');
+        const section = document.getElementById('rankingContainer');
         container.innerHTML = "";
         
-        // 💡 LOGIK BARU: Kecualikan Tingkatan 5 daripada senarai tingkatan yang dipaparkan
         let tings = filterTing === "ALL" ? ["1", "2", "3", "4"] : (filterTing === "5" ? [] : [filterTing]);
-
-        // Jika tiada tingkatan (kerana pilih T5), sembunyikan seksyen ranking
-        if (tings.length === 0) {
-            section.classList.add('d-none');
-            return;
-        }
-
+        if (tings.length === 0) { section.classList.add('d-none'); return; }
+        
         section.classList.remove('d-none');
         const medals = ["🥇", "🥈", "🥉"];
         const buildList = (data) => data.map((p, i) => `
@@ -316,7 +347,7 @@
 
             if (topL.length || topP.length) {
                 container.innerHTML += `
-                <div class="mb-4">
+                <div class="mb-4 p-3 bg-white border rounded">
                     <div class="text-center"><span class="ting-title">TINGKATAN ${t}</span></div>
                     <div class="row">
                         <div class="col-md-6 border-end">
@@ -336,8 +367,7 @@
     function paparSenaraiJuzuk(idx) {
         const senarai = dataSimpananJuzuk[idx];
         const isiModal = document.getElementById('isiModal');
-        const tajukModal = document.getElementById('tajukModal');
-        tajukModal.innerText = (idx === 30) ? "Senarai Pelajar Khatam" : "Senarai Pelajar: Juzuk " + idx;
+        document.getElementById('tajukModal').innerText = (idx === 30) ? "Senarai Pelajar Khatam" : "Senarai Pelajar: Juzuk " + idx;
         isiModal.innerHTML = senarai.length ? senarai.map((p, i) => `<tr><td>${i+1}</td><td class="fw-bold">${p.nama}</td><td>${p.kls}</td><td class="text-center">${p.ms}</td></tr>`).join('') : "<tr><td colspan='4' class='text-center'>Tiada pelajar</td></tr>";
         new bootstrap.Modal(document.getElementById('modalJuzuk')).show();
     }
