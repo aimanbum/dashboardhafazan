@@ -141,9 +141,10 @@
         </div>
     </div>
 
-    <div class="card card-menu">
+    <div class="card card-menu d-none" id="menuGuruContainer">
         <div class="menu-header text-dark" style="background-color: #0dcaf0;" data-bs-toggle="collapse" data-bs-target="#collapseGuru">
-            <span>👨‍🏫 Senarai Pelajar Mengikut Guru Halaqah</span><span class="toggle-icon">▼</span>
+            <div><span>👨‍🏫 Senarai Pelajar Mengikut Guru Halaqah</span> <button class="btn btn-outline-dark btn-export" onclick="eksportExcelGuru(event)">📥 EXCEL</button></div>
+            <span class="toggle-icon">▼</span>
         </div>
         <div id="collapseGuru" class="collapse" style="background-color: #f8f9fa;">
             <div class="card-body p-3" id="isiMenuGuru">
@@ -153,7 +154,7 @@
 
     <div class="card card-menu">
         <div class="menu-header text-white" style="background-color: #dc3545;" data-bs-toggle="collapse" data-bs-target="#collapseBawah">
-            <div><span>⚠️ Senarai Pelajar Bawah Sukatan</span> <button class="btn btn-outline-light btn-export" onclick="eksportExcel('isiJadualL', 'isiJadualP', 'BAWAH_SUKATAN')">📥 EXCEL</button></div>
+            <div><span>⚠️ Senarai Pelajar Bawah Sukatan</span> <button class="btn btn-outline-light btn-export" onclick="eksportExcel('isiJadualL', 'isiJadualP', 'BAWAH_SUKATAN', event)">📥 EXCEL</button></div>
             <span class="toggle-icon">▼</span>
         </div>
         <div id="collapseBawah" class="collapse" style="background-color: #fff9e6;">
@@ -168,7 +169,7 @@
 
     <div class="card card-menu">
         <div class="menu-header text-dark" style="background-color: #ffc107;" data-bs-toggle="collapse" data-bs-target="#collapseSkip">
-            <div><span>🟠 Senarai Pelajar Skip Hafazan</span> <button class="btn btn-outline-dark btn-export" onclick="eksportExcel('isiSkipL', 'isiSkipP', 'SKIP_HAFAZAN')">📥 EXCEL</button></div>
+            <div><span>🟠 Senarai Pelajar Skip Hafazan</span> <button class="btn btn-outline-dark btn-export" onclick="eksportExcel('isiSkipL', 'isiSkipP', 'SKIP_HAFAZAN', event)">📥 EXCEL</button></div>
             <span class="toggle-icon">▼</span>
         </div>
         <div id="collapseSkip" class="collapse" style="background-color: #fff5eb;">
@@ -183,7 +184,7 @@
 
     <div class="card card-menu">
         <div class="menu-header text-white" style="background-color: #198754;" data-bs-toggle="collapse" data-bs-target="#collapseKhatam">
-            <div><span>🏆 Senarai Pelajar Khatam</span> <button class="btn btn-outline-light btn-export" onclick="eksportExcel('isiKhatamL', 'isiKhatamP', 'PELAJAR_KHATAM')">📥 EXCEL</button></div>
+            <div><span>🏆 Senarai Pelajar Khatam</span> <button class="btn btn-outline-light btn-export" onclick="eksportExcel('isiKhatamL', 'isiKhatamP', 'PELAJAR_KHATAM', event)">📥 EXCEL</button></div>
             <span class="toggle-icon">▼</span>
         </div>
         <div id="collapseKhatam" class="collapse" style="background-color: #e8f5e9;">
@@ -222,6 +223,8 @@
     let rawDataSemasa = [];
     let rawDataSblm = [];
     let dataSimpananJuzuk = Array(31).fill().map(() => []); 
+    let csvGuruGlobal = []; // Menyimpan data Excel untuk Guru Halaqah
+
     Chart.register(ChartDataLabels);
 
     function muatData() {
@@ -231,6 +234,8 @@
         const urlSemasa = pautanBulan[bln] + "&cb=" + new Date().getTime();
         const urlSebelum = (idx > 0) ? pautanBulan[keys[idx - 1]] + "&cb=" + new Date().getTime() : null;
 
+        document.getElementById('paparBulan').innerText = document.getElementById('selBulan').options[document.getElementById('selBulan').selectedIndex].text;
+        
         Promise.all([
             new Promise(res => Papa.parse(urlSemasa, { download: true, header: true, complete: res })),
             urlSebelum ? new Promise(res => Papa.parse(urlSebelum, { download: true, header: true, complete: res })) : Promise.resolve({data:[]})
@@ -247,7 +252,13 @@
 
     function prosesAnalisis(data, dataSblm, filterTing) {
         document.getElementById('paparTing').innerText = (filterTing === "ALL") ? "KESELURUHAN" : "TINGKATAN " + filterTing;
-        document.getElementById('paparBulan').innerText = document.getElementById('selBulan').options[document.getElementById('selBulan').selectedIndex].text;
+
+        // Tunjuk/Sembunyi Menu Guru Halaqah
+        if (filterTing === "ALL") {
+            document.getElementById('menuGuruContainer').classList.add('d-none');
+        } else {
+            document.getElementById('menuGuruContainer').classList.remove('d-none');
+        }
 
         const rBody = document.getElementById('isiRingkasan');
         const jGrid = document.getElementById('juzukGrid');
@@ -260,6 +271,7 @@
         tSkipL.innerHTML = ""; tSkipP.innerHTML = ""; tKhatamL.innerHTML = ""; tKhatamP.innerHTML = "";
         isiGuru.innerHTML = "";
         dataSimpananJuzuk = Array(31).fill().map(() => []); 
+        csvGuruGlobal = [["Guru Halaqah", "Bil", "Nama Pelajar", "Kelas", "Mukasurat", "Status Pencapaian"]]; // Header Excel Guru
 
         const mapSblm = new Map();
         dataSblm.forEach(d => {
@@ -274,7 +286,7 @@
         let totalCount = 0; let skipCount = 0;
         let bilL = 0; let bilP = 0; let bilSL = 0; let bilSP = 0; let bilKL = 0; let bilKP = 0;
         let listProgress = [];
-        let guruMap = {}; // Untuk simpan data murid ikut guru
+        let guruMap = {};
 
         data.forEach(d => {
             const cari = (k) => d[Object.keys(d).find(x => x.toLowerCase().replace(/[\s.]/g, '').includes(k.toLowerCase().replace(/[\s.]/g, '')))] || '';
@@ -293,9 +305,11 @@
                 let sukatan = parseFloat(cari('sukatansemasa')) || 0;
                 let isSkip = (cari('skip') && cari('skip') !== "" && cari('skip') !== "0") || ind.includes("SKIP");
 
-                // Simpan dalam bakul Guru Halaqah
-                if (!guruMap[guru]) guruMap[guru] = [];
-                guruMap[guru].push({ nama, kls, ms, ind });
+                // Simpan dalam bakul Guru Halaqah jika Tingkatan spesifik dipilih
+                if (filterTing !== "ALL") {
+                    if (!guruMap[guru]) guruMap[guru] = [];
+                    guruMap[guru].push({ nama, kls, ms, ind });
+                }
 
                 let progress = ms - (mapSblm.get(nama) || 0);
                 listProgress.push({ nama, kls, progress, isP, guru, ting: tingData });
@@ -332,36 +346,39 @@
             }
         });
 
-        // JANA JADUAL UNTUK MENU GURU HALAQAH
-        Object.keys(guruMap).sort().forEach(g => {
-            let list = guruMap[g];
-            list.sort((a,b) => a.kls.localeCompare(b.kls) || a.nama.localeCompare(b.nama)); // Susun ikut kelas & nama
-            let tbody = list.map((p, i) => {
-                let badgeClass = p.ind.includes('BAWAH') ? 'bg-danger' : (p.ind.includes('KHATAM') ? 'bg-success' : (p.ind.includes('LEBIH') ? 'bg-primary' : 'bg-warning text-dark'));
-                return `<tr>
-                    <td class="text-center">${i+1}</td>
-                    <td class="fw-bold text-start" style="font-size:0.75rem;">${p.nama}</td>
-                    <td class="text-center small">${p.kls}</td>
-                    <td class="text-center fw-bold">${p.ms}</td>
-                    <td class="text-center"><span class="badge ${badgeClass}">${p.ind}</span></td>
-                </tr>`;
-            }).join('');
+        // JANA JADUAL MENU GURU & DATA EXCEL
+        if (filterTing !== "ALL") {
+            Object.keys(guruMap).sort().forEach(g => {
+                let list = guruMap[g];
+                list.sort((a,b) => a.kls.localeCompare(b.kls) || a.nama.localeCompare(b.nama)); 
+                let tbody = list.map((p, i) => {
+                    csvGuruGlobal.push([`"${g}"`, `"${i+1}"`, `"${p.nama}"`, `"${p.kls}"`, `"${p.ms}"`, `"${p.ind}"`]); // Simpan ke Excel array
+                    let badgeClass = p.ind.includes('BAWAH') ? 'bg-danger' : (p.ind.includes('KHATAM') ? 'bg-success' : (p.ind.includes('LEBIH') ? 'bg-primary' : 'bg-warning text-dark'));
+                    return `<tr>
+                        <td class="text-center">${i+1}</td>
+                        <td class="fw-bold text-start" style="font-size:0.75rem;">${p.nama}</td>
+                        <td class="text-center small">${p.kls}</td>
+                        <td class="text-center fw-bold">${p.ms}</td>
+                        <td class="text-center"><span class="badge ${badgeClass}">${p.ind}</span></td>
+                    </tr>`;
+                }).join('');
 
-            isiGuru.innerHTML += `
-            <div class="mb-4 bg-white p-3 border rounded shadow-sm">
-                <h6 class="fw-bold border-bottom pb-2" style="color:#1a4d2e;">
-                    👨‍🏫 ${g} <span class="badge bg-secondary float-end">${list.length} Pelajar</span>
-                </h6>
-                <div class="table-responsive">
-                    <table class="table table-bordered table-sm align-middle">
-                        <thead class="table-light text-center">
-                            <tr><th>Bil</th><th class="text-start">Nama Pelajar</th><th>Kelas</th><th>Ms</th><th>Status</th></tr>
-                        </thead>
-                        <tbody>${tbody}</tbody>
-                    </table>
-                </div>
-            </div>`;
-        });
+                isiGuru.innerHTML += `
+                <div class="mb-4 bg-white p-3 border rounded shadow-sm">
+                    <h6 class="fw-bold border-bottom pb-2" style="color:#1a4d2e;">
+                        👨‍🏫 ${g} <span class="badge bg-secondary float-end">${list.length} Pelajar</span>
+                    </h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-sm align-middle">
+                            <thead class="table-light text-center">
+                                <tr><th>Bil</th><th class="text-start">Nama Pelajar</th><th>Kelas</th><th>Ms</th><th>Status</th></tr>
+                            </thead>
+                            <tbody>${tbody}</tbody>
+                        </table>
+                    </div>
+                </div>`;
+            });
+        }
 
         paparRankingDinamik(listProgress, filterTing);
 
@@ -405,7 +422,9 @@
         });
     }
 
-    function eksportExcel(idL, idP, tajuk) {
+    // FUNGSI EKSPORT EXCEL JADUAL BIASA (Bawah Sukatan, Skip, Khatam)
+    function eksportExcel(idL, idP, tajuk, event) {
+        event.stopPropagation(); // Halang menu dari tertutup
         let csv = [];
         let rowsL = document.getElementById(idL).rows;
         let rowsP = document.getElementById(idP).rows;
@@ -415,10 +434,24 @@
         csv.push(headerRow.join(","));
         for (let r of rowsL) { let rData = []; for (let c of r.cells) rData.push('"' + c.innerText + '"'); csv.push(rData.join(",")); }
         for (let r of rowsP) { let rData = []; for (let c of r.cells) rData.push('"' + c.innerText + '"'); csv.push(rData.join(",")); }
-        let blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
+        muatTurunCSV(csv.join("\n"), tajuk);
+    }
+
+    // FUNGSI EKSPORT EXCEL KHAS GURU HALAQAH
+    function eksportExcelGuru(event) {
+        event.stopPropagation(); // Halang menu dari tertutup
+        let csvString = csvGuruGlobal.map(e => e.join(",")).join("\n");
+        muatTurunCSV(csvString, "GURU_HALAQAH");
+    }
+
+    function muatTurunCSV(csvString, tajuk) {
+        let bln = document.getElementById('selBulan').value;
+        let ting = document.getElementById('selTing').value;
+        let namaFail = `${tajuk}_TING_${ting}_${bln}.csv`;
+        let blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
         let link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
-        link.download = tajuk + "_" + document.getElementById('selBulan').value + ".csv";
+        link.download = namaFail;
         link.click();
     }
 
