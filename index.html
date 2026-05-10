@@ -42,19 +42,18 @@
         .medal { font-size: 1.1rem; margin-right: 8px; }
         .ting-title { background: #d4af37; color: white; padding: 2px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; display: inline-block; margin-bottom: 10px; }
 
-        /* GAYA MENU COLLAPSIBLE */
         .card-menu { border: none; margin-bottom: 15px; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .menu-header { padding: 15px 20px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; letter-spacing: 0.5px; }
-        .menu-header:hover { opacity: 0.9; }
         .toggle-icon { font-size: 0.8rem; transition: transform 0.3s ease; }
         .menu-header[aria-expanded="true"] .toggle-icon { transform: rotate(180deg); }
 
+        .btn-export { font-size: 0.7rem; padding: 2px 10px; border-radius: 20px; font-weight: bold; margin-left: 10px; }
+
         @media print { 
-            .filter-panel, .btn-print, .juzuk-item { cursor: default; } 
+            .filter-panel, .btn-print, .juzuk-item, .btn-export { display: none !important; } 
             .card-menu { page-break-inside: avoid; border: 1px solid #ddd !important; margin-bottom: 20px; } 
             .juzuk-grid { grid-template-columns: repeat(10, 1fr) !important; gap: 5px; }
             .toggle-icon { display: none !important; }
-            /* PAKSA SEMUA MENU TERBUKA KETIKA PRINT */
             .collapse { display: block !important; height: auto !important; }
         }
     </style>
@@ -72,10 +71,10 @@
 
 <div class="container my-4">
     <div class="filter-panel mb-4 btn-print">
-        <div class="row g-3 justify-content-center align-items-end">
-            <div class="col-md-3">
-                <label class="form-label fw-bold">Bulan:</label>
-                <select id="selBulan" class="form-select" onchange="muatData()">
+        <div class="row g-3">
+            <div class="col-md-2">
+                <label class="form-label fw-bold small">Bulan:</label>
+                <select id="selBulan" class="form-select form-select-sm" onchange="muatData()">
                     <option value="JAN">JANUARI</option><option value="FEB">FEBRUARI</option>
                     <option value="MAC">MAC</option><option value="APR">APRIL</option>
                     <option value="MEI">MEI</option><option value="JUN">JUN</option>
@@ -84,16 +83,28 @@
                     <option value="NOV">NOVEMBER</option><option value="DIS">DISEMBER</option>
                 </select>
             </div>
-            <div class="col-md-3">
-                <label class="form-label fw-bold">Tingkatan:</label>
-                <select id="selTing" class="form-select" onchange="muatData()">
+            <div class="col-md-2">
+                <label class="form-label fw-bold small">Tingkatan:</label>
+                <select id="selTing" class="form-select form-select-sm" onchange="tapisanManual()">
                     <option value="ALL">SEMUA TINGKATAN</option>
                     <option value="1">TINGKATAN 1</option><option value="2">TINGKATAN 2</option>
                     <option value="3">TINGKATAN 3</option><option value="4">TINGKATAN 4</option>
                     <option value="5">TINGKATAN 5</option>
                 </select>
             </div>
-            <div class="col-md-2"><button onclick="window.print()" class="btn btn-dark w-100 shadow-sm fw-bold">🖨️ CETAK PDF</button></div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold small">Guru Halaqah:</label>
+                <select id="selGuru" class="form-select form-select-sm" onchange="tapisanManual()">
+                    <option value="ALL">SEMUA GURU</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold small">Carian Nama Pelajar:</label>
+                <input type="text" id="txtCarian" class="form-control form-control-sm" placeholder="Taip nama..." onkeyup="tapisanManual()">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button onclick="window.print()" class="btn btn-dark btn-sm w-100 shadow-sm fw-bold">🖨️ CETAK PDF</button>
+            </div>
         </div>
     </div>
 
@@ -133,8 +144,8 @@
         <div class="menu-header bg-success text-white" data-bs-toggle="collapse" data-bs-target="#collapseJuzuk">
             <span>📖 Taburan Pelajar Mengikut Juzuk</span><span class="toggle-icon">▼</span>
         </div>
-        <div id="collapseJuzuk" class="collapse show"> <div class="card-body p-3">
-                <div class="text-center text-muted small mb-2">Klik pada kotak juzuk untuk lihat senarai nama pelajar.</div>
+        <div id="collapseJuzuk" class="collapse show">
+            <div class="card-body p-3">
                 <div id="juzukGrid" class="juzuk-grid"></div>
             </div>
         </div>
@@ -142,21 +153,23 @@
 
     <div class="card card-menu">
         <div class="menu-header text-white" style="background-color: #dc3545;" data-bs-toggle="collapse" data-bs-target="#collapseBawah">
-            <span>⚠️ Senarai Pelajar Bawah Sukatan</span><span class="toggle-icon">▼</span>
+            <div><span>⚠️ Senarai Pelajar Bawah Sukatan</span> <button class="btn btn-outline-light btn-export" onclick="eksportExcel('isiJadualL', 'isiJadualP', 'BAWAH_SUKATAN')">📥 EXCEL</button></div>
+            <span class="toggle-icon">▼</span>
         </div>
         <div id="collapseBawah" class="collapse" style="background-color: #fff9e6;">
             <div class="card-body p-3">
                 <div class="header-jantina bg-putera">PUTERA (LELAKI)</div>
-                <div class="table-responsive mb-4"><table class="table table-bordered table-sm align-middle bg-white"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Sukatan</th><th>Ms</th><th>Hutang</th><th>Guru Halaqah</th><th>Pencapaian</th></tr></thead><tbody id="isiJadualL"></tbody></table></div>
+                <div class="table-responsive mb-4"><table class="table table-bordered table-sm align-middle bg-white" id="tblBawahL"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Sukatan</th><th>Ms</th><th>Hutang</th><th>Guru Halaqah</th><th>Pencapaian</th></tr></thead><tbody id="isiJadualL"></tbody></table></div>
                 <div class="header-jantina bg-puteri">PUTERI (PEREMPUAN)</div>
-                <div class="table-responsive"><table class="table table-bordered table-sm align-middle bg-white"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Sukatan</th><th>Ms</th><th>Hutang</th><th>Guru Halaqah</th><th>Pencapaian</th></tr></thead><tbody id="isiJadualP"></tbody></table></div>
+                <div class="table-responsive"><table class="table table-bordered table-sm align-middle bg-white" id="tblBawahP"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Sukatan</th><th>Ms</th><th>Hutang</th><th>Guru Halaqah</th><th>Pencapaian</th></tr></thead><tbody id="isiJadualP"></tbody></table></div>
             </div>
         </div>
     </div>
 
     <div class="card card-menu">
         <div class="menu-header text-dark" style="background-color: #ffc107;" data-bs-toggle="collapse" data-bs-target="#collapseSkip">
-            <span>🟠 Senarai Pelajar Skip Hafazan</span><span class="toggle-icon">▼</span>
+            <div><span>🟠 Senarai Pelajar Skip Hafazan</span> <button class="btn btn-outline-dark btn-export" onclick="eksportExcel('isiSkipL', 'isiSkipP', 'SKIP_HAFAZAN')">📥 EXCEL</button></div>
+            <span class="toggle-icon">▼</span>
         </div>
         <div id="collapseSkip" class="collapse" style="background-color: #fff5eb;">
             <div class="card-body p-3">
@@ -170,7 +183,8 @@
 
     <div class="card card-menu">
         <div class="menu-header text-white" style="background-color: #198754;" data-bs-toggle="collapse" data-bs-target="#collapseKhatam">
-            <span>🏆 Senarai Pelajar Khatam</span><span class="toggle-icon">▼</span>
+            <div><span>🏆 Senarai Pelajar Khatam</span> <button class="btn btn-outline-light btn-export" onclick="eksportExcel('isiKhatamL', 'isiKhatamP', 'PELAJAR_KHATAM')">📥 EXCEL</button></div>
+            <span class="toggle-icon">▼</span>
         </div>
         <div id="collapseKhatam" class="collapse" style="background-color: #e8f5e9;">
             <div class="card-body p-3">
@@ -205,6 +219,8 @@
     };
 
     let bChart;
+    let rawDataSemasa = [];
+    let rawDataSblm = [];
     let dataSimpananJuzuk = Array(31).fill().map(() => []); 
     Chart.register(ChartDataLabels);
 
@@ -215,18 +231,36 @@
         const urlSemasa = pautanBulan[bln] + "&cb=" + new Date().getTime();
         const urlSebelum = (idx > 0) ? pautanBulan[keys[idx - 1]] + "&cb=" + new Date().getTime() : null;
 
-        document.getElementById('paparTing').innerText = (document.getElementById('selTing').value === "ALL") ? "KESELURUHAN" : "TINGKATAN " + document.getElementById('selTing').value;
-        document.getElementById('paparBulan').innerText = document.getElementById('selBulan').options[document.getElementById('selBulan').selectedIndex].text;
-        
         Promise.all([
             new Promise(res => Papa.parse(urlSemasa, { download: true, header: true, complete: res })),
             urlSebelum ? new Promise(res => Papa.parse(urlSebelum, { download: true, header: true, complete: res })) : Promise.resolve({data:[]})
         ]).then(values => {
-            prosesAnalisis(values[0].data, values[1].data, document.getElementById('selTing').value);
+            rawDataSemasa = values[0].data;
+            rawDataSblm = values[1].data;
+            kemaskiniDropdownGuru(rawDataSemasa);
+            tapisanManual();
         });
     }
 
-    function prosesAnalisis(data, dataSblm, filterTing) {
+    function kemaskiniDropdownGuru(data) {
+        const selGuru = document.getElementById('selGuru');
+        const setGuru = new Set();
+        data.forEach(d => {
+            const cari = (k) => d[Object.keys(d).find(x => x.toLowerCase().replace(/[\s.]/g, '').includes(k.toLowerCase().replace(/[\s.]/g, '')))] || '';
+            let g = cari('guruhalaqah');
+            if(g) setGuru.add(g.toUpperCase().trim());
+        });
+        selGuru.innerHTML = '<option value="ALL">SEMUA GURU</option>';
+        Array.from(setGuru).sort().forEach(g => {
+            selGuru.innerHTML += `<option value="${g}">${g}</option>`;
+        });
+    }
+
+    function tapisanManual() {
+        prosesAnalisis(rawDataSemasa, rawDataSblm, document.getElementById('selTing').value, document.getElementById('selGuru').value, document.getElementById('txtCarian').value);
+    }
+
+    function prosesAnalisis(data, dataSblm, filterTing, filterGuru, filterCari) {
         const rBody = document.getElementById('isiRingkasan');
         const jGrid = document.getElementById('juzukGrid');
         const tBodyL = document.getElementById('isiJadualL'); const tBodyP = document.getElementById('isiJadualP');
@@ -258,15 +292,20 @@
 
             let kls = cari('kelas');
             let tingData = kls.match(/\d+/) ? kls.match(/\d+/)[0] : '';
+            let guru = (cari('guruhalaqah') || "").toUpperCase().trim();
             let isP = nama.includes(" BINTI ") || nama.includes(" BT ") || nama.includes(" BT.");
 
-            if (filterTing === "ALL" || (tingData && tingData.toString() === filterTing.toString())) {
+            // LOGIK TAPISAN GABUNGAN
+            const padanTing = (filterTing === "ALL" || tingData === filterTing);
+            const padanGuru = (filterGuru === "ALL" || guru === filterGuru);
+            const padanCari = (filterCari === "" || nama.includes(filterCari.toUpperCase()));
+
+            if (padanTing && padanGuru && padanCari) {
                 totalCount++;
                 let ind = (cari('indikator') || "").toUpperCase();
                 let ms = parseFloat(cari('mukasurat')) || 0;
                 let sukatan = parseFloat(cari('sukatansemasa')) || 0;
                 let isSkip = (cari('skip') && cari('skip') !== "" && cari('skip') !== "0") || ind.includes("SKIP");
-                let guru = cari('guruhalaqah');
 
                 let progress = ms - (mapSblm.get(nama) || 0);
                 listProgress.push({ nama, kls, progress, isP, guru, ting: tingData });
@@ -292,7 +331,8 @@
 
                 if (isSkip) {
                     skipCount++; bilSL = isP ? bilSL : bilSL + 1; bilSP = isP ? bilSP + 1 : bilSP;
-                    let rS = `<tr><td class="text-center">${isP ? bilSP : bilSL}</td><td class="fw-bold">${nama}</td><td class="text-center">${kls}</td><td class="text-center small">${ind}</td><td>${guru}</td><td>${cari('Jumlah M/S Skip') || cari('skip') || 'Tiada'}</td></tr>`;
+                    // TUKAR CATATAN KEPADA JUMLAH M/S SKIP
+                    let rS = `<tr><td class="text-center">${isP ? bilSP : bilSL}</td><td class="fw-bold">${nama}</td><td class="text-center">${kls}</td><td class="text-center small">${ind}</td><td>${guru}</td><td class="fw-bold text-danger text-center">${cari('skip') || '0'}</td></tr>`;
                     if(isP) tSkipP.innerHTML += rS; else tSkipL.innerHTML += rS;
                 }
 
@@ -303,7 +343,7 @@
 
         paparRankingDinamik(listProgress, filterTing);
 
-        if (filterTing === "ALL") {
+        if (filterTing === "ALL" && filterGuru === "ALL") {
             document.getElementById('ringkasanContainer').classList.remove('d-none');
             for (let t in tingSummary) {
                 let tot = tingSummary[t].t;
@@ -328,40 +368,42 @@
         const container = document.getElementById('rankingContent');
         const section = document.getElementById('rankingContainer');
         container.innerHTML = "";
-        
         let tings = filterTing === "ALL" ? ["1", "2", "3", "4"] : (filterTing === "5" ? [] : [filterTing]);
         if (tings.length === 0) { section.classList.add('d-none'); return; }
-        
         section.classList.remove('d-none');
         const medals = ["🥇", "🥈", "🥉"];
-        const buildList = (data) => data.map((p, i) => `
-            <div class="rank-item">
-                <div><span class="medal">${medals[i]}</span> <strong>${p.nama}</strong> <br> <small class="text-muted">${p.kls} • Guru: ${p.guru || 'Tiada'}</small></div>
-                <span class="badge bg-success">+${p.progress} Ms</span>
-            </div>`).join('');
-
+        const buildList = (data) => data.map((p, i) => `<div class="rank-item"><div><span class="medal">${medals[i]}</span> <strong>${p.nama}</strong> <br> <small class="text-muted">${p.kls} • Guru: ${p.guru || 'Tiada'}</small></div><span class="badge bg-success">+${p.progress} Ms</span></div>`).join('');
         tings.forEach(t => {
             const listTing = list.filter(x => x.ting === t);
             const topL = listTing.filter(x => !x.isP).sort((a,b) => b.progress - a.progress).slice(0, 3);
             const topP = listTing.filter(x => x.isP).sort((a,b) => b.progress - a.progress).slice(0, 3);
-
             if (topL.length || topP.length) {
-                container.innerHTML += `
-                <div class="mb-4 p-3 bg-white border rounded">
-                    <div class="text-center"><span class="ting-title">TINGKATAN ${t}</span></div>
-                    <div class="row">
-                        <div class="col-md-6 border-end">
-                            <div class="header-jantina bg-putera">TOP 3 PUTERA</div>
-                            ${topL.length ? buildList(topL) : '<div class="text-center small py-2">Tiada Data</div>'}
-                        </div>
-                        <div class="col-md-6">
-                            <div class="header-jantina bg-puteri">TOP 3 PUTERI</div>
-                            ${topP.length ? buildList(topP) : '<div class="text-center small py-2">Tiada Data</div>'}
-                        </div>
-                    </div>
-                </div>`;
+                container.innerHTML += `<div class="mb-4 p-3 bg-white border rounded"><div class="text-center"><span class="ting-title">TINGKATAN ${t}</span></div><div class="row"><div class="col-md-6 border-end"><div class="header-jantina bg-putera">TOP 3 PUTERA</div>${topL.length ? buildList(topL) : '<div class="text-center small py-2">Tiada Data</div>'}</div><div class="col-md-6"><div class="header-jantina bg-puteri">TOP 3 PUTERI</div>${topP.length ? buildList(topP) : '<div class="text-center small py-2">Tiada Data</div>'}</div></div></div>`;
             }
         });
+    }
+
+    function eksportExcel(idL, idP, tajuk) {
+        let csv = [];
+        let rowsL = document.getElementById(idL).rows;
+        let rowsP = document.getElementById(idP).rows;
+        
+        // Headers
+        let headerRow = [];
+        let ths = rowsL[0] ? rowsL[0].parentElement.previousElementSibling.rows[0].cells : [];
+        for (let th of ths) headerRow.push(th.innerText);
+        csv.push(headerRow.join(","));
+
+        // Putera
+        for (let r of rowsL) { let rData = []; for (let c of r.cells) rData.push('"' + c.innerText + '"'); csv.push(rData.join(",")); }
+        // Puteri
+        for (let r of rowsP) { let rData = []; for (let c of r.cells) rData.push('"' + c.innerText + '"'); csv.push(rData.join(",")); }
+
+        let blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
+        let link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = tajuk + "_" + document.getElementById('selBulan').value + ".csv";
+        link.click();
     }
 
     function paparSenaraiJuzuk(idx) {
@@ -377,8 +419,8 @@
         if(bChart) bChart.destroy();
         bChart = new Chart(ctx, {
             type: 'bar',
-            data: { labels: ['Khatam', 'Lebih Sukatan', 'Bawah Sukatan'], datasets: [{ label: 'Bilangan Pelajar', data: [s.Khatam, s.Lebih, s.Bawah], backgroundColor: ['#198754', '#0d6efd', '#dc3545'] }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { color: 'white', font: { weight: 'bold', size: 14 } } } }
+            data: { labels: ['Khatam', 'Lebih', 'Bawah'], datasets: [{ label: 'Bilangan Pelajar', data: [s.Khatam, s.Lebih, s.Bawah], backgroundColor: ['#198754', '#0d6efd', '#dc3545'] }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { color: 'white', font: { weight: 'bold' } } } }
         });
     }
     window.onload = muatData;
