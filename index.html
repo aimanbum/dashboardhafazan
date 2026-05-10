@@ -292,7 +292,7 @@
 
                 if (isSkip) {
                     skipCount++; bilSL = isP ? bilSL : bilSL + 1; bilSP = isP ? bilSP + 1 : bilSP;
-                    let rS = `<tr><td class="text-center">${isP ? bilSP : bilSL}</td><td class="fw-bold">${nama}</td><td class="text-center">${kls}</td><td class="text-center small">${ind}</td><td>${guru}</td><td>${cari('catatan') || cari('skip') || 'Tiada'}</td></tr>`;
+                    let rS = `<tr><td class="text-center">${isP ? bilSP : bilSL}</td><td class="fw-bold">${nama}</td><td class="text-center">${kls}</td><td class="text-center small">${ind}</td><td>${guru}</td><td>${cari('Jumlah M/S Skip') || cari('skip') || 'Tiada'}</td></tr>`;
                     if(isP) tSkipP.innerHTML += rS; else tSkipL.innerHTML += rS;
                 }
 
