@@ -3,50 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Prestasi Hafazan SMKATB 2026</title>
+    <title>Dashboard Prestasi Hafazan SMKATB</title>
     <link rel="icon" type="image/png" href="logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    
     <style>
-        body { background-color: #f0f4f8; font-family: 'Segoe UI', sans-serif; }
-        .hero { background: linear-gradient(135deg, #1a4d2e, #2e7d32) !important; color: white !important; padding: 30px 0; border-bottom: 5px solid #d4af37; text-align: center; }
-        .logo-container { width: 120px; height: 120px; background: white !important; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto; border: 3px solid #d4af37; overflow: hidden; }
-        .school-logo { width: 100px; height: auto; object-fit: contain; }
-        .filter-panel { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-top: -30px; position: relative; z-index: 10; }
-        .card { border-radius: 15px; border: 1px solid #eee; margin-bottom: 20px; background: white; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
-        .chart-container { position: relative; height: 350px; width: 100%; }
-        .total-box { background: #1a4d2e !important; color: white !important; padding: 10px 20px; border-radius: 30px; display: inline-block; margin: 10px 5px; font-weight: bold; }
+        body { background-color: #f4f7fa; font-family: 'Inter', sans-serif; color: #2c3e50; }
         
-        .juzuk-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 8px; margin-top: 15px; }
+        /* HERO SECTION */
+        .hero { background: linear-gradient(135deg, #114227 0%, #1c7c4b 100%); padding: 35px 0; border-bottom: 4px solid #d4af37; text-align: center; color: white; }
+        .logo-container { width: 100px; height: 100px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto; border: 3px solid #d4af37; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .school-logo { width: 80px; height: auto; object-fit: contain; }
+        
+        /* KAD & BAYANG (PREMIUM LOOK) */
+        .card { border: none; border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.04); margin-bottom: 24px; transition: transform 0.2s ease; background-color: #ffffff; }
+        .card:hover { box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+        .card-header-custom { padding: 15px 20px; border-radius: 16px 16px 0 0; display: flex; justify-content: space-between; align-items: center; }
+        .filter-panel { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.06); margin-top: -30px; position: relative; z-index: 10; border: 1px solid #f0f0f0; }
+        
+        /* KOTAK JUMLAH */
+        .total-box { padding: 12px 25px; border-radius: 50px; display: inline-block; margin: 10px 8px; font-weight: 700; letter-spacing: 0.5px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .bg-total-main { background: #1a4d2e; color: white; }
+        .bg-total-skip { background: #ffc107; color: #212529; }
+        
+        /* GRID JUZUK */
+        .juzuk-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 10px; margin-top: 15px; }
         @media (max-width: 992px) { .juzuk-grid { grid-template-columns: repeat(5, 1fr); } }
         @media (max-width: 576px) { .juzuk-grid { grid-template-columns: repeat(3, 1fr); } }
+        .juzuk-item { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 5px; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .juzuk-item:hover { transform: translateY(-3px); border-color: #1a4d2e; box-shadow: 0 6px 15px rgba(26,77,46,0.1); }
+        .juzuk-num { font-size: 0.65rem; color: #64748b; display: block; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .juzuk-val { font-weight: 800; font-size: 1.3rem; color: #1a4d2e; }
+        .juzuk-item.active { background: #f0fdf4; border-color: #16a34a; }
+        .juzuk-item.khatam-box { background: #fffbeb; border-color: #d97706; }
 
-        .juzuk-item { background: #fff; border: 1px solid #dee2e6; border-radius: 8px; padding: 10px 5px; text-align: center; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.02); cursor: pointer; }
-        .juzuk-item:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-color: #2e7d32; }
-        .juzuk-num { font-size: 0.65rem; color: #6c757d; display: block; text-transform: uppercase; font-weight: bold; }
-        .juzuk-val { font-weight: 800; font-size: 1.2rem; color: #1a4d2e; }
-        .juzuk-item.active { background: #e8f5e9; border-color: #2e7d32; }
-        .juzuk-item.khatam-box { background: #fff3cd; border-color: #ffc107; }
+        /* JADUAL SCROLL (ANTI-SERABUT) */
+        .table-scroll { max-height: 350px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 15px; }
+        .table-scroll table { margin-bottom: 0; }
+        .table-scroll thead th { position: sticky; top: 0; background-color: #1e293b !important; color: white !important; z-index: 2; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 12px; }
+        .table-scroll tbody td { padding: 10px; font-size: 0.85rem; vertical-align: middle; }
+        
+        /* GAYA SCROLLBAR CUSTOM */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-        .header-jantina { padding: 6px; border-radius: 8px; font-weight: bold; margin-bottom: 8px; text-align: center; font-size: 0.8rem; }
-        .bg-putera { background-color: #e3f2fd; color: #0d6efd; border: 1px solid #0d6efd; }
-        .bg-puteri { background-color: #fce4ec; color: #d63384; border: 1px solid #d63384; }
-
-        .table thead th { background-color: #212529 !important; color: white !important; text-align: center; font-size: 0.75rem; vertical-align: middle; }
-        .badge-bawah { border: 2px solid #dc3545 !important; color: #dc3545 !important; font-weight: bold; border-radius: 20px; padding: 2px 10px; font-size: 0.7rem; }
-        .txt-peratus { font-size: 0.75rem; display: block; color: #495057; font-weight: bold !important; margin-top: 2px; }
-
-        .rank-item { display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; border-bottom: 1px solid #f1f1f1; font-size: 0.85rem; }
+        /* HEADER JANTINA & LABEL */
+        .header-jantina { padding: 6px 15px; border-radius: 6px; font-weight: 700; font-size: 0.75rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; }
+        .bg-putera { background-color: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+        .bg-puteri { background-color: #fdf2f8; color: #db2777; border: 1px solid #fbcfe8; }
+        .badge-bawah { border: 1.5px solid #dc3545; color: #dc3545; font-weight: 700; border-radius: 20px; padding: 3px 10px; font-size: 0.7rem; }
+        
+        /* BUTANG EXCEL */
+        .btn-export { font-size: 0.75rem; font-weight: 700; border-radius: 8px; padding: 5px 15px; letter-spacing: 0.5px; }
+        
+        /* RANKING LIST */
+        .rank-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; border-bottom: 1px solid #f1f5f9; }
         .rank-item:last-child { border-bottom: none; }
-        .medal { font-size: 1.1rem; margin-right: 8px; }
-        .ting-title { background: #d4af37; color: white; padding: 2px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; display: inline-block; margin-bottom: 10px; }
+        .medal { font-size: 1.2rem; margin-right: 10px; }
+        .ting-title { background: #d4af37; color: white; padding: 4px 20px; border-radius: 30px; font-size: 0.85rem; font-weight: 800; display: inline-block; box-shadow: 0 4px 10px rgba(212,175,55,0.3); }
+
+        .chart-container { position: relative; height: 320px; width: 100%; }
 
         @media print { 
-            .filter-panel, .btn-print, .juzuk-item, .btn-export { display: none !important; } 
-            .card { page-break-inside: avoid; border: 1px solid #ddd !important; margin-bottom: 20px; } 
-            .juzuk-grid { grid-template-columns: repeat(10, 1fr) !important; gap: 5px; }
+            .filter-panel, .btn-print, .btn-export, .table-scroll::-webkit-scrollbar { display: none !important; }
+            .table-scroll { max-height: none !important; overflow: visible !important; border: none !important; }
+            .card { box-shadow: none !important; border: 1px solid #ddd !important; }
         }
     </style>
 </head>
@@ -54,10 +81,10 @@
 
 <div class="hero">
     <div class="container">
-        <div class="logo-container"><img src="logo.png" alt="Logo SMKATB" class="school-logo"></div>
-        <h2 class="fw-bold text-uppercase">Dashboard Prestasi Hafazan Tahun 2026</h2>
-        <h4 class="mb-0">SMK AGAMA TOK BACHOK</h4>
-        <div id="infoCetak" class="mt-2 text-white d-none d-print-block">DATA : <span id="paparTing"></span> | BULAN : <span id="paparBulan"></span></div>
+        <div class="logo-container"><img src="logo.png" alt="Logo SMKATB" class="school-logo" onerror="this.src='https://via.placeholder.com/80?text=LOGO'"></div>
+        <h2 class="fw-bold" style="letter-spacing: 1px;">DASHBOARD PRESTASI HAFAZAN</h2>
+        <h5 class="fw-normal text-light opacity-75">SMK Agama Tok Bachok • 2026</h5>
+        <div id="infoCetak" class="mt-3 text-white d-none d-print-block fw-bold">DATA : <span id="paparTing"></span> | BULAN : <span id="paparBulan"></span></div>
     </div>
 </div>
 
@@ -65,106 +92,129 @@
     <div class="filter-panel mb-4 btn-print">
         <div class="row g-3 justify-content-center align-items-end">
             <div class="col-md-5">
-                <label class="form-label fw-bold">Bulan:</label>
-                <select id="selBulan" class="form-select" onchange="muatData()">
-                    <option value="JAN">JANUARI</option><option value="FEB">FEBRUARI</option>
-                    <option value="MAC">MAC</option><option value="APR">APRIL</option>
-                    <option value="MEI">MEI</option><option value="JUN">JUN</option>
-                    <option value="JUL">JULAI</option><option value="OGOS">OGOS</option>
-                    <option value="SEP">SEPTEMBER</option><option value="OKT">OKTOBER</option>
-                    <option value="NOV">NOVEMBER</option><option value="DIS">DISEMBER</option>
+                <label class="form-label fw-bold text-muted small text-uppercase">Bulan Semasa</label>
+                <select id="selBulan" class="form-select form-select-lg fw-semibold" onchange="muatData()">
+                    <option value="JAN">Januari</option><option value="FEB">Februari</option>
+                    <option value="MAC">Mac</option><option value="APR">April</option>
+                    <option value="MEI">Mei</option><option value="JUN">Jun</option>
+                    <option value="JUL">Julai</option><option value="OGOS">Ogos</option>
+                    <option value="SEP">September</option><option value="OKT">Oktober</option>
+                    <option value="NOV">November</option><option value="DIS">Disember</option>
                 </select>
             </div>
             <div class="col-md-5">
-                <label class="form-label fw-bold">Tingkatan:</label>
-                <select id="selTing" class="form-select" onchange="tapisanManual()">
-                    <option value="ALL">SEMUA TINGKATAN</option>
-                    <option value="1">TINGKATAN 1</option><option value="2">TINGKATAN 2</option>
-                    <option value="3">TINGKATAN 3</option><option value="4">TINGKATAN 4</option>
-                    <option value="5">TINGKATAN 5</option>
+                <label class="form-label fw-bold text-muted small text-uppercase">Tapis Tingkatan</label>
+                <select id="selTing" class="form-select form-select-lg fw-semibold" onchange="tapisanManual()">
+                    <option value="ALL">Semua Tingkatan</option>
+                    <option value="1">Tingkatan 1</option><option value="2">Tingkatan 2</option>
+                    <option value="3">Tingkatan 3</option><option value="4">Tingkatan 4</option>
+                    <option value="5">Tingkatan 5</option>
                 </select>
             </div>
             <div class="col-md-2 d-flex align-items-end">
-                <button onclick="window.print()" class="btn btn-dark w-100 shadow-sm fw-bold">🖨️ CETAK PDF</button>
+                <button onclick="window.print()" class="btn btn-dark btn-lg w-100 fw-bold shadow-sm">🖨️ CETAK</button>
             </div>
         </div>
     </div>
 
-    <div class="text-center mb-4">
-        <div class="total-box shadow-sm"><span id="labelTing">Keseluruhan Pelajar</span>: <span id="totalPelajar">0</span> Orang</div>
-        <div class="total-box shadow-sm bg-warning text-dark">Pelajar Skip: <span id="totalSkip">0</span> Orang</div>
+    <div class="text-center mb-5">
+        <div class="total-box bg-total-main">KAPASITI PELAJAR: <span id="totalPelajar" class="fs-5 ms-1">0</span></div>
+        <div class="total-box bg-total-skip">PELAJAR SKIP: <span id="totalSkip" class="fs-5 ms-1">0</span></div>
     </div>
 
-    <div id="rankingContainer" class="card p-3 mb-4 d-none" style="background-color: #fffdf2; border: 1px solid #d4af37;">
-        <h5 class="fw-bold text-center mb-3 text-dark">🌟 PELAJAR TASMIK TERBANYAK BULAN INI</h5>
-        <div id="rankingContent"></div>
-    </div>
-
-    <div id="menuGuruContainer" class="card p-3 mb-4 d-none" style="background-color: #f8f9fa; border: 1px solid #0dcaf0;">
-        <div class="position-relative mb-3 text-center">
-            <h5 class="fw-bold text-dark m-0">👨‍🏫 SENARAI PELAJAR MENGIKUT GURU HALAQAH</h5>
-            <button class="btn btn-info text-white btn-sm fw-bold position-absolute top-0 end-0 btn-export" onclick="eksportExcelGuru()">📥 EXCEL</button>
+    <div id="ringkasanContainer" class="card d-none">
+        <div class="card-header-custom bg-white border-bottom">
+            <h6 class="fw-bold text-success m-0">📊 RINGKASAN PRESTASI MENGIKUT TINGKATAN</h6>
         </div>
-        <div id="isiMenuGuru"></div>
-    </div>
-
-    <div id="ringkasanContainer" class="card p-3 mb-4 d-none">
-        <h6 class="fw-bold text-success border-bottom pb-2">📊 RINGKASAN PRESTASI MENGIKUT TINGKATAN</h6>
-        <div class="table-responsive">
-            <table class="table table-bordered text-center align-middle m-0">
-                <thead class="table-dark"><tr><th>Tingkatan</th><th>Jumlah</th><th class="bg-success">Khatam</th><th class="bg-primary">Lebih Sukatan (%)</th><th class="bg-danger">Bawah Sukatan (%)</th><th class="bg-warning text-dark">Skip Hafazan (%)</th></tr></thead>
-                <tbody id="isiRingkasan"></tbody>
-            </table>
+        <div class="card-body p-0">
+            <div class="table-responsive m-3 table-scroll" style="max-height: max-content;">
+                <table class="table table-hover text-center align-middle mb-0">
+                    <thead><tr><th>Tingkatan</th><th>Jumlah</th><th class="bg-success">Khatam</th><th class="bg-primary">Lebih Sukatan (%)</th><th class="bg-danger">Bawah Sukatan (%)</th><th class="bg-warning text-dark">Skip Hafazan (%)</th></tr></thead>
+                    <tbody id="isiRingkasan"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-    <div class="card p-3 mb-4">
-        <h6 class="fw-bold text-success border-bottom pb-2 text-center">📖 TABURAN PELAJAR MENGIKUT JUZUK TERKINI</h6>
-        <div class="text-center text-muted small mb-2">Klik pada kotak juzuk untuk lihat senarai nama pelajar.</div>
-        <div id="juzukGrid" class="juzuk-grid"></div>
-    </div>
-
-    <div class="card p-3 mb-4">
-        <h5 id="tajukCarta" class="fw-bold text-success text-center mb-3">Analisis Pencapaian</h5>
-        <div class="chart-container"><canvas id="barChart"></canvas></div>
-    </div>
-
-    <div class="card p-3 mb-4" style="background-color: #fff9e6; border: 1px solid #ffeeba;">
-        <div class="position-relative mb-4 text-center">
-            <h5 class="fw-bold text-danger m-0">⚠️ SENARAI PELAJAR BAWAH SUKATAN</h5>
-            <button class="btn btn-danger btn-sm fw-bold position-absolute top-0 end-0 btn-export" onclick="eksportExcel('isiJadualL', 'isiJadualP', 'BAWAH_SUKATAN')">📥 EXCEL</button>
+    <div class="card">
+        <div class="card-header-custom bg-white border-bottom">
+            <h6 class="fw-bold text-success m-0">📖 TABURAN PELAJAR MENGIKUT JUZUK</h6>
+            <small class="text-muted fw-normal d-none d-md-block">Klik kotak untuk lihat nama</small>
         </div>
-        <div class="header-jantina bg-putera">PUTERA (LELAKI)</div>
-        <div class="table-responsive mb-4"><table class="table table-bordered table-sm align-middle bg-white" id="tblBawahL"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Sukatan</th><th>Ms</th><th>Hutang</th><th>Guru Halaqah</th><th>Pencapaian</th></tr></thead><tbody id="isiJadualL"></tbody></table></div>
-        <div class="header-jantina bg-puteri">PUTERI (PEREMPUAN)</div>
-        <div class="table-responsive"><table class="table table-bordered table-sm align-middle bg-white" id="tblBawahP"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Sukatan</th><th>Ms</th><th>Hutang</th><th>Guru Halaqah</th><th>Pencapaian</th></tr></thead><tbody id="isiJadualP"></tbody></table></div>
+        <div class="card-body p-4">
+            <div id="juzukGrid" class="juzuk-grid"></div>
+        </div>
     </div>
 
-    <div class="card p-3 mb-4" style="background-color: #fff5eb; border: 1px solid #fd7e14;">
-        <div class="position-relative mb-4 text-center">
-            <h5 class="fw-bold text-warning text-dark m-0">🟠 SENARAI PELAJAR SKIP HAFAZAN</h5>
-            <button class="btn btn-warning btn-sm fw-bold text-dark position-absolute top-0 end-0 btn-export" onclick="eksportExcel('isiSkipL', 'isiSkipP', 'SKIP_HAFAZAN')">📥 EXCEL</button>
+    <div class="card">
+        <div class="card-header-custom bg-white border-bottom">
+            <h6 class="fw-bold text-success m-0">📈 ANALISIS PENCAPAIAN KESELURUHAN</h6>
         </div>
-        <div class="header-jantina bg-putera">PUTERA (LELAKI)</div>
-        <div class="table-responsive mb-4"><table class="table table-bordered table-sm align-middle bg-white"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Pencapaian Semasa</th><th>Guru Halaqah</th><th>Jumlah M/S Skip</th></tr></thead><tbody id="isiSkipL"></tbody></table></div>
-        <div class="header-jantina bg-puteri">PUTERI (PEREMPUAN)</div>
-        <div class="table-responsive"><table class="table table-bordered table-sm align-middle bg-white"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Pencapaian Semasa</th><th>Guru Halaqah</th><th>Jumlah M/S Skip</th></tr></thead><tbody id="isiSkipP"></tbody></table></div>
+        <div class="card-body p-4">
+            <div class="chart-container"><canvas id="barChart"></canvas></div>
+        </div>
     </div>
 
-    <div class="card p-3 mb-4" style="background-color: #e8f5e9; border: 1px solid #2e7d32;">
-        <div class="position-relative mb-4 text-center">
-            <h5 class="fw-bold text-success m-0">🏆 SENARAI PELAJAR KHATAM</h5>
-            <button class="btn btn-success btn-sm fw-bold position-absolute top-0 end-0 btn-export" onclick="eksportExcel('isiKhatamL', 'isiKhatamP', 'PELAJAR_KHATAM')">📥 EXCEL</button>
+    <div id="rankingContainer" class="card d-none" style="background-color: #fffdf8; border: 1px solid #fef08a;">
+        <div class="card-header-custom border-bottom" style="background-color: #fef9c3;">
+            <h6 class="fw-bold text-dark m-0">🌟 PELAJAR TASMIK TERBANYAK BULAN INI</h6>
         </div>
-        <div class="header-jantina bg-putera">PUTERA (LELAKI)</div>
-        <div class="table-responsive mb-4"><table class="table table-bordered table-sm align-middle bg-white"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Ms</th><th>Guru Halaqah</th></tr></thead><tbody id="isiKhatamL"></tbody></table></div>
-        <div class="header-jantina bg-puteri">PUTERI (PEREMPUAN)</div>
-        <div class="table-responsive"><table class="table table-bordered table-sm align-middle bg-white"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Ms</th><th>Guru Halaqah</th></tr></thead><tbody id="isiKhatamP"></tbody></table></div>
+        <div class="card-body p-4" id="rankingContent"></div>
+    </div>
+
+    <div id="menuGuruContainer" class="card d-none" style="border: 1px solid #bae6fd;">
+        <div class="card-header-custom border-bottom" style="background-color: #f0f9ff;">
+            <h6 class="fw-bold text-primary m-0">👨‍🏫 SENARAI PELAJAR MENGIKUT GURU HALAQAH</h6>
+            <button class="btn btn-outline-primary btn-export bg-white" onclick="eksportExcelGuru()">📥 MUAT TURUN</button>
+        </div>
+        <div class="card-body p-4 bg-light" id="isiMenuGuru"></div>
+    </div>
+
+    <div class="card" style="border: 1px solid #fecaca;">
+        <div class="card-header-custom border-bottom" style="background-color: #fef2f2;">
+            <h6 class="fw-bold text-danger m-0">⚠️ SENARAI PELAJAR BAWAH SUKATAN</h6>
+            <button class="btn btn-danger btn-export" onclick="eksportExcel('isiJadualL', 'isiJadualP', 'BAWAH_SUKATAN')">📥 EXCEL</button>
+        </div>
+        <div class="card-body p-4">
+            <div class="header-jantina bg-putera">👨 PUTERA (LELAKI)</div>
+            <div class="table-scroll"><table class="table table-hover align-middle bg-white mb-0" id="tblBawahL"><thead><tr><th width="5%">Bil</th><th width="30%" class="text-start">Nama Pelajar</th><th>Kelas</th><th>Sukatan</th><th>Ms</th><th>Hutang</th><th>Guru Halaqah</th><th>Status</th></tr></thead><tbody id="isiJadualL"></tbody></table></div>
+            
+            <div class="header-jantina bg-puteri mt-3">👩 PUTERI (PEREMPUAN)</div>
+            <div class="table-scroll"><table class="table table-hover align-middle bg-white mb-0" id="tblBawahP"><thead><tr><th width="5%">Bil</th><th width="30%" class="text-start">Nama Pelajar</th><th>Kelas</th><th>Sukatan</th><th>Ms</th><th>Hutang</th><th>Guru Halaqah</th><th>Status</th></tr></thead><tbody id="isiJadualP"></tbody></table></div>
+        </div>
+    </div>
+
+    <div class="card" style="border: 1px solid #fde68a;">
+        <div class="card-header-custom border-bottom" style="background-color: #fefce8;">
+            <h6 class="fw-bold text-warning text-dark m-0">🟠 SENARAI PELAJAR SKIP HAFAZAN</h6>
+            <button class="btn btn-warning text-dark btn-export" onclick="eksportExcel('isiSkipL', 'isiSkipP', 'SKIP_HAFAZAN')">📥 EXCEL</button>
+        </div>
+        <div class="card-body p-4">
+            <div class="header-jantina bg-putera">👨 PUTERA (LELAKI)</div>
+            <div class="table-scroll"><table class="table table-hover align-middle bg-white mb-0"><thead><tr><th width="5%">Bil</th><th width="35%" class="text-start">Nama Pelajar</th><th>Kelas</th><th>Status</th><th>Guru Halaqah</th><th>Jum. Skip</th></tr></thead><tbody id="isiSkipL"></tbody></table></div>
+            
+            <div class="header-jantina bg-puteri mt-3">👩 PUTERI (PEREMPUAN)</div>
+            <div class="table-scroll"><table class="table table-hover align-middle bg-white mb-0"><thead><tr><th width="5%">Bil</th><th width="35%" class="text-start">Nama Pelajar</th><th>Kelas</th><th>Status</th><th>Guru Halaqah</th><th>Jum. Skip</th></tr></thead><tbody id="isiSkipP"></tbody></table></div>
+        </div>
+    </div>
+
+    <div class="card" style="border: 1px solid #bbf7d0;">
+        <div class="card-header-custom border-bottom" style="background-color: #f0fdf4;">
+            <h6 class="fw-bold text-success m-0">🏆 SENARAI PELAJAR KHATAM</h6>
+            <button class="btn btn-success btn-export" onclick="eksportExcel('isiKhatamL', 'isiKhatamP', 'PELAJAR_KHATAM')">📥 EXCEL</button>
+        </div>
+        <div class="card-body p-4">
+            <div class="header-jantina bg-putera">👨 PUTERA (LELAKI)</div>
+            <div class="table-scroll"><table class="table table-hover align-middle bg-white mb-0"><thead><tr><th width="5%">Bil</th><th width="40%" class="text-start">Nama Pelajar</th><th>Kelas</th><th>Ms</th><th>Guru Halaqah</th></tr></thead><tbody id="isiKhatamL"></tbody></table></div>
+            
+            <div class="header-jantina bg-puteri mt-3">👩 PUTERI (PEREMPUAN)</div>
+            <div class="table-scroll"><table class="table table-hover align-middle bg-white mb-0"><thead><tr><th width="5%">Bil</th><th width="40%" class="text-start">Nama Pelajar</th><th>Kelas</th><th>Ms</th><th>Guru Halaqah</th></tr></thead><tbody id="isiKhatamP"></tbody></table></div>
+        </div>
     </div>
 </div>
 
 <div class="modal fade" id="modalJuzuk" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header bg-success text-white"><h5 class="modal-title fw-bold" id="tajukModal">Senarai Pelajar</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="table-responsive"><table class="table table-striped align-middle"><thead class="table-dark"><tr><th>Bil</th><th>Nama Pelajar</th><th>Kelas</th><th class="text-center">Ms Semasa</th></tr></thead><tbody id="isiModal"></tbody></table></div></div></div></div>
+  <div class="modal-dialog modal-lg"><div class="modal-content border-0"><div class="modal-header bg-success text-white"><h6 class="modal-title fw-bold" id="tajukModal">Senarai Pelajar</h6><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body p-0"><div class="table-responsive table-scroll m-0" style="max-height: 400px; border:none;"><table class="table table-striped align-middle mb-0"><thead class="table-dark"><tr><th width="10%">Bil</th><th class="text-start">Nama Pelajar</th><th width="20%">Kelas</th><th width="15%" class="text-center">Ms</th></tr></thead><tbody id="isiModal"></tbody></table></div></div></div></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -231,13 +281,12 @@
         dataSimpananJuzuk = Array(31).fill().map(() => []); 
         csvGuruGlobal = [["Guru Halaqah", "Bil", "Nama Pelajar", "Kelas", "Mukasurat", "Status Pencapaian"]];
 
-        // LOGIK SOROK/TUNJUK SEKSYEN RANKING DAN GURU
         if (filterTing === "ALL") {
             document.getElementById('menuGuruContainer').classList.add('d-none');
             document.getElementById('rankingContainer').classList.remove('d-none');
         } else if (filterTing === "5") {
             document.getElementById('menuGuruContainer').classList.remove('d-none');
-            document.getElementById('rankingContainer').classList.add('d-none'); // Tingkatan 5 dikecualikan Top 3
+            document.getElementById('rankingContainer').classList.add('d-none');
         } else {
             document.getElementById('menuGuruContainer').classList.remove('d-none');
             document.getElementById('rankingContainer').classList.remove('d-none');
@@ -293,20 +342,20 @@
 
                 if(ind.includes('KHATAM')) {
                     s.Khatam++; bilKL = isP ? bilKL : bilKL + 1; bilKP = isP ? bilKP + 1 : bilKP;
-                    let rK = `<tr><td class="text-center">${isP ? bilKP : bilKL}</td><td class="fw-bold text-start" style="font-size:0.75rem;">${nama}</td><td class="text-center small">${kls}</td><td class="text-center">${ms}</td><td class="small">${guru}</td></tr>`;
+                    let rK = `<tr><td class="text-center">${isP ? bilKP : bilKL}</td><td class="fw-bold text-start">${nama}</td><td class="text-center">${kls}</td><td class="text-center">${ms}</td><td>${guru}</td></tr>`;
                     if(isP) tKhatamP.innerHTML += rK; else tKhatamL.innerHTML += rK;
                 } else if(ind.includes('LEBIH')) s.Lebih++;
                 else if(ind.includes('BAWAH')) {
                     s.Bawah++; bilL = isP ? bilL : bilL + 1; bilP = isP ? bilP + 1 : bilP;
                     let hutang = Math.max(0, sukatan-ms);
-                    let rB = `<tr><td class="text-center">${isP ? bilP : bilL}</td><td class="fw-bold text-start" style="font-size:0.75rem;">${nama}</td><td class="text-center small">${kls}</td><td class="text-center">${sukatan}</td><td class="text-center">${ms}</td><td class="text-center text-danger fw-bold">${hutang}</td><td class="small">${guru}</td><td class="text-center"><span class="badge-bawah">${ind}</span></td></tr>`;
+                    let rB = `<tr><td class="text-center">${isP ? bilP : bilL}</td><td class="fw-bold text-start text-dark">${nama}</td><td class="text-center">${kls}</td><td class="text-center">${sukatan}</td><td class="text-center fw-bold">${ms}</td><td class="text-center text-danger fw-bold">${hutang}</td><td>${guru}</td><td class="text-center"><span class="badge-bawah">${ind}</span></td></tr>`;
                     if(isP) tBodyP.innerHTML += rB; else tBodyL.innerHTML += rB;
                 }
 
                 if (isSkip) {
                     skipCount++; bilSL = isP ? bilSL : bilSL + 1; bilSP = isP ? bilSP + 1 : bilSP;
                     let skipVal = cari('skip') || '0';
-                    let rS = `<tr><td class="text-center">${isP ? bilSP : bilSL}</td><td class="fw-bold text-start" style="font-size:0.75rem;">${nama}</td><td class="text-center small">${kls}</td><td class="text-center small">${ind}</td><td class="small">${guru}</td><td class="fw-bold text-danger text-center">${skipVal}</td></tr>`;
+                    let rS = `<tr><td class="text-center">${isP ? bilSP : bilSL}</td><td class="fw-bold text-start">${nama}</td><td class="text-center">${kls}</td><td class="text-center">${ind}</td><td>${guru}</td><td class="fw-bold text-danger text-center">${skipVal}</td></tr>`;
                     if(isP) tSkipP.innerHTML += rS; else tSkipL.innerHTML += rS;
                 }
 
@@ -322,13 +371,15 @@
                 let tbody = list.map((p, i) => {
                     csvGuruGlobal.push([`"${g}"`, `"${i+1}"`, `"${p.nama}"`, `"${p.kls}"`, `"${p.ms}"`, `"${p.ind}"`]);
                     let badgeClass = p.ind.includes('BAWAH') ? 'bg-danger' : (p.ind.includes('KHATAM') ? 'bg-success' : (p.ind.includes('LEBIH') ? 'bg-primary' : 'bg-warning text-dark'));
-                    return `<tr><td class="text-center">${i+1}</td><td class="fw-bold text-start" style="font-size:0.75rem;">${p.nama}</td><td class="text-center small">${p.kls}</td><td class="text-center fw-bold">${p.ms}</td><td class="text-center"><span class="badge ${badgeClass}">${p.ind}</span></td></tr>`;
+                    return `<tr><td class="text-center">${i+1}</td><td class="fw-bold text-start">${p.nama}</td><td class="text-center">${p.kls}</td><td class="text-center fw-bold">${p.ms}</td><td class="text-center"><span class="badge ${badgeClass} px-2 py-1">${p.ind}</span></td></tr>`;
                 }).join('');
 
                 isiGuru.innerHTML += `
-                <div class="mb-4 bg-white p-3 border rounded shadow-sm">
-                    <h6 class="fw-bold border-bottom pb-2" style="color:#1a4d2e;">👨‍🏫 ${g} <span class="badge bg-secondary float-end">${list.length} Pelajar</span></h6>
-                    <div class="table-responsive"><table class="table table-bordered table-sm align-middle"><thead class="table-light text-center"><tr><th>Bil</th><th class="text-start">Nama Pelajar</th><th>Kelas</th><th>Ms</th><th>Status</th></tr></thead><tbody>${tbody}</tbody></table></div>
+                <div class="mb-4 bg-white p-0 border rounded shadow-sm overflow-hidden">
+                    <h6 class="fw-bold bg-light m-0 p-3" style="color:#0284c7;">👨‍🏫 ${g} <span class="badge bg-secondary float-end">${list.length} Pelajar</span></h6>
+                    <div class="table-responsive table-scroll m-0" style="border:none;">
+                        <table class="table table-hover table-sm align-middle mb-0"><thead class="table-dark"><tr><th width="8%">Bil</th><th class="text-start">Nama Pelajar</th><th width="15%">Kelas</th><th width="10%">Ms</th><th width="20%">Status</th></tr></thead><tbody>${tbody}</tbody></table>
+                    </div>
                 </div>`;
             });
         }
@@ -362,13 +413,13 @@
         let tings = filterTing === "ALL" ? ["1", "2", "3", "4"] : (filterTing === "5" ? [] : [filterTing]);
         if (tings.length === 0) return;
         const medals = ["🥇", "🥈", "🥉"];
-        const buildList = (data) => data.map((p, i) => `<div class="rank-item"><div><span class="medal">${medals[i]}</span> <strong>${p.nama}</strong> <br> <small class="text-muted">${p.kls} • Guru: ${p.guru || 'Tiada'}</small></div><span class="badge bg-success">+${p.progress} Ms</span></div>`).join('');
+        const buildList = (data) => data.map((p, i) => `<div class="rank-item"><div><span class="medal">${medals[i]}</span> <strong>${p.nama}</strong> <br> <small class="text-muted">${p.kls} • Guru: ${p.guru || 'Tiada'}</small></div><span class="badge bg-success px-2 py-1 shadow-sm">+${p.progress} Ms</span></div>`).join('');
         tings.forEach(t => {
             const listTing = list.filter(x => x.ting === t);
             const topL = listTing.filter(x => !x.isP).sort((a,b) => b.progress - a.progress).slice(0, 3);
             const topP = listTing.filter(x => x.isP).sort((a,b) => b.progress - a.progress).slice(0, 3);
             if (topL.length || topP.length) {
-                container.innerHTML += `<div class="mb-4 p-3 bg-white border rounded shadow-sm"><div class="text-center"><span class="ting-title">TINGKATAN ${t}</span></div><div class="row"><div class="col-md-6 border-end"><div class="header-jantina bg-putera">TOP 3 PUTERA</div>${topL.length ? buildList(topL) : '<div class="text-center small py-2">Tiada Data</div>'}</div><div class="col-md-6"><div class="header-jantina bg-puteri">TOP 3 PUTERI</div>${topP.length ? buildList(topP) : '<div class="text-center small py-2">Tiada Data</div>'}</div></div></div>`;
+                container.innerHTML += `<div class="mb-4 bg-white border rounded shadow-sm overflow-hidden"><div class="text-center pt-3 pb-2"><span class="ting-title">TINGKATAN ${t}</span></div><div class="row g-0"><div class="col-md-6 border-end p-3"><div class="header-jantina bg-putera w-100">👨 TOP 3 PUTERA</div>${topL.length ? buildList(topL) : '<div class="text-center small py-2 text-muted">Tiada Data</div>'}</div><div class="col-md-6 p-3"><div class="header-jantina bg-puteri w-100">👩 TOP 3 PUTERI</div>${topP.length ? buildList(topP) : '<div class="text-center small py-2 text-muted">Tiada Data</div>'}</div></div></div>`;
             }
         });
     }
@@ -405,7 +456,7 @@
         const senarai = dataSimpananJuzuk[idx];
         const isiModal = document.getElementById('isiModal');
         document.getElementById('tajukModal').innerText = (idx === 30) ? "Senarai Pelajar Khatam" : "Senarai Pelajar: Juzuk " + idx;
-        isiModal.innerHTML = senarai.length ? senarai.map((p, i) => `<tr><td>${i+1}</td><td class="fw-bold">${p.nama}</td><td>${p.kls}</td><td class="text-center">${p.ms}</td></tr>`).join('') : "<tr><td colspan='4' class='text-center'>Tiada pelajar</td></tr>";
+        isiModal.innerHTML = senarai.length ? senarai.map((p, i) => `<tr><td class="text-center">${i+1}</td><td class="fw-bold text-start">${p.nama}</td><td class="text-center">${p.kls}</td><td class="text-center fw-bold">${p.ms}</td></tr>`).join('') : "<tr><td colspan='4' class='text-center text-muted'>Tiada pelajar</td></tr>";
         new bootstrap.Modal(document.getElementById('modalJuzuk')).show();
     }
 
@@ -414,8 +465,8 @@
         if(bChart) bChart.destroy();
         bChart = new Chart(ctx, {
             type: 'bar',
-            data: { labels: ['Khatam', 'Lebih Sukatan', 'Bawah Sukatan'], datasets: [{ label: 'Bilangan Pelajar', data: [s.Khatam, s.Lebih, s.Bawah], backgroundColor: ['#198754', '#0d6efd', '#dc3545'] }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { color: 'white', font: { weight: 'bold', size: 14 } } } }
+            data: { labels: ['Khatam', 'Lebih Sukatan', 'Bawah Sukatan'], datasets: [{ label: 'Bilangan Pelajar', data: [s.Khatam, s.Lebih, s.Bawah], backgroundColor: ['#16a34a', '#2563eb', '#dc2626'], borderRadius: 6 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { color: 'white', font: { weight: 'bold', size: 14 } } }, scales: { y: { beginAtZero: true, grid: { borderDash: [2, 4], color: '#f1f5f9' } }, x: { grid: { display: false } } } }
         });
     }
     window.onload = muatData;
