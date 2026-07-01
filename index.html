@@ -15,11 +15,9 @@
         .logo-container { width: 120px; height: 120px; background: white !important; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto; border: 3px solid #d4af37; overflow: hidden; }
         .school-logo { width: 100px; height: auto; object-fit: contain; }
         .filter-panel { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-top: -30px; position: relative; z-index: 10; }
-        .card { border-radius: 15px; border: 1px solid #eee; margin-bottom: 20px; background: white; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
         .chart-container { position: relative; height: 350px; width: 100%; }
         .total-box { background: #1a4d2e !important; color: white !important; padding: 10px 20px; border-radius: 30px; display: inline-block; margin: 10px 5px; font-weight: bold; }
         
-        /* GRID JUZUK KEMAS (10 KOLUM) */
         .juzuk-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 8px; margin-top: 15px; }
         @media (max-width: 992px) { .juzuk-grid { grid-template-columns: repeat(5, 1fr); } }
         @media (max-width: 576px) { .juzuk-grid { grid-template-columns: repeat(3, 1fr); } }
@@ -31,30 +29,32 @@
         .juzuk-item.active { background: #e8f5e9; border-color: #2e7d32; }
         .juzuk-item.khatam-box { background: #fff3cd; border-color: #ffc107; }
 
-        /* GAYA NAV PILLS / TABS CUSTOM */
-        .nav-pills .nav-link { color: #1a4d2e; font-weight: bold; border: 1px solid #1a4d2e; margin: 5px; border-radius: 20px; font-size: 0.85rem; transition: 0.3s; }
-        .nav-pills .nav-link.active { background-color: #1a4d2e !important; color: white !important; border-color: #1a4d2e; box-shadow: 0 4px 10px rgba(26,77,46,0.2); }
-        
         .header-jantina { padding: 6px; border-radius: 8px; font-weight: bold; margin-bottom: 8px; text-align: center; font-size: 0.8rem; }
         .bg-putera { background-color: #e3f2fd; color: #0d6efd; border: 1px solid #0d6efd; }
         .bg-puteri { background-color: #fce4ec; color: #d63384; border: 1px solid #d63384; }
 
-        .table { color: #212529 !important; }
         .table thead th { background-color: #212529 !important; color: white !important; text-align: center; font-size: 0.75rem; vertical-align: middle; }
         .badge-bawah { border: 2px solid #dc3545 !important; color: #dc3545 !important; font-weight: bold; border-radius: 20px; padding: 2px 10px; font-size: 0.7rem; }
         .txt-peratus { font-size: 0.75rem; display: block; color: #495057; font-weight: bold !important; margin-top: 2px; }
+
+        /* GAYA MENU DROPDOWN */
+        .card-menu { border: none; margin-bottom: 15px; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .menu-header { padding: 15px 20px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; letter-spacing: 0.5px; }
+        .toggle-icon { font-size: 0.8rem; transition: transform 0.3s ease; }
+        .menu-header[aria-expanded="true"] .toggle-icon { transform: rotate(180deg); }
 
         .rank-item { display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; border-bottom: 1px solid #f1f1f1; font-size: 0.85rem; }
         .rank-item:last-child { border-bottom: none; }
         .medal { font-size: 1.1rem; margin-right: 8px; }
         .ting-title { background: #d4af37; color: white; padding: 2px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; display: inline-block; margin-bottom: 10px; }
-        .btn-export { font-size: 0.75rem; font-weight: bold; border-radius: 20px; }
+        .btn-export { font-size: 0.7rem; padding: 2px 10px; border-radius: 20px; font-weight: bold; margin-left: 10px; }
 
         @media print { 
-            .filter-panel, .btn-print, .juzuk-item, .btn-export, .nav, .tab-title-btn { display: none !important; } 
-            .card { page-break-inside: avoid; border: 1px solid #ddd !important; margin-bottom: 20px; } 
+            .filter-panel, .btn-print, .juzuk-item, .btn-export { display: none !important; } 
+            .card-menu { page-break-inside: avoid; border: 1px solid #ddd !important; margin-bottom: 20px; } 
             .juzuk-grid { grid-template-columns: repeat(10, 1fr) !important; gap: 5px; }
-            .tab-pane { display: block !important; opacity: 1 !important; margin-bottom: 30px; }
+            .toggle-icon { display: none !important; }
+            .collapse { display: block !important; height: auto !important; }
         }
     </style>
 </head>
@@ -103,7 +103,7 @@
         <div class="total-box shadow-sm bg-warning text-dark">Pelajar Skip: <span id="totalSkip">0</span> Orang</div>
     </div>
 
-    <div id="ringkasanContainer" class="card p-3 mb-4 d-none">
+    <div id="ringkasanContainer" class="card p-3 mb-4 d-none shadow-sm">
         <h6 class="fw-bold text-success border-bottom pb-2">📊 RINGKASAN PRESTASI MENGIKUT TINGKATAN</h6>
         <div class="table-responsive">
             <table class="table table-bordered text-center align-middle m-0">
@@ -113,96 +113,79 @@
         </div>
     </div>
 
-    <div class="card p-3 mb-4">
+    <div class="card p-3 mb-4 shadow-sm">
         <h6 class="fw-bold text-success border-bottom pb-2 text-center">📖 TABURAN PELAJAR MENGIKUT JUZUK TERKINI</h6>
+        <div class="text-center text-muted small mb-2">Klik pada kotak juzuk untuk lihat senarai nama pelajar.</div>
         <div id="juzukGrid" class="juzuk-grid"></div>
     </div>
 
-    <div class="card p-3 mb-4">
+    <div class="card p-3 mb-4 shadow-sm">
         <h5 id="tajukCarta" class="fw-bold text-success text-center mb-3">Analisis Pencapaian</h5>
         <div class="chart-container"><canvas id="barChart"></canvas></div>
     </div>
 
-    <div class="card p-3 mb-4 btn-print" style="background-color: #f8f9fa;">
-        <h5 class="fw-bold text-dark text-center mb-3">📂 PUSAT SEMAKAN DATA PELAJAR</h5>
-        
-        <ul class="nav nav-pills justify-content-center mb-3" id="pills-tab" role="tablist">
-            <li class="nav-item" role="presentation" id="tabRankLi">
-                <button class="nav-link active" id="pills-rank-tab" data-bs-toggle="pill" data-bs-target="#pills-rank" type="button" role="tab">🌟 TOP 3 TASMIK</button>
-            </li>
-            <li class="nav-item" role="presentation" id="tabGuruLi">
-                <button class="nav-link" id="pills-guru-tab" data-bs-toggle="pill" data-bs-target="#pills-guru" type="button" role="tab">👨‍🏫 IKUT HALAQAH</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="pills-bawah-tab" data-bs-toggle="pill" data-bs-target="#pills-bawah" type="button" role="tab">⚠️ BAWAH SUKATAN</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="pills-skip-tab" data-bs-toggle="pill" data-bs-target="#pills-skip" type="button" role="tab">🟠 SKIP HAFAZAN</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="pills-khatam-tab" data-bs-toggle="pill" data-bs-target="#pills-khatam" type="button" role="tab">🏆 PELAJAR KHATAM</button>
-            </li>
-        </ul>
+    <div id="rankingContainer" class="card card-menu d-none">
+        <div class="menu-header" style="background-color: #fffdf2; color: #b8860b; border-left: 5px solid #d4af37;" data-bs-toggle="collapse" data-bs-target="#collapseRanking">
+            <span>🌟 Pelajar Tasmik Terbanyak (Top 3)</span><span class="toggle-icon">▼</span>
+        </div>
+        <div id="collapseRanking" class="collapse">
+            <div class="card-body" id="rankingContent"></div>
+        </div>
     </div>
 
-    <div class="tab-content" id="pills-tabContent">
-        
-        <div class="tab-pane fade show active" id="pills-rank" role="tabpanel">
-            <div class="card p-3 mb-4" style="background-color: #fffdf2; border-top: 5px solid #d4af37;">
-                <h5 class="fw-bold text-center mb-3 text-dark tab-title-btn">🌟 PELAJAR TASMIK TERBANYAK BULAN INI</h5>
-                <div id="rankingContent"></div>
-            </div>
+    <div id="menuGuruContainer" class="card card-menu d-none">
+        <div class="menu-header text-dark" style="background-color: #0dcaf0; border-left: 5px solid #0bacce;" data-bs-toggle="collapse" data-bs-target="#collapseGuru">
+            <div><span>👨‍🏫 Senarai Pelajar Mengikut Guru Halaqah</span> <button class="btn btn-outline-dark btn-export" onclick="eksportExcelGuru(event)">📥 EXCEL GURU</button></div>
+            <span class="toggle-icon">▼</span>
         </div>
-
-        <div class="tab-pane fade" id="pills-guru" role="tabpanel">
-            <div class="card p-3 mb-4" style="border-top: 5px solid #0dcaf0;">
-                <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3 tab-title-btn">
-                    <h5 class="fw-bold text-dark m-0">👨‍🏫 SENARAI PELAJAR GURU HALAQAH</h5>
-                    <button class="btn btn-info text-white btn-sm btn-export" onclick="eksportExcelGuru()">📥 DOWNLOAD EXCEL GURU</button>
-                </div>
-                <div id="isiMenuGuru"></div>
-            </div>
+        <div id="collapseGuru" class="collapse" style="background-color: #f8f9fa;">
+            <div class="card-body p-3" id="isiMenuGuru"></div>
         </div>
+    </div>
 
-        <div class="tab-pane fade" id="pills-bawah" role="tabpanel">
-            <div class="card p-3 mb-4" style="background-color: #fff9e6; border-top: 5px solid #dc3545;">
-                <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3 tab-title-btn">
-                    <h5 class="fw-bold text-danger m-0">⚠️ SENARAI PELAJAR BAWAH SUKATAN</h5>
-                    <button class="btn btn-danger btn-sm btn-export" onclick="eksportExcel('isiJadualL', 'isiJadualP', 'BAWAH_SUKATAN')">📥 DOWNLOAD EXCEL</button>
-                </div>
+    <div class="card card-menu">
+        <div class="menu-header text-white" style="background-color: #dc3545; border-left: 5px solid #b02a37;" data-bs-toggle="collapse" data-bs-target="#collapseBawah">
+            <div><span>⚠️ Senarai Pelajar Bawah Sukatan</span> <button class="btn btn-outline-light btn-export" onclick="eksportExcel('isiJadualL', 'isiJadualP', 'BAWAH_SUKATAN', event)">📥 EXCEL</button></div>
+            <span class="toggle-icon">▼</span>
+        </div>
+        <div id="collapseBawah" class="collapse" style="background-color: #fff9e6;">
+            <div class="card-body p-3">
                 <div class="header-jantina bg-putera">PUTERA (LELAKI)</div>
-                <div class="table-responsive mb-4"><table class="table table-bordered table-sm align-middle bg-white"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Sukatan</th><th>Ms</th><th>Hutang</th><th>Guru Halaqah</th><th>Pencapaian</th></tr></thead><tbody id="isiJadualL"></tbody></table></div>
+                <div class="table-responsive mb-4"><table class="table table-bordered table-sm align-middle bg-white" id="tblBawahL"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Sukatan</th><th>Ms</th><th>Hutang</th><th>Guru Halaqah</th><th>Pencapaian</th></tr></thead><tbody id="isiJadualL"></tbody></table></div>
                 <div class="header-jantina bg-puteri">PUTERI (PEREMPUAN)</div>
-                <div class="table-responsive"><table class="table table-bordered table-sm align-middle bg-white"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Sukatan</th><th>Ms</th><th>Hutang</th><th>Guru Halaqah</th><th>Pencapaian</th></tr></thead><tbody id="isiJadualP"></tbody></table></div>
+                <div class="table-responsive"><table class="table table-bordered table-sm align-middle bg-white" id="tblBawahP"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Sukatan</th><th>Ms</th><th>Hutang</th><th>Guru Halaqah</th><th>Pencapaian</th></tr></thead><tbody id="isiJadualP"></tbody></table></div>
             </div>
         </div>
+    </div>
 
-        <div class="tab-pane fade" id="pills-skip" role="tabpanel">
-            <div class="card p-3 mb-4" style="background-color: #fff5eb; border-top: 5px solid #ffc107;">
-                <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3 tab-title-btn">
-                    <h5 class="fw-bold text-warning text-dark m-0">🟠 SENARAI PELAJAR SKIP HAFAZAN</h5>
-                    <button class="btn btn-warning btn-sm btn-export text-dark" onclick="eksportExcel('isiSkipL', 'isiSkipP', 'SKIP_HAFAZAN')">📥 DOWNLOAD EXCEL</button>
-                </div>
+    <div class="card card-menu">
+        <div class="menu-header text-dark" style="background-color: #ffc107; border-left: 5px solid #d39e00;" data-bs-toggle="collapse" data-bs-target="#collapseSkip">
+            <div><span>🟠 Senarai Pelajar Skip Hafazan</span> <button class="btn btn-outline-dark btn-export" onclick="eksportExcel('isiSkipL', 'isiSkipP', 'SKIP_HAFAZAN', event)">📥 EXCEL</button></div>
+            <span class="toggle-icon">▼</span>
+        </div>
+        <div id="collapseSkip" class="collapse" style="background-color: #fff5eb;">
+            <div class="card-body p-3">
                 <div class="header-jantina bg-putera">PUTERA (LELAKI)</div>
                 <div class="table-responsive mb-4"><table class="table table-bordered table-sm align-middle bg-white"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Pencapaian Semasa</th><th>Guru Halaqah</th><th>Jumlah M/S Skip</th></tr></thead><tbody id="isiSkipL"></tbody></table></div>
                 <div class="header-jantina bg-puteri">PUTERI (PEREMPUAN)</div>
                 <div class="table-responsive"><table class="table table-bordered table-sm align-middle bg-white"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Pencapaian Semasa</th><th>Guru Halaqah</th><th>Jumlah M/S Skip</th></tr></thead><tbody id="isiSkipP"></tbody></table></div>
             </div>
         </div>
+    </div>
 
-        <div class="tab-pane fade" id="pills-khatam" role="tabpanel">
-            <div class="card p-3 mb-4" style="background-color: #e8f5e9; border-top: 5px solid #198754;">
-                <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3 tab-title-btn">
-                    <h5 class="fw-bold text-success m-0">🏆 SENARAI PELAJAR KHATAM</h5>
-                    <button class="btn btn-success btn-sm btn-export" onclick="eksportExcel('isiKhatamL', 'isiKhatamP', 'PELAJAR_KHATAM')">📥 DOWNLOAD EXCEL</button>
-                </div>
+    <div class="card card-menu">
+        <div class="menu-header text-white" style="background-color: #198754; border-left: 5px solid #146c43;" data-bs-toggle="collapse" data-bs-target="#collapseKhatam">
+            <div><span>🏆 Senarai Pelajar Khatam</span> <button class="btn btn-outline-light btn-export" onclick="eksportExcel('isiKhatamL', 'isiKhatamP', 'PELAJAR_KHATAM', event)">📥 EXCEL</button></div>
+            <span class="toggle-icon">▼</span>
+        </div>
+        <div id="collapseKhatam" class="collapse" style="background-color: #e8f5e9;">
+            <div class="card-body p-3">
                 <div class="header-jantina bg-putera">PUTERA (LELAKI)</div>
                 <div class="table-responsive mb-4"><table class="table table-bordered table-sm align-middle bg-white"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Ms</th><th>Guru Halaqah</th></tr></thead><tbody id="isiKhatamL"></tbody></table></div>
                 <div class="header-jantina bg-puteri">PUTERI (PEREMPUAN)</div>
                 <div class="table-responsive"><table class="table table-bordered table-sm align-middle bg-white"><thead><tr><th>Bil.</th><th>Nama Pelajar</th><th>Kelas</th><th>Ms</th><th>Guru Halaqah</th></tr></thead><tbody id="isiKhatamP"></tbody></table></div>
             </div>
         </div>
-
     </div>
 </div>
 
@@ -257,6 +240,9 @@
     }
 
     function prosesAnalisis(data, dataSblm, filterTing) {
+        document.getElementById('paparTing').innerText = (filterTing === "ALL") ? "KESELURUHAN" : "TINGKATAN " + filterTing;
+        document.getElementById('paparBulan').innerText = document.getElementById('selBulan').options[document.getElementById('selBulan').selectedIndex].text;
+
         const rBody = document.getElementById('isiRingkasan');
         const jGrid = document.getElementById('juzukGrid');
         const tBodyL = document.getElementById('isiJadualL'); const tBodyP = document.getElementById('isiJadualP');
@@ -270,21 +256,16 @@
         dataSimpananJuzuk = Array(31).fill().map(() => []); 
         csvGuruGlobal = [["Guru Halaqah", "Bil", "Nama Pelajar", "Kelas", "Mukasurat", "Status Pencapaian"]];
 
-        // Kawalan Sorok/Tunjuk Tab Ikut Guru Halaqah & Top 3 mengikut Tingkatan
+        // LOGIK SOROK MENU DROPDOWN
         if (filterTing === "ALL") {
-            document.getElementById('tabGuruLi').classList.add('d-none');
-            document.getElementById('tabRankLi').classList.remove('d-none');
-            // Alih tab aktif ke tab 1 jika tab guru sedang aktif
-            if(document.getElementById('pills-guru-tab').classList.contains('active')){
-                bootstrap.Tab.getInstance(document.getElementById('pills-rank-tab')).show();
-            }
+            document.getElementById('menuGuruContainer').classList.add('d-none');
+            document.getElementById('rankingContainer').classList.remove('d-none');
         } else if (filterTing === "5") {
-            document.getElementById('tabGuruLi').classList.remove('d-none');
-            document.getElementById('tabRankLi').classList.add('d-none'); // T5 tiada Top 3
-            bootstrap.Tab.getInstance(document.getElementById('pills-guru-tab')).show();
+            document.getElementById('menuGuruContainer').classList.remove('d-none');
+            document.getElementById('rankingContainer').classList.add('d-none');
         } else {
-            document.getElementById('tabGuruLi').classList.remove('d-none');
-            document.getElementById('tabRankLi').classList.remove('d-none');
+            document.getElementById('menuGuruContainer').classList.remove('d-none');
+            document.getElementById('rankingContainer').classList.remove('d-none');
         }
 
         const mapSblm = new Map();
@@ -417,7 +398,8 @@
         });
     }
 
-    function eksportExcel(idL, idP, tajuk) {
+    function eksportExcel(idL, idP, tajuk, event) {
+        if(event) event.stopPropagation();
         let csv = [];
         let rowsL = document.getElementById(idL).rows;
         let rowsP = document.getElementById(idP).rows;
@@ -430,7 +412,8 @@
         muatTurunCSV(csv.join("\n"), tajuk);
     }
 
-    function eksportExcelGuru() {
+    function eksportExcelGuru(event) {
+        if(event) event.stopPropagation();
         let csvString = csvGuruGlobal.map(e => e.join(",")).join("\n");
         muatTurunCSV(csvString, "GURU_HALAQAH");
     }
