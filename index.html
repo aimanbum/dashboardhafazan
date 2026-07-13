@@ -39,7 +39,7 @@
         .juzuk-item.active { background: #f0fdf4; border-color: #16a34a; }
         .juzuk-item.khatam-box { background: #fffbeb; border-color: #d97706; }
 
-        /* GAYA MENU DROPDOWN (ACCORDION) - SANGAT KEMAS */
+        /* GAYA MENU DROPDOWN (ACCORDION) */
         .card-menu { border: none; margin-bottom: 16px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.04); background-color: #ffffff; transition: 0.2s ease; }
         .card-menu:hover { box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
         .menu-header { padding: 18px 20px; font-weight: 700; cursor: pointer; display: flex; justify-content: space-between; align-items: center; letter-spacing: 0.5px; transition: 0.2s; border-left-width: 6px !important; border-left-style: solid !important; }
@@ -141,13 +141,12 @@
         </div>
     </div>
 
-    <div id="ringkasanContainer" class="card-menu d-none">
+    <div id="ringkasanContainer" class="card-menu">
         <div class="menu-header" style="background-color: #f8fafc; color: #334155; border-color: #94a3b8;" data-bs-toggle="collapse" data-bs-target="#collapseRingkasan">
             <span class="fs-6 m-0">📊 RINGKASAN PRESTASI & ANALISIS</span>
             <span class="toggle-icon">▼</span>
         </div>
-        <div id="collapseRingkasan" class="collapse">
-            <div class="card-body p-4">
+        <div id="collapseRingkasan" class="collapse show"> <div class="card-body p-4">
                 <div class="table-responsive mb-5">
                     <table class="table table-hover text-center align-middle m-0 border">
                         <thead class="table-dark"><tr><th>Tingkatan</th><th>Jumlah</th><th class="bg-success">Khatam</th><th class="bg-primary">Lebih Sukatan (%)</th><th class="bg-danger">Bawah Sukatan (%)</th><th class="bg-warning text-dark">Skip Hafazan (%)</th></tr></thead>
@@ -243,9 +242,7 @@
         var ringkasanCol = document.getElementById('collapseRingkasan');
         if(ringkasanCol) {
             ringkasanCol.addEventListener('shown.bs.collapse', function () {
-                if(bChart) {
-                    bChart.resize(); // Pastikan saiz chart dikira semula bila menu dibuka
-                }
+                if(bChart) { bChart.resize(); }
             });
         }
     });
@@ -312,7 +309,9 @@
         dataSimpananJuzuk = Array(31).fill().map(() => []); 
         csvGuruGlobal = [["Guru Halaqah", "Bil", "Nama Pelajar", "Kelas", "Mukasurat", "Status Pencapaian"]];
 
-        // LOGIK SOROK/TUNJUK MENU
+        // LOGIK TUNJUK MENU GURU/RANKING
+        document.getElementById('ringkasanContainer').classList.remove('d-none'); // SENTIASA ADA
+
         if (filterTing === "ALL") {
             document.getElementById('menuGuruContainer').classList.add('d-none');
             document.getElementById('rankingContainer').classList.remove('d-none');
@@ -418,16 +417,17 @@
 
         paparRankingDinamik(listProgress, filterTing);
 
-        if (filterTing === "ALL") {
-            document.getElementById('ringkasanContainer').classList.remove('d-none');
-            for (let t in tingSummary) {
+        // PAPAR RINGKASAN WALAU APAPUN PILIHAN
+        let tingsArray = filterTing === "ALL" ? ["1", "2", "3", "4", "5"] : [filterTing];
+        tingsArray.forEach(t => {
+            if (tingSummary[t] && (tingSummary[t].t > 0 || filterTing !== "ALL")) {
                 let tot = tingSummary[t].t;
                 let pL = tot > 0 ? (((tingSummary[t].l + tingSummary[t].k) / tot) * 100).toFixed(1) : 0;
                 let pB = tot > 0 ? ((tingSummary[t].b / tot) * 100).toFixed(1) : 0;
                 let pS = tot > 0 ? ((tingSummary[t].s / tot) * 100).toFixed(1) : 0;
                 rBody.innerHTML += `<tr><td class="fw-bold">TING ${t}</td><td>${tot}</td><td class="text-success fw-bold">${tingSummary[t].k}</td><td class="text-primary fw-bold">${tingSummary[t].l}<span class="txt-peratus">(${pL}%)</span></td><td class="text-danger fw-bold">${tingSummary[t].b}<span class="txt-peratus">(${pB}%)</span></td><td class="text-warning fw-bold" style="color:#fd7e14 !important;">${tingSummary[t].s}<span class="txt-peratus">(${pS}%)</span></td></tr>`;
             }
-        } else { document.getElementById('ringkasanContainer').classList.add('d-none'); }
+        });
 
         for (let i = 1; i <= 30; i++) {
             let label = (i === 30) ? "KHATAM" : "Juz " + i;
@@ -456,7 +456,6 @@
         });
     }
 
-    // HALANG MENU DARI TERTUTUP BILA KLIK BUTANG EXCEL
     function eksportExcel(idL, idP, tajuk, event) {
         event.stopPropagation(); 
         let csv = [];
