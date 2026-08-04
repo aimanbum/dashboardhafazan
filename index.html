@@ -146,13 +146,13 @@
         </div>
     </div>
 
-    <!-- MENU 3: RINGKASAN & CARTA (KINI SENTIASA ADA) -->
+    <!-- MENU 3: RINGKASAN & CARTA -->
     <div id="ringkasanContainer" class="card-menu">
         <div class="menu-header" style="background-color: #f8fafc; color: #334155; border-color: #94a3b8;" data-bs-toggle="collapse" data-bs-target="#collapseRingkasan">
             <span class="fs-6 m-0">📊 RINGKASAN PRESTASI & ANALISIS</span>
             <span class="toggle-icon">▼</span>
         </div>
-        <div id="collapseRingkasan" class="collapse show"> <!-- Ditetapkan terbuka (show) -->
+        <div id="collapseRingkasan" class="collapse show">
             <div class="card-body p-4">
                 <div class="table-responsive mb-5">
                     <table class="table table-hover text-center align-middle m-0 border">
@@ -180,7 +180,7 @@
         </div>
     </div>
 
-    <!-- MENU 5: BAWAH SUKATAN (DIKEMASKINI DENGAN INFO SKIP & JUMLAH HUTANG) -->
+    <!-- MENU 5: BAWAH SUKATAN -->
     <div class="card-menu">
         <div class="menu-header" style="background-color: #fef2f2; color: #b91c1c; border-color: #f87171;" data-bs-toggle="collapse" data-bs-target="#collapseBawah">
             <div class="d-flex align-items-center">
@@ -240,7 +240,7 @@
         </div>
     </div>
 
-    <!-- MENU 6: SKIP HAFAZAN -->
+    <!-- MENU 6: SKIP HAFAZAN (DISELARASKAN DENGAN BAWAH SUKATAN) -->
     <div class="card-menu">
         <div class="menu-header" style="background-color: #fffbeb; color: #a16207; border-color: #facc15;" data-bs-toggle="collapse" data-bs-target="#collapseSkip">
             <div class="d-flex align-items-center">
@@ -251,11 +251,51 @@
         </div>
         <div id="collapseSkip" class="collapse">
             <div class="card-body p-4">
+                <div class="alert alert-warning pb-2 pt-2 border-0" style="background-color: #fffbeb; color: #92400e;">
+                    <small><b>Makluman:</b> Kolum <b>Jum. Hutang</b> adalah hasil tambah (Hutang Ms + Skip Ms).</small>
+                </div>
+
                 <div class="header-jantina bg-putera">👨 PUTERA (LELAKI)</div>
-                <div class="table-responsive mb-4"><table class="table table-hover align-middle bg-white border"><thead><tr><th width="5%">Bil</th><th width="35%" class="text-start">Nama Pelajar</th><th>Kelas</th><th>Status</th><th>Guru Halaqah</th><th>Jum. Skip</th></tr></thead><tbody id="isiSkipL"></tbody></table></div>
+                <div class="table-responsive mb-4">
+                    <table class="table table-hover align-middle bg-white border" id="tblSkipL">
+                        <thead>
+                            <tr>
+                                <th width="5%">Bil</th>
+                                <th width="20%" class="text-start">Nama Pelajar</th>
+                                <th>Kelas</th>
+                                <th>Sukatan</th>
+                                <th>Ms</th>
+                                <th title="Sukatan tolak Muka Surat Semasa">Hutang Ms</th>
+                                <th class="text-warning">Skip Ms</th>
+                                <th class="bg-danger text-white">Jum. Hutang</th>
+                                <th>Guru Halaqah</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="isiSkipL"></tbody>
+                    </table>
+                </div>
                 
                 <div class="header-jantina bg-puteri">👩 PUTERI (PEREMPUAN)</div>
-                <div class="table-responsive"><table class="table table-hover align-middle bg-white border"><thead><tr><th width="5%">Bil</th><th width="35%" class="text-start">Nama Pelajar</th><th>Kelas</th><th>Status</th><th>Guru Halaqah</th><th>Jum. Skip</th></tr></thead><tbody id="isiSkipP"></tbody></table></div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle bg-white border" id="tblSkipP">
+                        <thead>
+                            <tr>
+                                <th width="5%">Bil</th>
+                                <th width="20%" class="text-start">Nama Pelajar</th>
+                                <th>Kelas</th>
+                                <th>Sukatan</th>
+                                <th>Ms</th>
+                                <th title="Sukatan tolak Muka Surat Semasa">Hutang Ms</th>
+                                <th class="text-warning">Skip Ms</th>
+                                <th class="bg-danger text-white">Jum. Hutang</th>
+                                <th>Guru Halaqah</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="isiSkipP"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -272,10 +312,10 @@
         <div id="collapseKhatam" class="collapse">
             <div class="card-body p-4">
                 <div class="header-jantina bg-putera">👨 PUTERA (LELAKI)</div>
-                <div class="table-responsive mb-4"><table class="table table-hover align-middle bg-white border"><thead><tr><th width="5%">Bil</th><th width="40%" class="text-start">Nama Pelajar</th><th>Kelas</th><th>Ms</th><th>Guru Halaqah</th></tr></thead><tbody id="isiKhatamL"></tbody></table></div>
+                <div class="table-responsive mb-4"><table class="table table-hover align-middle bg-white border" id="tblKhatamL"><thead><tr><th width="5%">Bil</th><th width="40%" class="text-start">Nama Pelajar</th><th>Kelas</th><th>Ms</th><th>Guru Halaqah</th></tr></thead><tbody id="isiKhatamL"></tbody></table></div>
                 
                 <div class="header-jantina bg-puteri">👩 PUTERI (PEREMPUAN)</div>
-                <div class="table-responsive"><table class="table table-hover align-middle bg-white border"><thead><tr><th width="5%">Bil</th><th width="40%" class="text-start">Nama Pelajar</th><th>Kelas</th><th>Ms</th><th>Guru Halaqah</th></tr></thead><tbody id="isiKhatamP"></tbody></table></div>
+                <div class="table-responsive"><table class="table table-hover align-middle bg-white border" id="tblKhatamP"><thead><tr><th width="5%">Bil</th><th width="40%" class="text-start">Nama Pelajar</th><th>Kelas</th><th>Ms</th><th>Guru Halaqah</th></tr></thead><tbody id="isiKhatamP"></tbody></table></div>
             </div>
         </div>
     </div>
@@ -434,7 +474,7 @@
                 else if(ind.includes('BAWAH')) {
                     s.Bawah++; bilL = isP ? bilL : bilL + 1; bilP = isP ? bilP + 1 : bilP;
                     let hutang = Math.max(0, sukatan-ms);
-                    let jumHutang = hutang + skipValNum; // Jumlah Hutang + Skip
+                    let jumHutang = hutang + skipValNum;
                     
                     let rB = `<tr>
                         <td class="text-center">${isP ? bilP : bilL}</td>
@@ -453,7 +493,21 @@
 
                 if (isSkip) {
                     skipCount++; bilSL = isP ? bilSL : bilSL + 1; bilSP = isP ? bilSP + 1 : bilSP;
-                    let rS = `<tr><td class="text-center">${isP ? bilSP : bilSL}</td><td class="fw-bold text-start text-dark">${nama}</td><td class="text-center">${kls}</td><td class="text-center fw-bold">${ind}</td><td>${guru}</td><td class="fw-bold text-danger text-center">${skipValNum}</td></tr>`;
+                    let hutang = Math.max(0, sukatan-ms);
+                    let jumHutang = hutang + skipValNum;
+                    
+                    let rS = `<tr>
+                        <td class="text-center">${isP ? bilSP : bilSL}</td>
+                        <td class="fw-bold text-start text-dark">${nama}</td>
+                        <td class="text-center">${kls}</td>
+                        <td class="text-center">${sukatan}</td>
+                        <td class="text-center fw-bold">${ms}</td>
+                        <td class="text-center text-secondary">${hutang}</td>
+                        <td class="text-center text-warning" style="font-weight:700; color:#b45309 !important;">${skipValNum}</td>
+                        <td class="text-center text-danger fw-bold fs-6">${jumHutang}</td>
+                        <td class="small">${guru}</td>
+                        <td class="text-center"><span class="badge bg-warning text-dark">${ind}</span></td>
+                    </tr>`;
                     if(isP) tSkipP.innerHTML += rS; else tSkipL.innerHTML += rS;
                 }
 
