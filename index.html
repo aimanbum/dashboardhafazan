@@ -180,7 +180,7 @@
         </div>
     </div>
 
-    <!-- MENU 5: INTERVENSI (GABUNGAN BAWAH SUKATAN & SKIP) -->
+    <!-- MENU 5: INTERVENSI (GABUNGAN BAWAH SUKATAN & SKIP - DISUSUN IKUT HUTANG TERTINGGI) -->
     <div class="card-menu">
         <div class="menu-header" style="background-color: #fef2f2; color: #b91c1c; border-color: #ef4444;" data-bs-toggle="collapse" data-bs-target="#collapseIntervensi">
             <div class="d-flex align-items-center">
@@ -192,7 +192,7 @@
         <div id="collapseIntervensi" class="collapse">
             <div class="card-body p-4">
                 <div class="alert alert-danger pb-2 pt-2 border-0 mb-4" style="background-color: #fef2f2; color: #991b1b;">
-                    <small><b>Makluman:</b> Senarai ini menggabungkan pelajar <b>Bawah Sukatan</b> dan pelajar <b>Skip Hafazan</b> agar tiada pertindihan nama. Kolum <b>Jum. Hutang</b> adalah hasil tambah (Hutang Ms + Skip Ms).</small>
+                    <small><b>Makluman:</b> Senarai disusun mengikut <b>Jum. Hutang tertinggi</b>. Kolum Jum. Hutang adalah hasil tambah (Hutang Ms + Skip Ms).</small>
                 </div>
                 
                 <div class="header-jantina bg-putera">👨 PUTERA (LELAKI)</div>
@@ -366,10 +366,13 @@
         let juzukCounts = Array(31).fill(0); 
         let tingSummary = {"1":{t:0,k:0,l:0,b:0,s:0},"2":{t:0,k:0,l:0,b:0,s:0},"3":{t:0,k:0,l:0,b:0,s:0},"4":{t:0,k:0,l:0,b:0,s:0},"5":{t:0,k:0,l:0,b:0,s:0}};
         let totalCount = 0; let skipCount = 0;
-        let bilIL = 0; let bilIP = 0; // Bilangan Intervensi
         let bilKL = 0; let bilKP = 0; // Bilangan Khatam
         let listProgress = [];
         let guruMap = {};
+        
+        // TEMPAT SIMPAN SEMENTARA UNTUK SORTING INTERVENSI
+        let intervensiPutera = [];
+        let intervensiPuteri = [];
 
         data.forEach(d => {
             const cari = (k) => d[Object.keys(d).find(x => x.toLowerCase().replace(/[\s.]/g, '').includes(k.toLowerCase().replace(/[\s.]/g, '')))] || '';
@@ -420,39 +423,68 @@
                     s.Lebih++;
                 }
 
-                // GABUNGAN KE DALAM JADUAL INTERVENSI (JIKA SKIP ATAU BAWAH SUKATAN)
+                // MASUKKAN KE DALAM ARRAY INTERVENSI
                 if (isBawah || isSkip) {
-                    bilIL = isP ? bilIL : bilIL + 1; 
-                    bilIP = isP ? bilIP + 1 : bilIP;
-                    
                     let hutang = Math.max(0, sukatan-ms);
                     let jumHutang = hutang + skipValNum;
                     
-                    // JANA BADGE (BOLEH ADA DUA BADGE SERENTAK)
-                    let badges = [];
-                    if (isBawah) badges.push('<span class="badge-bawah d-block mb-1">BAWAH</span>');
-                    if (isSkip) badges.push('<span class="badge bg-warning text-dark d-block">SKIP</span>');
-                    let statusHtml = badges.join('');
+                    let objData = { nama, kls, sukatan, ms, hutang, skipValNum, jumHutang, guru, isBawah, isSkip };
                     
-                    let rI = `<tr>
-                        <td class="text-center">${isP ? bilIP : bilIL}</td>
-                        <td class="fw-bold text-start text-dark">${nama}</td>
-                        <td class="text-center">${kls}</td>
-                        <td class="text-center">${sukatan}</td>
-                        <td class="text-center fw-bold">${ms}</td>
-                        <td class="text-center text-secondary">${hutang}</td>
-                        <td class="text-center text-warning" style="font-weight:700; color:#b45309 !important;">${skipValNum}</td>
-                        <td class="text-center text-danger fw-bold fs-6">${jumHutang}</td>
-                        <td class="small">${guru}</td>
-                        <td class="text-center">${statusHtml}</td>
-                    </tr>`;
-                    
-                    if(isP) tIntervensiP.innerHTML += rI; else tIntervensiL.innerHTML += rI;
+                    if(isP) intervensiPuteri.push(objData); 
+                    else intervensiPutera.push(objData);
                 }
 
                 let cJ = ms >= 604 ? 30 : (ms <= 1 ? 0 : Math.ceil((ms - 1) / 20));
                 if (cJ >= 1 && cJ <= 30) { juzukCounts[cJ]++; dataSimpananJuzuk[cJ].push({ nama, kls, ms }); }
             }
+        });
+
+        // ==========================================
+        // PROSES SORTING INTERVENSI (HUTANG TERTINGGI)
+        // ==========================================
+        intervensiPutera.sort((a, b) => b.jumHutang - a.jumHutang);
+        intervensiPuteri.sort((a, b) => b.jumHutang - a.jumHutang);
+
+        // BINA JADUAL PUTERA
+        intervensiPutera.forEach((p, i) => {
+            let badges = [];
+            if (p.isBawah) badges.push('<span class="badge-bawah d-block mb-1">BAWAH</span>');
+            if (p.isSkip) badges.push('<span class="badge bg-warning text-dark d-block">SKIP</span>');
+            let statusHtml = badges.join('');
+            
+            tIntervensiL.innerHTML += `<tr>
+                <td class="text-center">${i + 1}</td>
+                <td class="fw-bold text-start text-dark">${p.nama}</td>
+                <td class="text-center">${p.kls}</td>
+                <td class="text-center">${p.sukatan}</td>
+                <td class="text-center fw-bold">${p.ms}</td>
+                <td class="text-center text-secondary">${p.hutang}</td>
+                <td class="text-center text-warning" style="font-weight:700; color:#b45309 !important;">${p.skipValNum}</td>
+                <td class="text-center text-danger fw-bold fs-6">${p.jumHutang}</td>
+                <td class="small">${p.guru}</td>
+                <td class="text-center">${statusHtml}</td>
+            </tr>`;
+        });
+
+        // BINA JADUAL PUTERI
+        intervensiPuteri.forEach((p, i) => {
+            let badges = [];
+            if (p.isBawah) badges.push('<span class="badge-bawah d-block mb-1">BAWAH</span>');
+            if (p.isSkip) badges.push('<span class="badge bg-warning text-dark d-block">SKIP</span>');
+            let statusHtml = badges.join('');
+            
+            tIntervensiP.innerHTML += `<tr>
+                <td class="text-center">${i + 1}</td>
+                <td class="fw-bold text-start text-dark">${p.nama}</td>
+                <td class="text-center">${p.kls}</td>
+                <td class="text-center">${p.sukatan}</td>
+                <td class="text-center fw-bold">${p.ms}</td>
+                <td class="text-center text-secondary">${p.hutang}</td>
+                <td class="text-center text-warning" style="font-weight:700; color:#b45309 !important;">${p.skipValNum}</td>
+                <td class="text-center text-danger fw-bold fs-6">${p.jumHutang}</td>
+                <td class="small">${p.guru}</td>
+                <td class="text-center">${statusHtml}</td>
+            </tr>`;
         });
 
         // JANA JADUAL GURU HALAQAH
