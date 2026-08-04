@@ -180,24 +180,24 @@
         </div>
     </div>
 
-    <!-- MENU 5: BAWAH SUKATAN -->
+    <!-- MENU 5: INTERVENSI (GABUNGAN BAWAH SUKATAN & SKIP) -->
     <div class="card-menu">
-        <div class="menu-header" style="background-color: #fef2f2; color: #b91c1c; border-color: #f87171;" data-bs-toggle="collapse" data-bs-target="#collapseBawah">
+        <div class="menu-header" style="background-color: #fef2f2; color: #b91c1c; border-color: #ef4444;" data-bs-toggle="collapse" data-bs-target="#collapseIntervensi">
             <div class="d-flex align-items-center">
-                <span class="fs-6 m-0">⚠️ SENARAI PELAJAR BAWAH SUKATAN</span>
-                <button class="btn btn-outline-danger btn-export bg-white" onclick="eksportExcel('isiJadualL', 'isiJadualP', 'BAWAH_SUKATAN', event)">📥 EXCEL</button>
+                <span class="fs-6 m-0">⚠️ SENARAI PELAJAR PERLUKAN INTERVENSI</span>
+                <button class="btn btn-outline-danger btn-export bg-white" onclick="eksportExcel('tblIntervensiL', 'tblIntervensiP', 'PELAJAR_INTERVENSI', event)">📥 EXCEL</button>
             </div>
             <span class="toggle-icon">▼</span>
         </div>
-        <div id="collapseBawah" class="collapse">
+        <div id="collapseIntervensi" class="collapse">
             <div class="card-body p-4">
-                <div class="alert alert-danger pb-2 pt-2 border-0" style="background-color: #fef2f2;">
-                    <small><b>Makluman:</b> Kolum <b>Jum. Hutang</b> adalah hasil tambah (Hutang Ms + Skip Ms).</small>
+                <div class="alert alert-danger pb-2 pt-2 border-0 mb-4" style="background-color: #fef2f2; color: #991b1b;">
+                    <small><b>Makluman:</b> Senarai ini menggabungkan pelajar <b>Bawah Sukatan</b> dan pelajar <b>Skip Hafazan</b> agar tiada pertindihan nama. Kolum <b>Jum. Hutang</b> adalah hasil tambah (Hutang Ms + Skip Ms).</small>
                 </div>
                 
                 <div class="header-jantina bg-putera">👨 PUTERA (LELAKI)</div>
-                <div class="table-responsive mb-4">
-                    <table class="table table-hover align-middle bg-white border" id="tblBawahL">
+                <div class="table-responsive mb-5">
+                    <table class="table table-hover align-middle bg-white border" id="tblIntervensiL">
                         <thead>
                             <tr>
                                 <th width="5%">Bil</th>
@@ -209,16 +209,16 @@
                                 <th class="text-warning">Skip Ms</th>
                                 <th class="bg-danger text-white">Jum. Hutang</th>
                                 <th>Guru Halaqah</th>
-                                <th>Status</th>
+                                <th width="15%">Kategori</th>
                             </tr>
                         </thead>
-                        <tbody id="isiJadualL"></tbody>
+                        <tbody id="isiIntervensiL"></tbody>
                     </table>
                 </div>
                 
                 <div class="header-jantina bg-puteri">👩 PUTERI (PEREMPUAN)</div>
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle bg-white border" id="tblBawahP">
+                    <table class="table table-hover align-middle bg-white border" id="tblIntervensiP">
                         <thead>
                             <tr>
                                 <th width="5%">Bil</th>
@@ -230,82 +230,22 @@
                                 <th class="text-warning">Skip Ms</th>
                                 <th class="bg-danger text-white">Jum. Hutang</th>
                                 <th>Guru Halaqah</th>
-                                <th>Status</th>
+                                <th width="15%">Kategori</th>
                             </tr>
                         </thead>
-                        <tbody id="isiJadualP"></tbody>
+                        <tbody id="isiIntervensiP"></tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MENU 6: SKIP HAFAZAN (DISELARASKAN DENGAN BAWAH SUKATAN) -->
-    <div class="card-menu">
-        <div class="menu-header" style="background-color: #fffbeb; color: #a16207; border-color: #facc15;" data-bs-toggle="collapse" data-bs-target="#collapseSkip">
-            <div class="d-flex align-items-center">
-                <span class="fs-6 m-0">🟠 SENARAI PELAJAR SKIP HAFAZAN</span>
-                <button class="btn btn-outline-warning btn-export bg-white text-dark" onclick="eksportExcel('isiSkipL', 'isiSkipP', 'SKIP_HAFAZAN', event)">📥 EXCEL</button>
-            </div>
-            <span class="toggle-icon">▼</span>
-        </div>
-        <div id="collapseSkip" class="collapse">
-            <div class="card-body p-4">
-                <div class="alert alert-warning pb-2 pt-2 border-0" style="background-color: #fffbeb; color: #92400e;">
-                    <small><b>Makluman:</b> Kolum <b>Jum. Hutang</b> adalah hasil tambah (Hutang Ms + Skip Ms).</small>
-                </div>
-
-                <div class="header-jantina bg-putera">👨 PUTERA (LELAKI)</div>
-                <div class="table-responsive mb-4">
-                    <table class="table table-hover align-middle bg-white border" id="tblSkipL">
-                        <thead>
-                            <tr>
-                                <th width="5%">Bil</th>
-                                <th width="20%" class="text-start">Nama Pelajar</th>
-                                <th>Kelas</th>
-                                <th>Sukatan</th>
-                                <th>Ms</th>
-                                <th title="Sukatan tolak Muka Surat Semasa">Hutang Ms</th>
-                                <th class="text-warning">Skip Ms</th>
-                                <th class="bg-danger text-white">Jum. Hutang</th>
-                                <th>Guru Halaqah</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="isiSkipL"></tbody>
-                    </table>
-                </div>
-                
-                <div class="header-jantina bg-puteri">👩 PUTERI (PEREMPUAN)</div>
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle bg-white border" id="tblSkipP">
-                        <thead>
-                            <tr>
-                                <th width="5%">Bil</th>
-                                <th width="20%" class="text-start">Nama Pelajar</th>
-                                <th>Kelas</th>
-                                <th>Sukatan</th>
-                                <th>Ms</th>
-                                <th title="Sukatan tolak Muka Surat Semasa">Hutang Ms</th>
-                                <th class="text-warning">Skip Ms</th>
-                                <th class="bg-danger text-white">Jum. Hutang</th>
-                                <th>Guru Halaqah</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="isiSkipP"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MENU 7: KHATAM -->
+    <!-- MENU 6: KHATAM -->
     <div class="card-menu">
         <div class="menu-header" style="background-color: #f0fdf4; color: #16a34a; border-color: #4ade80;" data-bs-toggle="collapse" data-bs-target="#collapseKhatam">
             <div class="d-flex align-items-center">
                 <span class="fs-6 m-0">🏆 SENARAI PELAJAR KHATAM</span>
-                <button class="btn btn-outline-success btn-export bg-white" onclick="eksportExcel('isiKhatamL', 'isiKhatamP', 'PELAJAR_KHATAM', event)">📥 EXCEL</button>
+                <button class="btn btn-outline-success btn-export bg-white" onclick="eksportExcel('tblKhatamL', 'tblKhatamP', 'PELAJAR_KHATAM', event)">📥 EXCEL</button>
             </div>
             <span class="toggle-icon">▼</span>
         </div>
@@ -390,14 +330,14 @@
 
         const rBody = document.getElementById('isiRingkasan');
         const jGrid = document.getElementById('juzukGrid');
-        const tBodyL = document.getElementById('isiJadualL'); const tBodyP = document.getElementById('isiJadualP');
-        const tSkipL = document.getElementById('isiSkipL'); const tSkipP = document.getElementById('isiSkipP');
-        const tKhatamL = document.getElementById('isiKhatamL'); const tKhatamP = document.getElementById('isiKhatamP');
+        const tIntervensiL = document.getElementById('isiIntervensiL'); 
+        const tIntervensiP = document.getElementById('isiIntervensiP');
+        const tKhatamL = document.getElementById('isiKhatamL'); 
+        const tKhatamP = document.getElementById('isiKhatamP');
         const isiGuru = document.getElementById('isiMenuGuru');
 
-        rBody.innerHTML = ""; jGrid.innerHTML = ""; tBodyL.innerHTML = ""; tBodyP.innerHTML = ""; 
-        tSkipL.innerHTML = ""; tSkipP.innerHTML = ""; tKhatamL.innerHTML = ""; tKhatamP.innerHTML = "";
-        isiGuru.innerHTML = "";
+        rBody.innerHTML = ""; jGrid.innerHTML = ""; tIntervensiL.innerHTML = ""; tIntervensiP.innerHTML = ""; 
+        tKhatamL.innerHTML = ""; tKhatamP.innerHTML = ""; isiGuru.innerHTML = "";
         dataSimpananJuzuk = Array(31).fill().map(() => []); 
         csvGuruGlobal = [["Guru Halaqah", "Bil", "Nama Pelajar", "Kelas", "Mukasurat", "Status Pencapaian"]];
 
@@ -426,7 +366,8 @@
         let juzukCounts = Array(31).fill(0); 
         let tingSummary = {"1":{t:0,k:0,l:0,b:0,s:0},"2":{t:0,k:0,l:0,b:0,s:0},"3":{t:0,k:0,l:0,b:0,s:0},"4":{t:0,k:0,l:0,b:0,s:0},"5":{t:0,k:0,l:0,b:0,s:0}};
         let totalCount = 0; let skipCount = 0;
-        let bilL = 0; let bilP = 0; let bilSL = 0; let bilSP = 0; let bilKL = 0; let bilKP = 0;
+        let bilIL = 0; let bilIP = 0; // Bilangan Intervensi
+        let bilKL = 0; let bilKP = 0; // Bilangan Khatam
         let listProgress = [];
         let guruMap = {};
 
@@ -445,9 +386,10 @@
                 let ind = (cari('indikator') || "").toUpperCase();
                 let ms = parseFloat(cari('mukasurat')) || 0;
                 let sukatan = parseFloat(cari('sukatansemasa')) || 0;
-                let isSkip = (cari('skip') && cari('skip') !== "" && cari('skip') !== "0") || ind.includes("SKIP");
                 
-                // Ambil nilai numerik untuk skip
+                // MENGESAN STATUS SKIP & BAWAH
+                let isSkip = (cari('skip') && cari('skip') !== "" && cari('skip') !== "0") || ind.includes("SKIP");
+                let isBawah = ind.includes("BAWAH");
                 let skipValNum = parseFloat(cari('skip')) || 0;
 
                 if (filterTing !== "ALL") {
@@ -458,6 +400,7 @@
                 let progress = ms - (mapSblm.get(nama) || 0);
                 listProgress.push({ nama, kls, progress, isP, guru, ting: tingData });
 
+                // PENGIRAAN STATISTIK
                 if (tingSummary[tingData]) {
                     tingSummary[tingData].t++;
                     if(isSkip) tingSummary[tingData].s++;
@@ -466,38 +409,33 @@
                     else if(ind.includes('BAWAH')) tingSummary[tingData].b++;
                 }
 
-                if(ind.includes('KHATAM')) {
+                if (isBawah) s.Bawah++;
+                if (isSkip) skipCount++;
+                if (ind.includes('KHATAM')) {
                     s.Khatam++; bilKL = isP ? bilKL : bilKL + 1; bilKP = isP ? bilKP + 1 : bilKP;
                     let rK = `<tr><td class="text-center">${isP ? bilKP : bilKL}</td><td class="fw-bold text-start text-dark">${nama}</td><td class="text-center">${kls}</td><td class="text-center fw-bold">${ms}</td><td>${guru}</td></tr>`;
                     if(isP) tKhatamP.innerHTML += rK; else tKhatamL.innerHTML += rK;
-                } else if(ind.includes('LEBIH')) s.Lebih++;
-                else if(ind.includes('BAWAH')) {
-                    s.Bawah++; bilL = isP ? bilL : bilL + 1; bilP = isP ? bilP + 1 : bilP;
-                    let hutang = Math.max(0, sukatan-ms);
-                    let jumHutang = hutang + skipValNum;
-                    
-                    let rB = `<tr>
-                        <td class="text-center">${isP ? bilP : bilL}</td>
-                        <td class="fw-bold text-start text-dark">${nama}</td>
-                        <td class="text-center">${kls}</td>
-                        <td class="text-center">${sukatan}</td>
-                        <td class="text-center fw-bold">${ms}</td>
-                        <td class="text-center text-secondary">${hutang}</td>
-                        <td class="text-center text-warning" style="font-weight:700; color:#b45309 !important;">${skipValNum}</td>
-                        <td class="text-center text-danger fw-bold fs-6">${jumHutang}</td>
-                        <td class="small">${guru}</td>
-                        <td class="text-center"><span class="badge-bawah">${ind}</span></td>
-                    </tr>`;
-                    if(isP) tBodyP.innerHTML += rB; else tBodyL.innerHTML += rB;
+                } 
+                else if (ind.includes('LEBIH')) {
+                    s.Lebih++;
                 }
 
-                if (isSkip) {
-                    skipCount++; bilSL = isP ? bilSL : bilSL + 1; bilSP = isP ? bilSP + 1 : bilSP;
+                // GABUNGAN KE DALAM JADUAL INTERVENSI (JIKA SKIP ATAU BAWAH SUKATAN)
+                if (isBawah || isSkip) {
+                    bilIL = isP ? bilIL : bilIL + 1; 
+                    bilIP = isP ? bilIP + 1 : bilIP;
+                    
                     let hutang = Math.max(0, sukatan-ms);
                     let jumHutang = hutang + skipValNum;
                     
-                    let rS = `<tr>
-                        <td class="text-center">${isP ? bilSP : bilSL}</td>
+                    // JANA BADGE (BOLEH ADA DUA BADGE SERENTAK)
+                    let badges = [];
+                    if (isBawah) badges.push('<span class="badge-bawah d-block mb-1">BAWAH</span>');
+                    if (isSkip) badges.push('<span class="badge bg-warning text-dark d-block">SKIP</span>');
+                    let statusHtml = badges.join('');
+                    
+                    let rI = `<tr>
+                        <td class="text-center">${isP ? bilIP : bilIL}</td>
                         <td class="fw-bold text-start text-dark">${nama}</td>
                         <td class="text-center">${kls}</td>
                         <td class="text-center">${sukatan}</td>
@@ -506,9 +444,10 @@
                         <td class="text-center text-warning" style="font-weight:700; color:#b45309 !important;">${skipValNum}</td>
                         <td class="text-center text-danger fw-bold fs-6">${jumHutang}</td>
                         <td class="small">${guru}</td>
-                        <td class="text-center"><span class="badge bg-warning text-dark">${ind}</span></td>
+                        <td class="text-center">${statusHtml}</td>
                     </tr>`;
-                    if(isP) tSkipP.innerHTML += rS; else tSkipL.innerHTML += rS;
+                    
+                    if(isP) tIntervensiP.innerHTML += rI; else tIntervensiL.innerHTML += rI;
                 }
 
                 let cJ = ms >= 604 ? 30 : (ms <= 1 ? 0 : Math.ceil((ms - 1) / 20));
@@ -516,6 +455,7 @@
             }
         });
 
+        // JANA JADUAL GURU HALAQAH
         if (filterTing !== "ALL") {
             Object.keys(guruMap).sort().forEach(g => {
                 let list = guruMap[g];
@@ -577,18 +517,26 @@
         });
     }
 
-    // HALANG MENU DARI TERTUTUP BILA KLIK BUTANG EXCEL
-    function eksportExcel(idL, idP, tajuk, event) {
+    // FUNGSI MUAT TURUN EXCEL UNTUK JADUAL YANG DIPILIH
+    function eksportExcel(idTable1, idTable2, tajuk, event) {
         event.stopPropagation(); 
         let csv = [];
-        let rowsL = document.getElementById(idL).rows;
-        let rowsP = document.getElementById(idP).rows;
+        let table1 = document.getElementById(idTable1);
+        let table2 = document.getElementById(idTable2);
+
+        if(!table1 || !table2) return;
+
+        let rowsL = table1.getElementsByTagName('tbody')[0].rows;
+        let rowsP = table2.getElementsByTagName('tbody')[0].rows;
+        
         let headerRow = [];
-        let ths = rowsL[0] ? rowsL[0].parentElement.previousElementSibling.rows[0].cells : [];
+        let ths = table1.getElementsByTagName('thead')[0].rows[0].cells;
         for (let th of ths) headerRow.push(th.innerText);
         csv.push(headerRow.join(","));
+        
         for (let r of rowsL) { let rData = []; for (let c of r.cells) rData.push('"' + c.innerText + '"'); csv.push(rData.join(",")); }
         for (let r of rowsP) { let rData = []; for (let c of r.cells) rData.push('"' + c.innerText + '"'); csv.push(rData.join(",")); }
+        
         muatTurunCSV(csv.join("\n"), tajuk);
     }
 
