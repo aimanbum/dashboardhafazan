@@ -28,6 +28,7 @@
         .total-box { padding: 12px 25px; border-radius: 50px; display: inline-block; margin: 10px 8px; font-weight: 700; letter-spacing: 0.5px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .bg-total-main { background: #1a4d2e; color: white; }
         .bg-total-skip { background: #ffc107; color: #212529; }
+        .bg-total-bawah { background: #dc2626; color: white; } /* Warna merah untuk Bawah Sukatan */
         
         /* GRID JUZUK */
         .juzuk-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 10px; margin-top: 15px; }
@@ -115,10 +116,11 @@
         </div>
     </div>
 
-    <!-- BOX JUMLAH -->
+    <!-- BOX JUMLAH KESELURUHAN (DITAMBAH BAWAH SUKATAN) -->
     <div class="text-center mb-5">
         <div class="total-box bg-total-main">KAPASITI PELAJAR: <span id="totalPelajar" class="fs-5 ms-1">0</span></div>
         <div class="total-box bg-total-skip">PELAJAR SKIP: <span id="totalSkip" class="fs-5 ms-1">0</span></div>
+        <div class="total-box bg-total-bawah">BAWAH SUKATAN: <span id="totalBawah" class="fs-5 ms-1">0</span></div>
     </div>
 
     <!-- MENU 1: RANKING TASMIK -->
@@ -180,7 +182,7 @@
         </div>
     </div>
 
-    <!-- MENU 5: INTERVENSI (GABUNGAN BAWAH SUKATAN & SKIP - DISUSUN IKUT HUTANG TERTINGGI) -->
+    <!-- MENU 5: INTERVENSI (GABUNGAN BAWAH SUKATAN & SKIP) -->
     <div class="card-menu">
         <div class="menu-header" style="background-color: #fef2f2; color: #b91c1c; border-color: #ef4444;" data-bs-toggle="collapse" data-bs-target="#collapseIntervensi">
             <div class="d-flex align-items-center">
@@ -370,7 +372,6 @@
         let listProgress = [];
         let guruMap = {};
         
-        // TEMPAT SIMPAN SEMENTARA UNTUK SORTING INTERVENSI
         let intervensiPutera = [];
         let intervensiPuteri = [];
 
@@ -423,11 +424,9 @@
                     s.Lebih++;
                 }
 
-                // MASUKKAN KE DALAM ARRAY INTERVENSI
                 if (isBawah || isSkip) {
                     let hutang = Math.max(0, sukatan-ms);
                     let jumHutang = hutang + skipValNum;
-                    
                     let objData = { nama, kls, sukatan, ms, hutang, skipValNum, jumHutang, guru, isBawah, isSkip };
                     
                     if(isP) intervensiPuteri.push(objData); 
@@ -439,52 +438,22 @@
             }
         });
 
-        // ==========================================
-        // PROSES SORTING INTERVENSI (HUTANG TERTINGGI)
-        // ==========================================
+        // SORTING INTERVENSI & BINA JADUAL
         intervensiPutera.sort((a, b) => b.jumHutang - a.jumHutang);
         intervensiPuteri.sort((a, b) => b.jumHutang - a.jumHutang);
 
-        // BINA JADUAL PUTERA
         intervensiPutera.forEach((p, i) => {
             let badges = [];
             if (p.isBawah) badges.push('<span class="badge-bawah d-block mb-1">BAWAH</span>');
             if (p.isSkip) badges.push('<span class="badge bg-warning text-dark d-block">SKIP</span>');
-            let statusHtml = badges.join('');
-            
-            tIntervensiL.innerHTML += `<tr>
-                <td class="text-center">${i + 1}</td>
-                <td class="fw-bold text-start text-dark">${p.nama}</td>
-                <td class="text-center">${p.kls}</td>
-                <td class="text-center">${p.sukatan}</td>
-                <td class="text-center fw-bold">${p.ms}</td>
-                <td class="text-center text-secondary">${p.hutang}</td>
-                <td class="text-center text-warning" style="font-weight:700; color:#b45309 !important;">${p.skipValNum}</td>
-                <td class="text-center text-danger fw-bold fs-6">${p.jumHutang}</td>
-                <td class="small">${p.guru}</td>
-                <td class="text-center">${statusHtml}</td>
-            </tr>`;
+            tIntervensiL.innerHTML += `<tr><td class="text-center">${i + 1}</td><td class="fw-bold text-start text-dark">${p.nama}</td><td class="text-center">${p.kls}</td><td class="text-center">${p.sukatan}</td><td class="text-center fw-bold">${p.ms}</td><td class="text-center text-secondary">${p.hutang}</td><td class="text-center text-warning" style="font-weight:700; color:#b45309 !important;">${p.skipValNum}</td><td class="text-center text-danger fw-bold fs-6">${p.jumHutang}</td><td class="small">${p.guru}</td><td class="text-center">${badges.join('')}</td></tr>`;
         });
 
-        // BINA JADUAL PUTERI
         intervensiPuteri.forEach((p, i) => {
             let badges = [];
             if (p.isBawah) badges.push('<span class="badge-bawah d-block mb-1">BAWAH</span>');
             if (p.isSkip) badges.push('<span class="badge bg-warning text-dark d-block">SKIP</span>');
-            let statusHtml = badges.join('');
-            
-            tIntervensiP.innerHTML += `<tr>
-                <td class="text-center">${i + 1}</td>
-                <td class="fw-bold text-start text-dark">${p.nama}</td>
-                <td class="text-center">${p.kls}</td>
-                <td class="text-center">${p.sukatan}</td>
-                <td class="text-center fw-bold">${p.ms}</td>
-                <td class="text-center text-secondary">${p.hutang}</td>
-                <td class="text-center text-warning" style="font-weight:700; color:#b45309 !important;">${p.skipValNum}</td>
-                <td class="text-center text-danger fw-bold fs-6">${p.jumHutang}</td>
-                <td class="small">${p.guru}</td>
-                <td class="text-center">${statusHtml}</td>
-            </tr>`;
+            tIntervensiP.innerHTML += `<tr><td class="text-center">${i + 1}</td><td class="fw-bold text-start text-dark">${p.nama}</td><td class="text-center">${p.kls}</td><td class="text-center">${p.sukatan}</td><td class="text-center fw-bold">${p.ms}</td><td class="text-center text-secondary">${p.hutang}</td><td class="text-center text-warning" style="font-weight:700; color:#b45309 !important;">${p.skipValNum}</td><td class="text-center text-danger fw-bold fs-6">${p.jumHutang}</td><td class="small">${p.guru}</td><td class="text-center">${badges.join('')}</td></tr>`;
         });
 
         // JANA JADUAL GURU HALAQAH
@@ -510,7 +479,7 @@
 
         paparRankingDinamik(listProgress, filterTing);
 
-        // PAPAR RINGKASAN WALAU APAPUN PILIHAN
+        // PAPAR RINGKASAN
         let tingsArray = filterTing === "ALL" ? ["1", "2", "3", "4", "5"] : [filterTing];
         tingsArray.forEach(t => {
             if (tingSummary[t] && (tingSummary[t].t > 0 || filterTing !== "ALL")) {
@@ -527,8 +496,11 @@
             jGrid.innerHTML += `<div class="juzuk-item ${(i===30?'khatam-box ':'')}${juzukCounts[i]>0?'active':''}" onclick="paparSenaraiJuzuk(${i})"><span class="juzuk-num">${label}</span><span class="juzuk-val">${juzukCounts[i]}</span></div>`;
         }
 
+        // KEMAS KINI KOTAK JUMLAH 
         document.getElementById('totalPelajar').innerText = totalCount;
         document.getElementById('totalSkip').innerText = skipCount;
+        document.getElementById('totalBawah').innerText = s.Bawah;
+
         updateChart(s);
     }
 
@@ -549,7 +521,6 @@
         });
     }
 
-    // FUNGSI MUAT TURUN EXCEL UNTUK JADUAL YANG DIPILIH
     function eksportExcel(idTable1, idTable2, tajuk, event) {
         event.stopPropagation(); 
         let csv = [];
