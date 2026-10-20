@@ -1,0 +1,108 @@
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&display=swap');
+
+/* =========================================================
+   PREMIUM OVERLAY - Dashboard Hafazan SMKATB
+   Letak SELEPAS </style> dalam index.html. Tiada fungsi diubah.
+   ========================================================= */
+:root {
+    --serif: 'Newsreader', Georgia, serif;
+    --gold-soft: #f6efdc;
+    --shadow: 0 1px 2px rgba(18,59,45,.05), 0 12px 32px rgba(18,59,45,.07);
+    --shadow-lift: 0 2px 4px rgba(18,59,45,.06), 0 18px 40px rgba(18,59,45,.11);
+}
+body { background: #f2f5f2; -webkit-font-smoothing: antialiased; }
+.container { max-width: 1240px; }
+
+/* ---------- HERO ---------- */
+.hero { padding: 46px 0 78px; }
+.hero:before { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: linear-gradient(90deg, transparent, var(--gold), transparent); opacity: .7; }
+.hero h2 { font-family: var(--serif); font-weight: 600 !important; letter-spacing: .01em !important; font-size: clamp(1.6rem, 3.4vw, 2.5rem); }
+.hero h5 { font-weight: 500 !important; opacity: .8 !important; letter-spacing: .04em; }
+.logo-container { box-shadow: 0 0 0 4px rgba(201,168,91,.35), 0 14px 30px rgba(0,0,0,.22); }
+
+/* ---------- PANEL TAPISAN ---------- */
+.filter-panel { border-radius: 20px; padding: 24px 28px; box-shadow: var(--shadow-lift); }
+.form-select { background-color: #f8faf8; border-color: #dfe7e1; font-size: 1rem; }
+.form-select:hover { border-color: #b9cdc0; }
+.btn-dark { transition: background .2s, transform .15s; }
+.btn-dark:hover { background: var(--jade); border-color: var(--jade); }
+.btn-dark:active { transform: translateY(1px); }
+.form-select:focus-visible, .btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+/* ---------- KAD JUMLAH ---------- */
+.text-center .total-box { position: relative; overflow: hidden; min-height: 128px; padding: 22px 26px; border-radius: 20px; font-size: .78rem; font-weight: 600; letter-spacing: .03em; }
+.text-center .total-box span { font-family: var(--serif); font-weight: 600; font-size: clamp(2.1rem, 4.4vw, 2.9rem) !important; letter-spacing: -.02em; line-height: 1.05; }
+.bg-total-main { background: radial-gradient(circle at 100% 0, rgba(201,168,91,.28), transparent 45%), linear-gradient(140deg, #123b2d, #23704f); }
+.bg-total-skip { background: #fffdf6; border-color: #eddfb7; box-shadow: inset 4px 0 0 var(--gold), var(--shadow); }
+.bg-total-bawah { background: #fffafa; border-color: #f1d6d1; box-shadow: inset 4px 0 0 #d2665a, var(--shadow); }
+
+/* ---------- KAD MENU ---------- */
+.card-menu { border-radius: 20px; margin-bottom: 20px; border-color: #e3eae5; box-shadow: var(--shadow); }
+.card-menu:hover { box-shadow: var(--shadow-lift); }
+.card-menu .menu-header { --acc: #5b6b66; background: #fff !important; color: var(--ink) !important; border-left-color: var(--acc) !important; border-left-width: 5px !important; font-weight: 650; font-size: .95rem; transition: background .2s; }
+.card-menu .menu-header:hover { background: #f8faf8 !important; filter: none; }
+.menu-header[style*="#b45309"] { --acc: #c9a85b; }
+.menu-header[style*="#0369a1"] { --acc: #2f7f86; }
+.menu-header[style*="#334155"] { --acc: #5b6b66; }
+.menu-header[style*="#15803d"], .menu-header[style*="#16a34a"] { --acc: #28775a; }
+.menu-header[style*="#b91c1c"] { --acc: #c4574a; }
+.toggle-icon { width: 30px; height: 30px; border-radius: 50%; background: #eef3ef; display: inline-flex; align-items: center; justify-content: center; font-size: .62rem; flex-shrink: 0; }
+.menu-header[aria-expanded="true"] .toggle-icon { background: var(--forest); color: #fff; }
+.card-body.bg-light { background: #f6f8f6 !important; }
+
+/* ---------- JADUAL ---------- */
+.table-responsive { border: 1px solid #e3eae5; border-radius: 14px; background: #fff; }
+.table-responsive[style*="border:none"] { border: 0; border-radius: 0; }
+.table.border { border: 0 !important; }
+.table thead th { background: #eef3ef !important; color: var(--forest) !important; border-bottom: 1px solid #dbe5de !important; border-color: #e3eae5 !important; font-weight: 700; }
+.table thead th.bg-success { box-shadow: inset 0 -3px 0 #28775a; }
+.table thead th.bg-primary { box-shadow: inset 0 -3px 0 #4a7fb5; }
+.table thead th.bg-danger { background: #fbeae7 !important; color: #a43c31 !important; box-shadow: inset 0 -3px 0 #d2665a; }
+.table thead th.bg-warning { box-shadow: inset 0 -3px 0 var(--gold); }
+.table thead th.text-warning { color: #8a6414 !important; }
+.table tbody td { font-variant-numeric: tabular-nums; border-color: #eef2ef; }
+.table-hover tbody tr:hover { --bs-table-accent-bg: #f4f9f5; }
+.txt-peratus { display: block; font-size: .68rem; font-weight: 500; opacity: .7; }
+.alert-danger { border-radius: 12px; background: #fdf3f1 !important; border-left: 4px solid #d2665a !important; }
+
+/* ---------- LENCANA ---------- */
+.badge { font-weight: 650; border-radius: 999px; letter-spacing: .02em; }
+.badge.bg-success { background: #e2f0e8 !important; color: #1c5a43 !important; }
+.badge.bg-primary { background: #e5edf6 !important; color: #2f5f8a !important; }
+.badge.bg-danger { background: #fbe9e6 !important; color: #a43c31 !important; }
+.badge.bg-warning { background: #faefd2 !important; color: #7a560f !important; }
+.badge.bg-secondary { background: #eaeeeb !important; color: #4a5a54 !important; }
+.badge-bawah { border: 0; background: #fbe9e6; color: #a43c31; }
+.header-jantina { border-radius: 999px; padding: 7px 16px; }
+.ting-title { font-family: var(--serif); font-size: .95rem; background: var(--gold-soft); }
+
+/* ---------- PAPAN KEDUDUKAN ---------- */
+.rank-item { transition: background .15s; border-radius: 10px; }
+.rank-item:hover { background: #f6faf7; }
+.medal { font-size: 1.3rem; }
+
+/* ---------- JUZUK ---------- */
+.juzuk-item { border-radius: 14px; background: #fafbfa; color: #9aa7a0; }
+.juzuk-item .juzuk-val { font-family: var(--serif); font-weight: 600; font-size: 1.6rem; color: #aab5af; }
+.juzuk-item.active { background: #fff; border-color: #cfe0d5; box-shadow: inset 0 3px 0 var(--jade); }
+.juzuk-item.active .juzuk-val { color: var(--forest); }
+.juzuk-item.khatam-box { background: #fffbef; border-color: #ecd9a2; box-shadow: inset 0 3px 0 var(--gold); }
+.juzuk-item:hover { box-shadow: 0 10px 22px rgba(18,59,45,.12); }
+
+/* ---------- BUTANG EKSPORT & MODAL ---------- */
+.btn-export { border-radius: 999px; padding: 5px 13px; border-color: #cfdcd3 !important; color: var(--forest-2) !important; background: #fff !important; }
+.btn-export:hover { background: var(--forest) !important; color: #fff !important; border-color: var(--forest) !important; }
+.modal-header.bg-success { background: linear-gradient(120deg, #123b2d, #1f6448) !important; padding: 16px 22px; }
+.modal-content { border-radius: 20px; }
+
+@media (max-width: 767px) {
+    .filter-panel { border-radius: 18px; }
+    .text-center .total-box { min-height: 108px; padding: 16px 18px; }
+    .toggle-icon { width: 26px; height: 26px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+@media print {
+    .total-box, .hero, .table thead th, .badge, .badge-bawah, .header-jantina, .ting-title { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .card-menu .menu-header { border-left-width: 1px !important; }
+    .card-menu { border-radius: 8px; }
+}
