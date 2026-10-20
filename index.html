@@ -14,65 +14,91 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     
     <style>
-        body { background-color: #f4f7fa; font-family: 'Inter', sans-serif; color: #2c3e50; }
-        
-        /* HERO SECTION */
-        .hero { background: linear-gradient(135deg, #114227 0%, #1c7c4b 100%); padding: 35px 0; border-bottom: 4px solid #d4af37; text-align: center; color: white; }
-        .logo-container { width: 100px; height: 100px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto; border: 3px solid #d4af37; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        .school-logo { width: 80px; height: auto; object-fit: contain; }
-        
-        /* PANEL TAPISAN */
-        .filter-panel { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.06); margin-top: -30px; position: relative; z-index: 10; border: 1px solid #f0f0f0; }
-        
-        /* KOTAK JUMLAH */
-        .total-box { padding: 12px 25px; border-radius: 50px; display: inline-block; margin: 10px 8px; font-weight: 700; letter-spacing: 0.5px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .bg-total-main { background: #1a4d2e; color: white; }
-        .bg-total-skip { background: #ffc107; color: #212529; }
-        .bg-total-bawah { background: #dc2626; color: white; } /* Warna merah untuk Bawah Sukatan */
-        
-        /* GRID JUZUK */
-        .juzuk-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 10px; margin-top: 15px; }
-        @media (max-width: 992px) { .juzuk-grid { grid-template-columns: repeat(5, 1fr); } }
-        @media (max-width: 576px) { .juzuk-grid { grid-template-columns: repeat(3, 1fr); } }
-        .juzuk-item { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 5px; text-align: center; cursor: pointer; transition: all 0.2s; }
-        .juzuk-item:hover { transform: translateY(-3px); border-color: #1a4d2e; box-shadow: 0 6px 15px rgba(26,77,46,0.1); }
-        .juzuk-num { font-size: 0.65rem; color: #64748b; display: block; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-        .juzuk-val { font-weight: 800; font-size: 1.3rem; color: #1a4d2e; }
-        .juzuk-item.active { background: #f0fdf4; border-color: #16a34a; }
-        .juzuk-item.khatam-box { background: #fffbeb; border-color: #d97706; }
-
-        /* GAYA MENU DROPDOWN (ACCORDION) */
-        .card-menu { border: none; margin-bottom: 16px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.04); background-color: #ffffff; transition: 0.2s ease; }
-        .card-menu:hover { box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
-        .menu-header { padding: 18px 20px; font-weight: 700; cursor: pointer; display: flex; justify-content: space-between; align-items: center; letter-spacing: 0.5px; transition: 0.2s; border-left-width: 6px !important; border-left-style: solid !important; }
-        .menu-header:hover { filter: brightness(0.97); }
-        .toggle-icon { font-size: 0.9rem; transition: transform 0.3s ease; color: #64748b; }
-        .menu-header[aria-expanded="true"] .toggle-icon { transform: rotate(180deg); }
-        
-        /* GAYA JADUAL & LABEL */
-        .table thead th { background-color: #1e293b !important; color: white !important; text-align: center; font-size: 0.75rem; vertical-align: middle; text-transform: uppercase; letter-spacing: 0.5px; padding: 12px; }
-        .table tbody td { padding: 10px; font-size: 0.85rem; vertical-align: middle; }
-        
-        .header-jantina { padding: 6px 15px; border-radius: 6px; font-weight: 700; font-size: 0.75rem; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; }
-        .bg-putera { background-color: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
-        .bg-puteri { background-color: #fdf2f8; color: #db2777; border: 1px solid #fbcfe8; }
-        .badge-bawah { border: 1.5px solid #dc3545; color: #dc3545; font-weight: 700; border-radius: 20px; padding: 3px 10px; font-size: 0.7rem; }
-        
-        .rank-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; }
-        .rank-item:last-child { border-bottom: none; }
-        .medal { font-size: 1.2rem; margin-right: 10px; }
-        .ting-title { background: #d4af37; color: white; padding: 4px 20px; border-radius: 30px; font-size: 0.85rem; font-weight: 800; display: inline-block; box-shadow: 0 4px 10px rgba(212,175,55,0.3); margin-bottom: 15px; }
-        
-        /* BUTANG EXCEL DALAM HEADER */
-        .btn-export { font-size: 0.7rem; font-weight: 700; border-radius: 8px; padding: 4px 12px; margin-left: 15px; letter-spacing: 0.5px; text-transform: uppercase; position: relative; z-index: 5; }
-
-        .chart-container { position: relative; height: 320px; width: 100%; }
-
-        @media print { 
-            .filter-panel, .btn-print, .btn-export, .toggle-icon { display: none !important; }
-            .collapse { display: block !important; height: auto !important; }
-            .card-menu { box-shadow: none !important; border: 1px solid #ddd !important; border-left-width: 1px !important; margin-bottom: 20px; page-break-inside: avoid; }
-        }
+    :root {
+        --forest: #123b2d;
+        --forest-2: #1c5a43;
+        --jade: #28775a;
+        --gold: #c9a85b;
+        --ink: #172b25;
+        --muted: #718079;
+        --surface: #ffffff;
+        --canvas: #f3f6f3;
+        --line: #e5ebe6;
+        --shadow: 0 14px 38px rgba(24, 54, 40, .075);
+    }
+    * { box-sizing: border-box; }
+    body { background: var(--canvas); font-family: 'Inter', sans-serif; color: var(--ink); line-height: 1.55; }
+    .hero { position: relative; overflow: hidden; background: radial-gradient(ellipse at 90% 10%, rgba(201,168,91,.22), transparent 32%), linear-gradient(125deg, #102f25 0%, #174c38 62%, #216449 100%); padding: 40px 0 68px; border: 0; text-align: left; color: white; }
+    .hero:after { content: ''; position: absolute; right: -90px; bottom: -250px; width: 440px; height: 440px; border: 1px solid rgba(255,255,255,.12); border-radius: 50%; box-shadow: 0 0 0 35px rgba(255,255,255,.025), 0 0 0 75px rgba(255,255,255,.02); pointer-events: none; }
+    .hero .container { position: relative; z-index: 1; padding-left: 132px; }
+    .logo-container { position: absolute; left: 12px; top: 0; width: 94px; height: 94px; background: #fff; border-radius: 24px; display: flex; align-items: center; justify-content: center; margin: 0; border: 1px solid rgba(255,255,255,.55); box-shadow: 0 12px 28px rgba(0,0,0,.18); }
+    .school-logo { width: 76px; height: 76px; object-fit: contain; }
+    .hero h2 { font-size: clamp(1.45rem, 3vw, 2.2rem); letter-spacing: -.045em !important; margin: 8px 0 5px; }
+    .hero h5 { font-size: .98rem; letter-spacing: .02em; }
+    .filter-panel { background: var(--surface); border-radius: 18px; padding: 22px 24px; box-shadow: var(--shadow); margin-top: -34px; position: relative; z-index: 10; border: 1px solid rgba(229,235,230,.85); }
+    .form-label { letter-spacing: .09em; font-size: .68rem !important; color: var(--muted) !important; }
+    .form-select { border-color: var(--line); border-radius: 11px; color: var(--ink); }
+    .form-select:focus { border-color: var(--jade); box-shadow: 0 0 0 .2rem rgba(40,119,90,.13); }
+    .btn-dark { background: var(--forest); border-color: var(--forest); border-radius: 11px; }
+    .total-box { width: min(31%, 320px); min-width: 220px; min-height: 118px; padding: 19px 22px; border-radius: 17px; display: inline-flex; flex-direction: column-reverse; align-items: flex-start; justify-content: center; gap: 2px; margin: 0 7px; text-align: left; font-size: .7rem; font-weight: 700; letter-spacing: .09em; box-shadow: var(--shadow); border: 1px solid transparent; }
+    .total-box span { font-size: 2rem !important; line-height: 1.2; margin: 0 !important; letter-spacing: -.05em; }
+    .bg-total-main { background: linear-gradient(140deg, #164d38, #247553); color: white; }
+    .bg-total-skip { background: #fff9e9; color: #855f13; border-color: #f0dfb4; }
+    .bg-total-bawah { background: #fff4f2; color: #a43c31; border-color: #f2d3ce; }
+    .juzuk-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 11px; margin-top: 18px; }
+    @media (max-width: 992px) { .juzuk-grid { grid-template-columns: repeat(5, 1fr); } }
+    @media (max-width: 576px) { .juzuk-grid { grid-template-columns: repeat(3, 1fr); } }
+    .juzuk-item { background: #fff; border: 1px solid var(--line); border-radius: 13px; padding: 14px 5px; text-align: center; cursor: pointer; transition: .2s ease; }
+    .juzuk-item:hover { transform: translateY(-3px); border-color: var(--jade); box-shadow: 0 8px 20px rgba(26,77,46,.10); }
+    .juzuk-num { font-size: .63rem; color: var(--muted); display: block; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+    .juzuk-val { font-weight: 800; font-size: 1.4rem; color: var(--forest); }
+    .juzuk-item.active { background: #f1f8f3; border-color: #9ecab0; }
+    .juzuk-item.khatam-box { background: #fff9ea; border-color: #ead49a; }
+    .card-menu { border: 1px solid var(--line); margin-bottom: 17px; border-radius: 17px; overflow: hidden; box-shadow: 0 5px 18px rgba(25,53,39,.045); background: var(--surface); transition: box-shadow .2s ease; }
+    .card-menu:hover { box-shadow: var(--shadow); }
+    .menu-header { min-height: 64px; padding: 17px 22px; font-weight: 700; cursor: pointer; display: flex; justify-content: space-between; align-items: center; letter-spacing: .01em; transition: .2s; border-left-width: 4px !important; border-left-style: solid !important; }
+    .menu-header:hover { filter: brightness(.985); }
+    .toggle-icon { font-size: .8rem; transition: transform .3s ease; color: var(--muted); }
+    .menu-header[aria-expanded="true"] .toggle-icon { transform: rotate(180deg); }
+    .card-body { padding: 25px !important; }
+    .table { --bs-table-bg: transparent; margin-bottom: 0; }
+    .table thead th { background-color: #183b30 !important; color: white !important; text-align: center; font-size: .68rem; vertical-align: middle; text-transform: uppercase; letter-spacing: .06em; padding: 13px 10px; white-space: nowrap; border-color: rgba(255,255,255,.12); }
+    .table tbody td { padding: 11px 10px; font-size: .82rem; vertical-align: middle; border-color: #edf1ee; }
+    .table-hover tbody tr:hover { --bs-table-accent-bg: #f5f9f6; }
+    .header-jantina { padding: 7px 13px; border-radius: 8px; font-weight: 700; font-size: .68rem; margin-bottom: 12px; text-transform: uppercase; letter-spacing: .08em; display: inline-block; }
+    .bg-putera { background: #edf4f8; color: #34637d; border: 1px solid #d5e5ed; }
+    .bg-puteri { background: #f8eff4; color: #985578; border: 1px solid #eedbe6; }
+    .badge-bawah { border: 1.5px solid #dc3545; color: #dc3545; font-weight: 700; border-radius: 20px; padding: 3px 10px; font-size: .68rem; }
+    .rank-item { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 15px; border-bottom: 1px solid #edf1ee; font-size: .84rem; }
+    .rank-item:last-child { border-bottom: 0; }
+    .medal { font-size: 1.15rem; margin-right: 8px; }
+    .ting-title { background: #f7efd9; color: #805f17; padding: 6px 17px; border-radius: 30px; font-size: .78rem; font-weight: 800; display: inline-block; border: 1px solid #ead8a5; margin-bottom: 12px; }
+    .btn-export { font-size: .66rem; font-weight: 700; border-radius: 8px; padding: 5px 11px; margin-left: 14px; letter-spacing: .05em; text-transform: uppercase; position: relative; z-index: 5; }
+    .chart-container { position: relative; height: 320px; width: 100%; }
+    .modal-content { border-radius: 16px; overflow: hidden; box-shadow: 0 24px 70px rgba(0,0,0,.18); }
+    @media (max-width: 767px) {
+        .hero { padding: 28px 0 56px; }
+        .hero .container { padding-left: 0; text-align: center; }
+        .logo-container { position: static; width: 68px; height: 68px; margin: 0 auto 13px; border-radius: 19px; }
+        .school-logo { width: 56px; height: 56px; }
+        .filter-panel { padding: 18px; }
+        .total-box { width: calc(50% - 12px); min-width: 0; min-height: 105px; margin: 5px; padding: 15px; font-size: .6rem; }
+        .total-box:first-child { width: calc(100% - 10px); }
+        .total-box span { font-size: 1.8rem !important; }
+        .menu-header { padding: 15px; }
+        .menu-header .fs-6 { font-size: .83rem !important; }
+        .card-body { padding: 17px !important; }
+        .btn-export { margin-left: 6px; padding: 4px 7px; font-size: .58rem; }
+        .chart-container { height: 270px; }
+    }
+    @media print {
+        body { background: white; }
+        .filter-panel, .btn-print, .btn-export, .toggle-icon { display: none !important; }
+        .collapse { display: block !important; height: auto !important; }
+        .card-menu { box-shadow: none !important; border: 1px solid #ddd !important; border-left-width: 1px !important; margin-bottom: 20px; page-break-inside: avoid; }
+        .hero { padding: 20px 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .total-box { box-shadow: none; }
+    }
     </style>
 </head>
 <body>
