@@ -307,6 +307,21 @@
         tr { page-break-inside: avoid; }
     }
 
+
+    /* Premium navigation tabs */
+    .premium-tabs{display:flex;align-items:stretch;gap:8px;padding:8px;background:#fff;border:1px solid var(--line);border-radius:17px;box-shadow:0 8px 24px rgba(12,48,35,.055);overflow-x:auto;scrollbar-width:thin}
+    .premium-tab{display:inline-flex;align-items:center;justify-content:center;gap:9px;flex:1 0 auto;min-height:48px;padding:10px 15px;border:1px solid transparent;border-radius:11px;background:transparent;color:#52665b;font:inherit;font-size:.86rem;font-weight:700;white-space:nowrap;cursor:pointer;transition:background .18s,color .18s,box-shadow .18s}
+    .premium-tab:hover{background:#f2f7f3;color:var(--forest)}
+    .premium-tab.active{color:#fff;background:linear-gradient(135deg,#103d2c,#23734f);box-shadow:0 5px 13px rgba(16,61,44,.18)}
+    .premium-tab .tab-icon{font-size:1rem;line-height:1}
+    .premium-tab:disabled{opacity:.42;cursor:not-allowed}
+    .tab-section{display:none!important}
+    .tab-section.tab-visible{display:block!important}
+    .tab-section .collapse,.tab-section .collapse:not(.show){display:block!important;height:auto!important;visibility:visible!important}
+    .tab-section .menu-header{cursor:default}
+    .tab-section .toggle-icon{display:none!important}
+    @media(max-width:767px){.premium-tabs{gap:5px;padding:6px;border-radius:14px}.premium-tab{min-height:44px;padding:9px 12px;font-size:.78rem;gap:6px}.premium-tab .tab-icon{font-size:.92rem}}
+
     </style>
 </head>
 <body>
@@ -350,6 +365,16 @@
         </div>
     </div>
 
+    <!-- NAVIGASI TAB PREMIUM -->
+    <nav class="premium-tabs mb-4" aria-label="Navigasi dashboard">
+        <button type="button" class="premium-tab active" data-tab="analisis" onclick="tukarTab('analisis')"><span class="tab-icon">▥</span><span>Analisis</span></button>
+        <button type="button" class="premium-tab" data-tab="ranking" onclick="tukarTab('ranking')"><span class="tab-icon">🏆</span><span>Ranking</span></button>
+        <button type="button" class="premium-tab" data-tab="juzuk" onclick="tukarTab('juzuk')"><span class="tab-icon">📖</span><span>Taburan Juzuk</span></button>
+        <button type="button" class="premium-tab" data-tab="intervensi" onclick="tukarTab('intervensi')"><span class="tab-icon">⚠</span><span>Intervensi</span></button>
+        <button type="button" class="premium-tab" data-tab="khatam" onclick="tukarTab('khatam')"><span class="tab-icon">🏅</span><span>Khatam</span></button>
+        <button type="button" class="premium-tab" data-tab="guru" onclick="tukarTab('guru')"><span class="tab-icon">♙</span><span>Guru Halaqah</span></button>
+    </nav>
+
     <!-- BOX JUMLAH KESELURUHAN (DITAMBAH BAWAH SUKATAN) -->
     <div class="text-center mb-5">
         <div class="total-box bg-total-main">KAPASITI PELAJAR: <span id="totalPelajar" class="fs-5 ms-1">0</span></div>
@@ -358,8 +383,8 @@
     </div>
 
     <!-- MENU 1: RANKING TASMIK -->
-    <div id="rankingContainer" class="card-menu d-none">
-        <div class="menu-header" style="background-color: #fffbeb; color: #b45309; border-color: #fbbf24;" data-bs-toggle="collapse" data-bs-target="#collapseRanking">
+    <div id="rankingContainer" class="card-menu tab-section d-none" data-tab-section="ranking">
+        <div class="menu-header" style="background-color: #fffbeb; color: #b45309; border-color: #fbbf24;">
             <span class="fs-6 m-0">🌟 PELAJAR TASMIK TERBANYAK BULAN INI (TOP 3)</span>
             <span class="toggle-icon">▼</span>
         </div>
@@ -369,8 +394,8 @@
     </div>
 
     <!-- MENU 2: GURU HALAQAH -->
-    <div id="menuGuruContainer" class="card-menu d-none">
-        <div class="menu-header" style="background-color: #f0f9ff; color: #0369a1; border-color: #38bdf8;" data-bs-toggle="collapse" data-bs-target="#collapseGuru">
+    <div id="menuGuruContainer" class="card-menu tab-section d-none" data-tab-section="guru">
+        <div class="menu-header" style="background-color: #f0f9ff; color: #0369a1; border-color: #38bdf8;">
             <div class="d-flex align-items-center">
                 <span class="fs-6 m-0">👨‍🏫 SENARAI PELAJAR MENGIKUT GURU HALAQAH</span>
                 <button class="btn btn-outline-primary btn-export bg-white" onclick="eksportExcelGuru(event)">📥 MUAT TURUN</button>
@@ -383,8 +408,8 @@
     </div>
 
     <!-- MENU 3: RINGKASAN & CARTA -->
-    <div id="ringkasanContainer" class="card-menu">
-        <div class="menu-header" style="background-color: #f8fafc; color: #334155; border-color: #94a3b8;" data-bs-toggle="collapse" data-bs-target="#collapseRingkasan">
+    <div id="ringkasanContainer" class="card-menu tab-section" data-tab-section="analisis">
+        <div class="menu-header" style="background-color: #f8fafc; color: #334155; border-color: #94a3b8;">
             <span class="fs-6 m-0">📊 RINGKASAN PRESTASI & ANALISIS</span>
             <span class="toggle-icon">▼</span>
         </div>
@@ -403,8 +428,8 @@
     </div>
 
     <!-- MENU 4: JUZUK GRID -->
-    <div class="card-menu">
-        <div class="menu-header" style="background-color: #f0fdf4; color: #15803d; border-color: #4ade80;" data-bs-toggle="collapse" data-bs-target="#collapseJuzuk">
+    <div id="juzukContainer" class="card-menu tab-section" data-tab-section="juzuk">
+        <div class="menu-header" style="background-color: #f0fdf4; color: #15803d; border-color: #4ade80;">
             <span class="fs-6 m-0">📖 TABURAN PELAJAR MENGIKUT JUZUK TERKINI</span>
             <span class="toggle-icon">▼</span>
         </div>
@@ -417,8 +442,8 @@
     </div>
 
     <!-- MENU 5: INTERVENSI (GABUNGAN BAWAH SUKATAN & SKIP) -->
-    <div class="card-menu">
-        <div class="menu-header" style="background-color: #fef2f2; color: #b91c1c; border-color: #ef4444;" data-bs-toggle="collapse" data-bs-target="#collapseIntervensi">
+    <div id="intervensiContainer" class="card-menu tab-section" data-tab-section="intervensi">
+        <div class="menu-header" style="background-color: #fef2f2; color: #b91c1c; border-color: #ef4444;">
             <div class="d-flex align-items-center">
                 <span class="fs-6 m-0">⚠️ SENARAI PELAJAR PERLUKAN INTERVENSI</span>
                 <button class="btn btn-outline-danger btn-export bg-white" onclick="eksportExcel('tblIntervensiL', 'tblIntervensiP', 'PELAJAR_INTERVENSI', event)">📥 EXCEL</button>
@@ -477,8 +502,8 @@
     </div>
 
     <!-- MENU 6: KHATAM -->
-    <div class="card-menu">
-        <div class="menu-header" style="background-color: #f0fdf4; color: #16a34a; border-color: #4ade80;" data-bs-toggle="collapse" data-bs-target="#collapseKhatam">
+    <div id="khatamContainer" class="card-menu tab-section" data-tab-section="khatam">
+        <div class="menu-header" style="background-color: #f0fdf4; color: #16a34a; border-color: #4ade80;">
             <div class="d-flex align-items-center">
                 <span class="fs-6 m-0">🏆 SENARAI PELAJAR KHATAM</span>
                 <button class="btn btn-outline-success btn-export bg-white" onclick="eksportExcel('tblKhatamL', 'tblKhatamP', 'PELAJAR_KHATAM', event)">📥 EXCEL</button>
@@ -736,6 +761,9 @@
         document.getElementById('totalBawah').innerText = s.Bawah;
 
         updateChart(s);
+        kemasKiniTabTersedia();
+        const activeTab = document.querySelector('.premium-tab.active');
+        tukarTab(activeTab && !activeTab.disabled ? activeTab.dataset.tab : 'analisis');
     }
 
     function paparRankingDinamik(list, filterTing) {
@@ -810,6 +838,35 @@
             options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { color: 'white', font: { weight: 'bold', size: 14 } } }, scales: { y: { beginAtZero: true, grid: { borderDash: [2, 4], color: '#f1f5f9' } }, x: { grid: { display: false } } } }
         });
     }
+
+    function tukarTab(tabId) {
+        const sections = document.querySelectorAll('[data-tab-section]');
+        const target = document.querySelector('[data-tab-section="' + tabId + '"]');
+        if (!target || target.classList.contains('d-none')) {
+            if (tabId !== 'analisis') tukarTab('analisis');
+            return;
+        }
+        sections.forEach(section => {
+            section.classList.toggle('tab-visible', section.getAttribute('data-tab-section') === tabId);
+        });
+        document.querySelectorAll('.premium-tab').forEach(button => {
+            const active = button.dataset.tab === tabId;
+            button.classList.toggle('active', active);
+            button.setAttribute('aria-selected', active ? 'true' : 'false');
+        });
+        const nav = document.querySelector('.premium-tabs');
+        if (nav) window.scrollTo({top: Math.max(0, nav.offsetTop - 16), behavior: 'smooth'});
+    }
+
+    function kemasKiniTabTersedia() {
+        document.querySelectorAll('.premium-tab').forEach(button => {
+            const section = document.querySelector('[data-tab-section="' + button.dataset.tab + '"]');
+            button.disabled = !!section && section.classList.contains('d-none');
+        });
+        const active = document.querySelector('.premium-tab.active');
+        if (active && active.disabled) tukarTab('analisis');
+    }
+
     window.onload = muatData;
 </script>
 </body>
